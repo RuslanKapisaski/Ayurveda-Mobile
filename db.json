@@ -1,0 +1,88 @@
+{
+  "therapies": [
+    {
+      "id": 1,
+      "name": "Shirodhara",
+      "description": "A continuous stream of warm herbal oil poured on the forehead to calm the nervous system.",
+      "duration": 45,
+      "benefits": ["Stress relief", "Better sleep", "Mental clarity"],
+      "type": "Relaxation"
+    },
+    {
+      "id": 2,
+      "name": "Abhyanga",
+      "description": "Full body oil massage to detoxify and rejuvenate the body.",
+      "duration": 60,
+      "benefits": ["Improves circulation", "Detoxification", "Skin health"],
+      "type": "Detox"
+    },
+    {
+      "id": 3,
+      "name": "Panchakarma",
+      "description": "Deep detox program for cleansing the body from toxins.",
+      "duration": 120,
+      "benefits": ["Total detox", "Immunity boost", "Weight balance"],
+      "type": "Therapy Program"
+    }
+  ],
+
+  "medicines": [
+    {
+      "id": 1,
+      "name": "Triphala",
+      "description": "Herbal blend used to improve digestion and detoxify the body.",
+      "dosage": "2 capsules daily",
+      "durationDays": 14
+    },
+    {
+      "id": 2,
+      "name": "Ashwagandha",
+      "description": "Adaptogenic herb to reduce stress and increase energy.",
+      "dosage": "1 capsule in the morning",
+      "durationDays": 30
+    },
+    {
+      "id": 3,
+      "name": "Chyawanprash",
+      "description": "Herbal jam to boost immunity and vitality.",
+      "dosage": "1 spoon after breakfast",
+      "durationDays": 21
+    }
+  ],
+
+  "programs": [
+    {
+      "id": 1,
+      "name": "Panchakarma Detox",
+      "startDate": "2026-01-12",
+      "endDate": "2026-01-26",
+      "progress": 60,
+      "therapyIds": [1, 2, 3],
+      "medicineIds": [1, 2, 3]
+    }
+  ],
+
+  "visits": [
+    {
+      "id": 1,
+      "date": "2026-01-13",
+      "therapyId": 1,
+      "notes": "Felt very relaxed after the session."
+    },
+    {
+      "id": 2,
+      "date": "2026-01-15",
+      "therapyId": 2,
+      "notes": "Body felt lighter and more energetic."
+    }
+  ],
+
+  "users": [
+    {
+      "id": 1,
+      "name": "Maria Ivanova",
+      "email": "maria@test.com",
+      "currentProgramId": 1
+    }
+  ]
+}
