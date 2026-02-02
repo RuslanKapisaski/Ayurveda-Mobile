@@ -22,10 +22,41 @@
       "description": "Deep detox program for cleansing the body from toxins.",
       "duration": 120,
       "benefits": ["Total detox", "Immunity boost", "Weight balance"],
-      "type": "Therapy Program"
+      "type": "Therapy"
+    },
+    {
+      "id": 4,
+      "name": "Matra vasti",
+      "description": "Matra Vasti is a specialized Ayurvedic Panchakarma procedure classified as a type of Sneha Vasti (fat-based enema). It involves the administration of a small, precisely measured quantity (roughly 50–120 ml) of warm medicated oil or ghee into the rectum to balance Vata dosha. ",
+      "duration": 15,
+      "benefits": ["Total detox", "Detox of toxines", "Weight balance"],
+      "type": "Therapy"
+    },
+    {
+      "id": 5,
+      "name": "Kashaya vasti",
+      "description": "Kashaya Vasti is a mode of parenteral drug administration. Parenteral refers to medication which is not administered through the digestive system. ",
+      "duration": 40,
+      "benefits": ["Total detox", "Detox of toxines", "Weight balance"],
+      "type": "Therapy"
+    },
+    {
+      "id": 6,
+      "name": "Podi Kizi",
+      "description": "Podi Kizi is a traditional Ayurvedic therapy involving a massage with small cotton bundles filled with a heated blend of medicinal herbal powders, salt, and sometimes rice ",
+      "duration": 50,
+      "benefits": ["Total detox", "Detox of toxines", "Weight loss"],
+      "type": "Therapy"
+    },
+    {
+      "id": 7,
+      "name": "Nasya",
+      "description": "Nasya is an Ayurvedic Panchakarma therapy (detoxification) that involves administering herbal oils, ghee, powders, or juices through the nasal passages to treat disorders above the clavicle (head, nose, throat, ears). ",
+      "duration": 30,
+      "benefits": ["Clear mind", "Mind detox"],
+      "type": "Therapy"
     }
   ],
-
   "medicines": [
     {
       "id": 1,
@@ -49,19 +80,32 @@
       "durationDays": 21
     }
   ],
-
   "programs": [
     {
       "id": 1,
       "name": "Panchakarma Detox",
-      "startDate": "2026-01-12",
-      "endDate": "2026-01-26",
-      "progress": 60,
+      "startDate": "2026-03-15",
+      "endDate": "2026-03-29",
       "therapyIds": [1, 2, 3],
+      "medicineIds": [1, 2, 3]
+    },
+    {
+      "id": 2,
+      "name": "Ayurveda Smart Detox",
+      "startDate": "2026-04-19",
+      "endDate": "2026-04-22",
+      "therapyIds": [1, 2, 3],
+      "medicineIds": [1, 2, 3]
+    },
+    {
+      "id": 3,
+      "name": "Ayurveda Recharge",
+      "startDate": "2026-04-19",
+      "endDate": "2026-04-22",
+      "therapyIds": [2, 4, 6, 7],
       "medicineIds": [1, 2, 3]
     }
   ],
-
   "visits": [
     {
       "id": 1,
@@ -76,7 +120,6 @@
       "notes": "Body felt lighter and more energetic."
     }
   ],
-
   "users": [
     {
       "id": 1,
