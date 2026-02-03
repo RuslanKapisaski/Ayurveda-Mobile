@@ -3,6 +3,7 @@
     {
       "id": 1,
       "name": "Shirodhara",
+      "imageUrl": "https://www.starlingholistic.co.uk/uploads/1/3/8/4/138425273/starling-holistic-shirodhara-720_orig.jpg",
       "description": "A continuous stream of warm herbal oil poured on the forehead to calm the nervous system.",
       "duration": 45,
       "benefits": ["Stress relief", "Better sleep", "Mental clarity"],
@@ -11,6 +12,8 @@
     {
       "id": 2,
       "name": "Abhyanga",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTs1pqfCZejVqYP5RKe6Fd-bylhNgdOhsiE-g&s",
+
       "description": "Full body oil massage to detoxify and rejuvenate the body.",
       "duration": 60,
       "benefits": ["Improves circulation", "Detoxification", "Skin health"],
@@ -19,6 +22,8 @@
     {
       "id": 3,
       "name": "Panchakarma",
+      "imageUrl": "https://www.ayurvedabansko.bg/wp-content/uploads/2022/04/psnchakarma-detox.png",
+
       "description": "Deep detox program for cleansing the body from toxins.",
       "duration": 120,
       "benefits": ["Total detox", "Immunity boost", "Weight balance"],
@@ -27,6 +32,7 @@
     {
       "id": 4,
       "name": "Matra vasti",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTf2KY0zBptY1dUCRUW8KB52Xsd0JC1BnEEGA&s",
       "description": "Matra Vasti is a specialized Ayurvedic Panchakarma procedure classified as a type of Sneha Vasti (fat-based enema). It involves the administration of a small, precisely measured quantity (roughly 50–120 ml) of warm medicated oil or ghee into the rectum to balance Vata dosha. ",
       "duration": 15,
       "benefits": ["Total detox", "Detox of toxines", "Weight balance"],
@@ -35,6 +41,8 @@
     {
       "id": 5,
       "name": "Kashaya vasti",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ2m7d4XXljcZtG6VTvoNud_b803hWfW-Zcmw&s",
+
       "description": "Kashaya Vasti is a mode of parenteral drug administration. Parenteral refers to medication which is not administered through the digestive system. ",
       "duration": 40,
       "benefits": ["Total detox", "Detox of toxines", "Weight balance"],
@@ -43,6 +51,8 @@
     {
       "id": 6,
       "name": "Podi Kizi",
+      "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTL6ry44dZJLIHTTUvGd80c-wnwm2JVv0eX2w&s",
+
       "description": "Podi Kizi is a traditional Ayurvedic therapy involving a massage with small cotton bundles filled with a heated blend of medicinal herbal powders, salt, and sometimes rice ",
       "duration": 50,
       "benefits": ["Total detox", "Detox of toxines", "Weight loss"],
@@ -51,39 +61,59 @@
     {
       "id": 7,
       "name": "Nasya",
+      "imageUrl": "https://ayurwayayurveda.com/wp-content/uploads/2025/02/Nasya-Therapy-for-Stress.jpg",
+
       "description": "Nasya is an Ayurvedic Panchakarma therapy (detoxification) that involves administering herbal oils, ghee, powders, or juices through the nasal passages to treat disorders above the clavicle (head, nose, throat, ears). ",
       "duration": 30,
       "benefits": ["Clear mind", "Mind detox"],
       "type": "Therapy"
     }
   ],
+
   "medicines": [
     {
       "id": 1,
-      "name": "Triphala",
-      "description": "Herbal blend used to improve digestion and detoxify the body.",
-      "dosage": "2 capsules daily",
-      "durationDays": 14
-    },
-    {
-      "id": 2,
       "name": "Ashwagandha",
-      "description": "Adaptogenic herb to reduce stress and increase energy.",
-      "dosage": "1 capsule in the morning",
+      "imageUrl": "https://eu-images.contentstack.com/v3/assets/blt2183a7e3152cc969/blt812a9a79fa6d9667/674f7f29a2038423bc9dab8c/ashwagandha.jpg?width=1280&auto=webp&quality=80&disable=upscale",
+      "description": "Adaptogenic herb that reduces stress, improves energy and supports immunity.",
+      "dosage": "1 capsule twice daily after meals",
+      "purpose": "Stress, fatigue, nervous system balance",
       "durationDays": 30
     },
     {
-      "id": 3,
-      "name": "Chyawanprash",
-      "description": "Herbal jam to boost immunity and vitality.",
-      "dosage": "1 spoon after breakfast",
+      "id": 2,
+      "name": "Triphala",
+      "imageUrl": "https://thegoodbug.com/cdn/shop/articles/Benefits_and_Therapeutic_uses_of_Triphala_for_gut_health_97e499fa-d367-48b6-8968-e64ca3e84ab5.jpg?v=1755682595",
+      "description": "Traditional blend for digestive health and detoxification.",
+      "dosage": "1 teaspoon in warm water before bed",
+      "purpose": "Digestion, detox, bowel regulation",
       "durationDays": 21
+    },
+    {
+      "id": 3,
+      "name": "Brahmi",
+      "imageUrl": "https://bilkite.net/wp-content/uploads/2023/06/brahmi-bilkitenet.jpg",
+      "description": "Enhances memory, focus and calms the mind.",
+      "dosage": "1 capsule in the morning",
+      "purpose": "Mental clarity, anxiety, concentration",
+      "durationDays": 28
+    },
+    {
+      "id": 4,
+      "name": "Chyawanprash",
+      "imageUrl": "https://www.metropolisindia.com/upgrade/blog/upload/25/11/Chyawanprash%20Benefits1763645506.webp",
+      "description": "Herbal jam for immunity and rejuvenation.",
+      "dosage": "1 teaspoon in the morning",
+      "purpose": "Immunity, vitality",
+      "durationDays": 60
     }
   ],
+
   "programs": [
     {
       "id": 1,
       "name": "Panchakarma Detox",
+      "imageUrl": "https://ayurveda-kerala.org/wp-content/uploads/2024/02/New-Project-1-768x523.webp",
       "startDate": "2026-03-15",
       "endDate": "2026-03-29",
       "therapyIds": [1, 2, 3],
@@ -92,6 +122,7 @@
     {
       "id": 2,
       "name": "Ayurveda Smart Detox",
+      "imageUrl": "https://thumbnail-cloud.naturaltherapypages.com.au/unsafe/620x290/smart/https://mediacache.naturaltherapypages.com.au/creative/articles/ntp/4514/6953c45759fd9.jpg",
       "startDate": "2026-04-19",
       "endDate": "2026-04-22",
       "therapyIds": [1, 2, 3],
@@ -100,12 +131,55 @@
     {
       "id": 3,
       "name": "Ayurveda Recharge",
+      "imageUrl": "https://d29rsonz3qynlj.cloudfront.net/joyful_lemur_21286_Close_up_still_life_of_Ayurvedic_fertility_b529ad03_016a_4d3d_ac36_a0ef7d87f6ab_3_11zon_3e1a14fec5.jpg",
       "startDate": "2026-04-19",
       "endDate": "2026-04-22",
       "therapyIds": [2, 4, 6, 7],
       "medicineIds": [1, 2, 3]
     }
   ],
+
+  "nutritionPlans": [
+    {
+      "id": 1,
+      "name": "Vata Balancing Diet",
+      "imageUrl": "https://i.imgur.com/01VTYhc.jpeg",
+      "description": "Warm, nourishing foods to ground and stabilize the nervous system.",
+      "recommendedFoods": [
+        "Cooked vegetables",
+        "Rice",
+        "Ghee",
+        "Warm soups",
+        "Oats"
+      ],
+      "avoid": ["Cold drinks", "Raw food", "Caffeine"]
+    },
+    {
+      "id": 2,
+      "name": "Pitta Cooling Diet",
+      "imageUrl": "https://i.imgur.com/UpQw2KF.jpeg",
+
+      "description": "Foods that reduce heat and inflammation in the body.",
+      "recommendedFoods": [
+        "Cucumber",
+        "Mint",
+        "Coconut",
+        "Sweet fruits",
+        "Rice"
+      ],
+      "avoid": ["Spicy food", "Alcohol", "Fried food"]
+    },
+    {
+      "id": 3,
+      "name": "Kapha Detox Diet",
+      "imageUrl": "https://i.imgur.com/QUeRWDR.jpeg",
+
+      "description": "Light and stimulating foods to increase metabolism and energy.",
+      "recommendedFoods": ["Vegetable soups", "Legumes", "Spices", "Green tea"],
+      "avoid": ["Dairy", "Sugar", "Heavy foods"]
+    }
+  ],
+
   "visits": [
     {
       "id": 1,
@@ -120,6 +194,7 @@
       "notes": "Body felt lighter and more energetic."
     }
   ],
+
   "users": [
     {
       "id": 1,
