@@ -5,19 +5,23 @@ import { Text } from "react-native";
 import { KeyboardAvoidingView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { validate } from "../utils/validate";
+import useAuth from "../auth/useAuth";
 
-export default function LoginScreen() {
+export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
+  const { login, isLoading, error, clearError } = useAuth();
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     setErrors({});
-    console.log(errors);
-
     const validationErrors = validate({ email, password }, "login");
-
     setErrors(validationErrors);
+
+    if (Object.keys(validationErrors).length === 0) {
+      console.log("API Key:", process.env.EXPO_PUBLIC_FIREBASE_API_KEY);
+      login(email, password);
+    }
   };
   return (
     <SafeAreaView style={styles.container}>
@@ -26,7 +30,7 @@ export default function LoginScreen() {
         style={styles.inner}
       >
         <Text style={styles.title}>Login</Text>
-
+        {error && <Text style={styles.error}>{error}</Text>}
         <TextInput
           placeholder="Email"
           style={styles.input}
@@ -47,7 +51,7 @@ export default function LoginScreen() {
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => {}}>
+        <TouchableOpacity onPress={() => navigation.navigate("Register")}>
           <Text style={styles.link}>
             Do not have an account? Register here!
           </Text>

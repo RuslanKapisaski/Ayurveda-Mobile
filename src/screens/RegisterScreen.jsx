@@ -6,7 +6,7 @@ import { KeyboardAvoidingView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { validate } from "../utils/validate";
 
-export default function RegisterScreen() {
+export default function RegisterScreen({ navigation }) {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -15,7 +15,6 @@ export default function RegisterScreen() {
 
   const handleRegister = () => {
     setErrors({});
-    console.log(errors);
 
     const validationErrors = validate(
       { username, email, password, confirmPassword },
@@ -23,6 +22,10 @@ export default function RegisterScreen() {
     );
 
     setErrors(validationErrors);
+
+    if (Object.keys(validationErrors).length === 0) {
+      register(username, email, password);
+    }
   };
   return (
     <SafeAreaView style={styles.container}>
@@ -70,7 +73,7 @@ export default function RegisterScreen() {
           <Text style={styles.buttonText}>Register</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => {}}>
+        <TouchableOpacity onPress={() => navigation.navigate("Login")}>
           <Text style={styles.link}>Already have account?</Text>
         </TouchableOpacity>
       </KeyboardAvoidingView>
