@@ -4,7 +4,9 @@ import { TextInput } from "react-native";
 import { Text } from "react-native";
 import { KeyboardAvoidingView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
 import { validate } from "../utils/validate";
+import useAuth from "../auth/useAuth";
 
 export default function RegisterScreen({ navigation }) {
   const [username, setUsername] = useState("");
@@ -12,9 +14,11 @@ export default function RegisterScreen({ navigation }) {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState({});
+  const { error, register, clearError } = useAuth();
 
   const handleRegister = () => {
     setErrors({});
+    clearError();
 
     const validationErrors = validate(
       { username, email, password, confirmPassword },
@@ -34,6 +38,7 @@ export default function RegisterScreen({ navigation }) {
         style={styles.inner}
       >
         <Text style={styles.title}>Register</Text>
+        {error && <Text style={styles.error}>{error}</Text>}
 
         <TextInput
           placeholder="Full Name"
