@@ -6,21 +6,16 @@ import { KeyboardAvoidingView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { validate } from "../utils/validate";
 
-export default function RegisterScreen() {
-  const [username, setUsername] = useState("");
+export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState({});
 
-  const handleRegister = () => {
+  const handleLogin = () => {
     setErrors({});
     console.log(errors);
 
-    const validationErrors = validate(
-      { username, email, password, confirmPassword },
-      "register",
-    );
+    const validationErrors = validate({ email, password }, "login");
 
     setErrors(validationErrors);
   };
@@ -30,15 +25,7 @@ export default function RegisterScreen() {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.inner}
       >
-        <Text style={styles.title}>Register</Text>
-
-        <TextInput
-          placeholder="Full Name"
-          style={styles.input}
-          value={username}
-          onChangeText={setUsername}
-        />
-        {errors.username && <Text style={styles.error}>{errors.username}</Text>}
+        <Text style={styles.title}>Login</Text>
 
         <TextInput
           placeholder="Email"
@@ -56,22 +43,14 @@ export default function RegisterScreen() {
         />
         {errors.password && <Text style={styles.error}>{errors.password}</Text>}
 
-        <TextInput
-          placeholder="Confirm password"
-          style={styles.input}
-          value={confirmPassword}
-          onChangeText={setConfirmPassword}
-        />
-        {errors.confirmPassword && (
-          <Text style={styles.error}>{errors.confirmPassword}</Text>
-        )}
-
-        <TouchableOpacity style={styles.button} onPress={handleRegister}>
-          <Text style={styles.buttonText}>Register</Text>
+        <TouchableOpacity style={styles.button} onPress={handleLogin}>
+          <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => {}}>
-          <Text style={styles.link}>Already have account?</Text>
+          <Text style={styles.link}>
+            Do not have an account? Register here!
+          </Text>
         </TouchableOpacity>
       </KeyboardAvoidingView>
     </SafeAreaView>
