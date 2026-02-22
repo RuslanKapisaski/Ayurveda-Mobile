@@ -15,14 +15,15 @@ export default function LoginScreen({ navigation }) {
 
   const handleLogin = async () => {
     setErrors({});
+    clearError({});
     const validationErrors = validate({ email, password }, "login");
     setErrors(validationErrors);
 
     if (Object.keys(validationErrors).length === 0) {
-      console.log("API Key:", process.env.EXPO_PUBLIC_FIREBASE_API_KEY);
       login(email, password);
     }
   };
+
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
@@ -30,7 +31,9 @@ export default function LoginScreen({ navigation }) {
         style={styles.inner}
       >
         <Text style={styles.title}>Login</Text>
+
         {error && <Text style={styles.error}>{error}</Text>}
+
         <TextInput
           placeholder="Email"
           style={styles.input}

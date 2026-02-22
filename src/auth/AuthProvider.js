@@ -87,7 +87,7 @@ export function AuthProvider({ children }) {
       register,
       logout: async () => {
         try {
-          await signOut(user);
+          await signOut(auth);
           setAuthState({ user: null });
         } catch (error) {
           setError(error.message || "An error occured while logging out");
