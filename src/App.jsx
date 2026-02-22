@@ -10,6 +10,7 @@ export default function App() {
     <NavigationContainer>
         <StatusBar style="auto" />
       <AuthProvider>
+        <AppNavigator />
       </AuthProvider>
     </NavigationContainer>
   );
