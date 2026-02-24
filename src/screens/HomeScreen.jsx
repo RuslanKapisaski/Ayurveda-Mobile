@@ -4,260 +4,179 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  SafeAreaView,
   TouchableOpacity,
   Image,
   Alert,
   FlatList,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-import { fetchTerapies } from "../api/therapy.api";
-import { fetchMedicines } from "../api/medicines.api";
-import { fetchNutritionPlans } from "../api/nutritionPlans.api";
-import { fetchPrograms } from "../api/programs.api";
-import InfoCard from "../components/InfoCard";
+import Button from "../components/Button";
+import useAuth from "../auth/useAuth";
 
 export default function HomeScreen() {
-  const [therapies, setTherapies] = useState([]);
-  const [medicines, setMedicines] = useState([]);
-  const [nutritionPlans, setNutritionPlans] = useState([]);
-  const [programs, setPrograms] = useState([]);
-
-  const navigation = useNavigation();
-
-  fetchData(setTherapies, setMedicines, setNutritionPlans, setPrograms);
-
-  const renderCard = (item, type) => (
-    <InfoCard
-      data={item}
-      type={type}
-      key={item.id}
-      onPress={() => navigation.navigate("Details", { data: item, type })}
-    />
-  );
+  const { user } = useAuth();
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.content}>
-        {/* Hero */}
-        <Image
-          source={{
-            uri: "https://vediherbals.com/cdn/shop/articles/AyurvedaHistory.jpg?v=1739768432",
-          }}
-          style={styles.heroImage}
-          resizeMode="cover"
-        />
-        <Text style={styles.brand}>Ayurveda Journey</Text>
-        <Text style={styles.hero}>
-          Natural healing for body, mind and balance
-        </Text>
-
-        {/* What is Ayurveda */}
-        <View style={styles.section}>
-          <Text style={styles.title}>What is Ayurveda?</Text>
-          <Text style={styles.text}>
-            Ayurveda is a holistic healing system that focuses on restoring
-            balance between body, mind, and lifestyle. Instead of treating
-            symptoms, it addresses the root cause of imbalance.
-          </Text>
+    <SafeAreaView style={styles.safe}>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        {/* HEADER */}
+        <View style={styles.header}>
+          <View>
+            <Text style={styles.greeting}>Good Morning,</Text>
+            <Text style={styles.username}>{user.name} 🌿</Text>
+          </View>
+          <Image source={{ uri: user.avatar }} style={styles.avatar} />
         </View>
 
-        {/* Our Mission */}
-        <View style={styles.section}>
-          <Text style={styles.title}>Our Mission</Text>
-          <Text style={styles.text}>
-            We help people achieve long-term health and vitality through
-            personalized therapies, herbal medicine, and mindful living.
-          </Text>
+        {/* NEXT APPOINTMENT */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Next Appointment</Text>
+          <Text style={styles.cardMain}>23 Feb • 14:00</Text>
+          <Text style={styles.cardSub}>Initial Consultation</Text>
         </View>
 
-        {/* What We Offer */}
-        <View style={styles.offerSection}>
-          <Text style={styles.title}>What We Offer</Text>
+        {/* ACTIVE THERAPY */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Active Therapy</Text>
+          <Text style={styles.cardMain}>Vata Balancing Program</Text>
+          <Text style={styles.cardSub}>Day 7 of 21</Text>
+        </View>
 
-          {/* Therapies */}
-          <Text style={styles.cardTitle}>Therapies</Text>
-          <Text style={styles.cardText}>
-            Personalized treatments for detox, stress and healing
-          </Text>
-          {therapies.length > 0 ? (
-            <FlatList
-              horizontal
-              data={therapies}
-              keyExtractor={(item) => item.id.toString()}
-              renderItem={({ item }) => renderCard(item, "therapy")}
-              showsHorizontalScrollIndicator={false}
-            />
-          ) : (
-            <Text>No available therapies.</Text>
-          )}
+        {/* HERBAL REMINDER */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Today’s Herbal Intake</Text>
+          <Text style={styles.cardSub}>• Ashwagandha – 1 capsule</Text>
+          <Text style={styles.cardSub}>• Triphala – evening</Text>
+        </View>
 
-          {/* Herbal Medicine */}
-          <Text style={styles.cardTitle}>Herbal Medicine</Text>
-          <Text style={styles.cardText}>
-            Natural herbs prescribed for your unique body type
-          </Text>
-          {medicines.length > 0 ? (
-            <FlatList
-              horizontal
-              data={medicines}
-              keyExtractor={(item) => item.id.toString()}
-              renderItem={({ item }) => renderCard(item, "medicine")}
-              showsHorizontalScrollIndicator={false}
-            />
-          ) : (
-            <Text>No available medicines.</Text>
-          )}
+        {/* PROGRESS */}
+        <View style={styles.progressContainer}>
+          <View style={styles.progressBox}>
+            <Text style={styles.progressNumber}>3</Text>
+            <Text style={styles.progressLabel}>Therapies</Text>
+          </View>
+          <View style={styles.progressBox}>
+            <Text style={styles.progressNumber}>14</Text>
+            <Text style={styles.progressLabel}>Active Days</Text>
+          </View>
+          <View style={styles.progressBox}>
+            <Text style={styles.progressNumber}>2</Text>
+            <Text style={styles.progressLabel}>Herbal Plans</Text>
+          </View>
+        </View>
 
-          {/* Nutrition Plans */}
-          <Text style={styles.cardTitle}>Nutrition</Text>
-          <Text style={styles.cardText}>
-            Food plans designed to support your dosha and energy
-          </Text>
-          {nutritionPlans.length > 0 ? (
-            <FlatList
-              horizontal
-              data={nutritionPlans}
-              keyExtractor={(item) => item.id.toString()}
-              renderItem={({ item }) => renderCard(item, "nutrition")}
-              showsHorizontalScrollIndicator={false}
-            />
-          ) : (
-            <Text>No available nutrition plans.</Text>
-          )}
-
-          {/* Detox Programs */}
-          <Text style={styles.cardTitle}>Detox</Text>
-          <Text style={styles.cardText}>
-            Detox programs that help clean toxins out of your body
-          </Text>
-          {programs.length > 0 ? (
-            <FlatList
-              horizontal
-              data={programs}
-              keyExtractor={(item) => item.id.toString()}
-              renderItem={({ item }) => renderCard(item, "detox")}
-              showsHorizontalScrollIndicator={false}
-            />
-          ) : (
-            <Text>No available programs.</Text>
-          )}
-
-          {/* Call to action */}
-          <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText}>Start Your Journey</Text>
-          </TouchableOpacity>
+        {/* QUICK ACTIONS */}
+        <View style={styles.actionsContainer}>
+          <Button text="Book Therapy" active={true} />
+          <Button text="My Progress" active={false} />
         </View>
       </ScrollView>
     </SafeAreaView>
   );
-
-  function fetchData() {
-    useEffect(() => {
-      const loadData = async () => {
-        try {
-          const [
-            therapiesData,
-            medicinesData,
-            nutritionPlansData,
-            programsData,
-          ] = await Promise.all([
-            fetchTerapies(),
-            fetchMedicines(),
-            fetchNutritionPlans(),
-            fetchPrograms(),
-          ]);
-
-          setTherapies(therapiesData.data);
-          setMedicines(medicinesData.data);
-          setNutritionPlans(nutritionPlansData.data);
-          setPrograms(programsData.data);
-        } catch (error) {
-          Alert.alert("Error", `Cannot load data: ${error}!`, [
-            { text: "Cancel" },
-            { text: "OK" },
-          ]);
-        }
-      };
-
-      loadData();
-    }, []);
-  }
 }
 
 const styles = StyleSheet.create({
-  container: {
+  safe: {
     flex: 1,
-    backgroundColor: "#000000",
+    backgroundColor: "#f6f1e4",
   },
-  content: {
-    padding: 8,
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 20,
   },
-  heroImage: {
-    width: "100%",
-    height: 200,
-    borderRadius: 8,
-  },
-  brand: {
-    fontSize: 14,
-    color: "#ffffff",
-    letterSpacing: 2,
-    textTransform: "uppercase",
-    marginTop: 8,
-  },
-  hero: {
-    fontSize: 28,
-    fontWeight: "700",
-    color: "#b9e4d8",
-    marginTop: 6,
-    marginBottom: 24,
-  },
-  section: {
-    backgroundColor: "#a2c0ad",
-    padding: 16,
-    marginBottom: 12,
-    borderRadius: 8,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "600",
-    color: "#efefef",
-    marginBottom: 8,
-  },
-  text: {
+
+  greeting: {
     fontSize: 16,
-    lineHeight: 24,
-    color: "#4F6F64",
+    color: "#777",
   },
-  offerSection: {
-    backgroundColor: "#3a4c43",
-    marginVertical: 6,
-    borderEndEndRadius: 8,
-    paddingVertical: 16,
-    paddingHorizontal: 8,
+
+  username: {
+    fontSize: 22,
+    fontWeight: "bold",
+    color: "#2E2E2E",
+  },
+
+  avatar: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+  },
+
+  card: {
+    backgroundColor: "#FFFFFF",
+    marginHorizontal: 10,
+    // iOS Shadow
+    shadowColor: "#224324",
+    shadowOffset: { width: 10, height: 10 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    // Android Shadow
+    elevation: 8,
+    marginBottom: 16,
+    padding: 20,
+    borderRadius: 16,
   },
   cardTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#bdd0cb",
-    marginTop: 12,
-  },
-  cardText: {
     fontSize: 14,
-    color: "#ffffff",
+    color: "#4A7C59",
     marginBottom: 6,
   },
-  button: {
-    backgroundColor: "#1F3F36",
-    padding: 16,
-    borderRadius: 12,
-    alignItems: "center",
-    marginTop: 16,
-    marginBottom: 40,
-  },
-  buttonText: {
-    color: "#FFFFFF",
+
+  cardMain: {
+    fontSize: 20,
     fontWeight: "600",
+    height: 80,
+    color: "#012b10",
+  },
+
+  cardSub: {
+    fontSize: 16,
+    color: "#666",
+    marginTop: 4,
+  },
+
+  progressContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginHorizontal: 20,
+    marginBottom: 20,
+  },
+
+  progressBox: {
+    backgroundColor: "#FFFFFF",
+    flex: 1,
+    marginHorizontal: 10,
+    padding: 20,
+    borderRadius: 16,
+    alignItems: "center",
+    // iOS Shadow
+    shadowColor: "#224324",
+    shadowOffset: { width: 10, height: 10 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    // Android Shadow
+    elevation: 8,
+  },
+
+  progressNumber: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#4A7C59",
+  },
+
+  progressLabel: {
+    fontSize: 10,
+    color: "#777",
+    marginTop: 4,
+  },
+
+  actionsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 10,
+    marginHorizontal: 40,
   },
 });
