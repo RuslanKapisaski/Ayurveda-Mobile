@@ -19,7 +19,7 @@ export default function AppNavigator() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       {isAuthenticated ? (
-        <Stack.Screen name="Home" component={RootNavigator} />
+        <Stack.Screen name="App" component={RootNavigator} />
       ) : (
         <Stack.Screen name="Auth" component={AuthNavigator} />
       )}

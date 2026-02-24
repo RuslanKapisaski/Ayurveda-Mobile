@@ -16,6 +16,7 @@ import useAuth from "../auth/useAuth";
 
 export default function HomeScreen() {
   const { user } = useAuth();
+  console.log(user);
 
   return (
     <SafeAreaView style={styles.safe}>

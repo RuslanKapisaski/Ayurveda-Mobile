@@ -28,6 +28,7 @@ export function AuthProvider({ children }) {
           user: {
             id: user.uid,
             email: user.email,
+            name: user.displayName,
           },
         });
       } else {
@@ -61,7 +62,7 @@ export function AuthProvider({ children }) {
       setIsLoading(true);
 
       const user = await authService.register(name, email, password);
-
+      
       setAuthState({
         user: {
           id: user.uid,
