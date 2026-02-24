@@ -7,6 +7,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { validate } from "../utils/validate";
 import useAuth from "../auth/useAuth";
+import ImagePicker from "../components/ImagePicker";
 
 export default function RegisterScreen({ navigation }) {
   const [username, setUsername] = useState("");
@@ -15,6 +16,7 @@ export default function RegisterScreen({ navigation }) {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState({});
   const { error, register, clearError } = useAuth();
+  const [imageUrl, setImageUrl] = useState(null);
 
   const handleRegister = () => {
     setErrors({});
@@ -40,6 +42,7 @@ export default function RegisterScreen({ navigation }) {
         <Text style={styles.title}>Register</Text>
         {error && <Text style={styles.error}>{error}</Text>}
 
+        <ImagePicker onImagePicked={setImageUrl} imageUri={imageUrl} />
         <TextInput
           placeholder="Full Name"
           style={styles.input}
@@ -47,7 +50,6 @@ export default function RegisterScreen({ navigation }) {
           onChangeText={setUsername}
         />
         {errors.username && <Text style={styles.error}>{errors.username}</Text>}
-
         <TextInput
           placeholder="Email"
           style={styles.input}
@@ -55,29 +57,27 @@ export default function RegisterScreen({ navigation }) {
           onChangeText={setEmail}
         />
         {errors.email && <Text style={styles.error}>{errors.email}</Text>}
-
         <TextInput
           placeholder="Password"
           style={styles.input}
           value={password}
+          secureTextEntry={true}
           onChangeText={setPassword}
         />
         {errors.password && <Text style={styles.error}>{errors.password}</Text>}
-
         <TextInput
           placeholder="Confirm password"
           style={styles.input}
           value={confirmPassword}
+          secureTextEntry={true}
           onChangeText={setConfirmPassword}
         />
         {errors.confirmPassword && (
           <Text style={styles.error}>{errors.confirmPassword}</Text>
         )}
-
         <TouchableOpacity style={styles.button} onPress={handleRegister}>
           <Text style={styles.buttonText}>Register</Text>
         </TouchableOpacity>
-
         <TouchableOpacity onPress={() => navigation.navigate("Login")}>
           <Text style={styles.link}>Already have account?</Text>
         </TouchableOpacity>

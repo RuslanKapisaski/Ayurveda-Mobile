@@ -46,6 +46,7 @@ export default function LoginScreen({ navigation }) {
           placeholder="Password"
           style={styles.input}
           value={password}
+          secureTextEntry={true}
           onChangeText={setPassword}
         />
         {errors.password && <Text style={styles.error}>{errors.password}</Text>}
