@@ -35,8 +35,8 @@ export default function TherapyDetailsScreen({ route, navigation }) {
     loadTherapy();
   }, [therapyDocId]);
 
-  const onSignUp = () => {
-    navigation.navigate("Booking");
+  const onSignUp = (therapyId) => {
+    navigation.navigate("Booking", { therapyId });
   };
 
   if (isLoading) return <ActivityIndicator size="large" style={{ flex: 1 }} />;
@@ -69,9 +69,11 @@ export default function TherapyDetailsScreen({ route, navigation }) {
       <Text style={styles.sectionTitle}>Duration</Text>
       <Text style={styles.duration}>{therapy.durationMinutes} minutes</Text>
 
-      <TouchableOpacity style={styles.signUpButton} onPress={onSignUp}>
-        <Text style={styles.signUpButtonText}>Sign Up for Therapy</Text>
-      </TouchableOpacity>
+      <Button
+        text="Sign Up for Therapy"
+        active={true}
+        onPress={() => onSignUp(therapy.id)}
+      />
     </ScrollView>
   );
 }
@@ -136,10 +138,7 @@ const styles = StyleSheet.create({
     color: "#444",
   },
   signUpButton: {
-    marginTop: 24,
-    backgroundColor: "#118161",
-    paddingVertical: 14,
-    borderRadius: 10,
+    marginTop: 20,
     alignItems: "center",
   },
   signUpButtonText: {
