@@ -3,9 +3,9 @@ import { Ionicons } from "@expo/vector-icons";
 
 import HomeNavigator from "./HomeNavigator";
 import MyProfileScreen from "../screens/MyProfileScreen";
-import TherapiesScreen from "../screens/TherapiesScreen";
 import AppointmentsScreen from "../screens/AppointmentsScreen";
-import NutritionPlansScreen from "../screens/NutritionPlansScreen";
+import ProgramsScreen from "../screens/ProgramsScreen";
+import TherapiesNavigator from "./TherapiesNavigator";
 
 const Tabs = createBottomTabNavigator();
 
@@ -16,7 +16,7 @@ export default function RootNavigator() {
         headerShown: false,
         tabBarActiveTintColor: "#118161",
         tabBarInactiveTintColor: "#888",
-        tabBarLabelStyle: { fontSize: 10, fontWeight: "500" },
+        tabBarLabelStyle: { fontSize: 10, fontWeight: "600" },
       }}
     >
       <Tabs.Screen
@@ -31,8 +31,8 @@ export default function RootNavigator() {
       />
 
       <Tabs.Screen
-        name="Therapies"
-        component={TherapiesScreen}
+        name="TherapiesStack"
+        component={TherapiesNavigator}
         options={{
           tabBarLabel: "Therapies",
           tabBarIcon: ({ color, size }) => (
@@ -53,12 +53,8 @@ export default function RootNavigator() {
       />
 
       <Tabs.Screen
-        name="NutitionPlans"
-        component={NutritionPlansScreen}
         options={{
-          tabBarLabel: "Nutiotion Plans",
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="restaurant" size={size} color={color} />
           ),
         }}
       />
