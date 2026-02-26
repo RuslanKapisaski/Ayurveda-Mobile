@@ -30,7 +30,3 @@ export async function getById(id) {
     throw new Error("Failed to fetch this therapy");
   }
 }
-
-export async function getOne() {}
-export async function create() {}
-export async function edit() {}

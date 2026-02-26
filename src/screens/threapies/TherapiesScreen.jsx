@@ -39,13 +39,12 @@ export default function TherapiesScreen({ navigation }) {
 
       <FlatList
         data={therapies}
-        keyExtractor={(item) => item.id} 
+        keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <TherapyCard
             therapy={item}
-            onPress={
-              () =>
-                navigation.navigate("TherapyDetails", { therapyDocId: item.id })
+            onPress={() =>
+              navigation.navigate("TherapyDetails", { therapyDocId: item.id })
             }
           />
         )}

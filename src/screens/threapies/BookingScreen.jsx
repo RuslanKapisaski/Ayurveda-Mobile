@@ -18,7 +18,7 @@ import Button from "../../components/Button";
 import useAuth from "../../auth/useAuth.js";
 
 import * as therapiesService from "../../services/therapiesService.js";
-import * as appointmentsService from "../../services/appointmensService.js";
+import * as appointmentsService from "../../services/appointmentsService.js";
 
 export default function BookingScreen({ route, navigation }) {
   const [therapy, setTherapy] = useState(null);
