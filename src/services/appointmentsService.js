@@ -1,16 +1,27 @@
-import { collection, addDoc, getDocs, query, where } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  query,
+  where,
+  getDoc,
+  deleteDoc,
+  doc,
+  serverTimestamp,
+} from "firebase/firestore";
 import { db } from "../fireBaseConfig";
 
 export async function create(appointmentData) {
   try {
-    const docRef = await addDoc(
-      collection(db, "appointments"),
-      appointmentData,
-    );
-    console.log("Document written with ID: ", docRef.id);
+    const docRef = await addDoc(collection(db, "appointments"), {
+      ...appointmentData,
+      createdAt: serverTimestamp(),
+    });
+
+    return docRef.id;
   } catch (e) {
     console.error("Error adding appointment: ", e);
-    throw new Error("Failed appointent creation:", e.message);
+    throw new Error(`Failed appointment creation: ${e.message}`);
   }
 }
 
@@ -23,12 +34,10 @@ export async function getAllByUser(userId) {
 
     const querySnapshot = await getDocs(q);
 
-    const appointments = querySnapshot.docs.map((doc) => ({
+    return querySnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
-
-    return appointments;
   } catch (error) {
     console.error("Error loading user appointments: ", error);
     throw new Error("Failed appointment load: " + error.message);
@@ -38,7 +47,6 @@ export async function getAllByUser(userId) {
 export async function deleteAppointment(appointmentId) {
   try {
     await deleteDoc(doc(db, "appointments", appointmentId));
-    console.log("Appointment deleted successfully");
     return true;
   } catch (error) {
     console.error("Error deleting appointment:", error);

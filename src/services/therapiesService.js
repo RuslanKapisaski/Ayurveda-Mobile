@@ -11,7 +11,7 @@ export async function getAll() {
     }));
   } catch (error) {
     console.error("Error fetching therapies:", error);
-    throw new Error("Failed to fetch therapies");
+    throw new Error(`Failed to fetch therapies ${error.message}`);
   }
 }
 
@@ -26,7 +26,7 @@ export async function getById(id) {
 
     return { id: snapshot.id, ...snapshot.data() };
   } catch (error) {
-    console.error("Error fetching therapy:", error, id);
-    throw new Error("Failed to fetch this therapy");
+    console.error("Error fetching therapy:", error);
+    throw new Error(`Failed to fetch this therapy ${error.message}`);
   }
 }
