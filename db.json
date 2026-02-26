@@ -70,45 +70,6 @@
     }
   ],
 
-  "medicines": [
-    {
-      "id": 1,
-      "name": "Ashwagandha",
-      "imageUrl": "https://eu-images.contentstack.com/v3/assets/blt2183a7e3152cc969/blt812a9a79fa6d9667/674f7f29a2038423bc9dab8c/ashwagandha.jpg?width=1280&auto=webp&quality=80&disable=upscale",
-      "description": "Adaptogenic herb that reduces stress, improves energy and supports immunity.",
-      "dosage": "1 capsule twice daily after meals",
-      "purpose": "Stress, fatigue, nervous system balance",
-      "durationDays": 30
-    },
-    {
-      "id": 2,
-      "name": "Triphala",
-      "imageUrl": "https://thegoodbug.com/cdn/shop/articles/Benefits_and_Therapeutic_uses_of_Triphala_for_gut_health_97e499fa-d367-48b6-8968-e64ca3e84ab5.jpg?v=1755682595",
-      "description": "Traditional blend for digestive health and detoxification.",
-      "dosage": "1 teaspoon in warm water before bed",
-      "purpose": "Digestion, detox, bowel regulation",
-      "durationDays": 21
-    },
-    {
-      "id": 3,
-      "name": "Brahmi",
-      "imageUrl": "https://bilkite.net/wp-content/uploads/2023/06/brahmi-bilkitenet.jpg",
-      "description": "Enhances memory, focus and calms the mind.",
-      "dosage": "1 capsule in the morning",
-      "purpose": "Mental clarity, anxiety, concentration",
-      "durationDays": 28
-    },
-    {
-      "id": 4,
-      "name": "Chyawanprash",
-      "imageUrl": "https://www.metropolisindia.com/upgrade/blog/upload/25/11/Chyawanprash%20Benefits1763645506.webp",
-      "description": "Herbal jam for immunity and rejuvenation.",
-      "dosage": "1 teaspoon in the morning",
-      "purpose": "Immunity, vitality",
-      "durationDays": 60
-    }
-  ],
-
   "programs": [
     {
       "id": 1,
