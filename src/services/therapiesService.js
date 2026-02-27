@@ -1,4 +1,12 @@
-import { collection, getDoc, getDocs, doc } from "firebase/firestore";
+import {
+  collection,
+  getDoc,
+  getDocs,
+  doc,
+  documentId,
+  query,
+  where,
+} from "firebase/firestore";
 import { db } from "../fireBaseConfig";
 
 export async function getAll() {
@@ -28,5 +36,27 @@ export async function getById(id) {
   } catch (error) {
     console.error("Error fetching therapy:", error);
     throw new Error(`Failed to fetch this therapy ${error.message}`);
+  }
+}
+
+export async function getTherapiesByIds(ids) {
+  if (!ids.length) return [];
+
+  try {
+    const q = query(
+      collection(db, "therapies"),
+      where(documentId(), "in", ids),
+    );
+
+    const snapshot = await getDocs(q);
+
+    return snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+  } catch (error) {
+    throw new Error(
+      `Failed loading therapies by therir ids:  + ${error.message}`,
+    );
   }
 }
