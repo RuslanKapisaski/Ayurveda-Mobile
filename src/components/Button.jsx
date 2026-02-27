@@ -6,6 +6,7 @@ export default function Button({ style = {}, text, active, onPress }) {
       style={[
         styles.button,
         active ? styles.primaryButton : styles.secondaryButton,
+        style,
       ]}
       onPress={onPress}
     >
