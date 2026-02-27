@@ -3,9 +3,9 @@ import { Ionicons } from "@expo/vector-icons";
 
 import HomeNavigator from "./HomeNavigator";
 import MyProfileScreen from "../screens/MyProfileScreen";
-import AppointmentsScreen from "../screens/AppointmentsScreen";
 import ProgramsNavigator from "./ProgramsNavigator";
 import TherapiesNavigator from "./TherapiesNavigator";
+import AppointmentsNavigator from "./AppointemntsNavigator";
 
 const Tabs = createBottomTabNavigator();
 
@@ -43,7 +43,7 @@ export default function RootNavigator() {
 
       <Tabs.Screen
         name="Appointments"
-        component={AppointmentsScreen}
+        component={AppointmentsNavigator}
         options={{
           tabBarLabel: "Appointments",
           tabBarIcon: ({ color, size }) => (

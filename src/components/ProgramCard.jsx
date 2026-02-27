@@ -14,7 +14,7 @@ export default function ProgramCard({ program, onPress }) {
 
       <Text style={styles.title}>{program.name}</Text>
       <Text style={styles.description}>{program.shortDescription}</Text>
-
+      <Text style={styles.price}>{program.price}€</Text>
     </TouchableOpacity>
   );
 }
@@ -54,5 +54,12 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 14,
     color: "#555",
+  },
+  price: {
+    marginLeft: "auto",
+    fontSize: 18,
+    fontWeight: "400",
+    color: "#118161",
+    marginBottom: 6,
   },
 });

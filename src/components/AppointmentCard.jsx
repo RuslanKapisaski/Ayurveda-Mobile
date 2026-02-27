@@ -1,47 +1,82 @@
 import { useEffect, useState } from "react";
-import { Text, StyleSheet, TouchableOpacity, Image, View } from "react-native";
+import {
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  View,
+  ScrollView,
+} from "react-native";
 
 import * as therapiesService from "../services/therapiesService";
+import * as programsService from "../services/programsService";
+import Button from "./Button";
+import { formatDate } from "../utils/dateForamater";
 
-export default function AppointmentCard({ appointment, onCancel }) {
-  const [therapy, setTherapy] = useState(null);
+export default function AppointmentCard({ appointment, onCancel, onEdit }) {
+  const [item, setItem] = useState(null);
 
   useEffect(() => {
-    const loadTherapy = async () => {
+    const loadData = async () => {
       try {
-        const result = await therapiesService.getById(appointment.therapyId);
-        setTherapy(result);
+        let result;
+        if (appointment.type === "therapy") {
+          result = await therapiesService.getById(appointment.itemId);
+        } else if (appointment.type === "program") {
+          result = await programsService.getById(appointment.itemId);
+        }
+        // } else if (appointment.type === "checkup") {
+        //   result = appointment;
+        // }
+
+        setItem(result);
       } catch (error) {
-        console.log("Error loading therapy:", error);
+        console.error(`Error loading appointments: ${error.message}`);
       }
     };
 
-    loadTherapy();
+    loadData();
   }, [appointment.therapyId]);
 
   return (
-    <View style={styles.card}>
-      {therapy?.imageUrl ? (
-        <Image source={{ uri: therapy.imageUrl }} style={styles.image} />
+    <ScrollView style={styles.card}>
+      {item?.imageUrl ? (
+        <Image source={{ uri: item.imageUrl }} style={styles.image} />
       ) : (
         <View style={styles.imagePlaceholder}>
           <Text style={styles.imagePlaceholderText}>No Image</Text>
         </View>
       )}
-
-      <Text style={styles.therapyName}>Therapy: {therapy?.name}</Text>
-
-      <Text style={styles.date}>
-        {new Date(appointment.date).toLocaleString()}
+      <Text style={styles.subtitle}>
+        Appointment:
+        <Text style={styles.itemName}> {item?.name} </Text>
+      </Text>
+      <Text style={styles.subtitle}>
+        Type:
+        <Text style={styles.itemName}> {appointment?.type}</Text>
+      </Text>
+      <Text style={styles.subtitle}>
+        Date:
+        <Text style={styles.itemName}>
+          {appointment?.date && formatDate(appointment.date)}
+        </Text>
       </Text>
 
-      <TouchableOpacity
-        style={styles.cancelButton}
-        onPress={() => onCancel(appointment.id)}
-      >
-        <Text style={styles.cancelButtonText}>Cancel</Text>
-      </TouchableOpacity>
-    </View>
+      <View style={styles.buttonPanel}>
+        <Button
+          style={styles.cancelButton}
+          textStyle={styles.buttonText}
+          text="Cancel"
+          onPress={() => onCancel(appointment.id)}
+        />
+        <Button
+          style={styles.editButton}
+          textStyle={styles.buttonText}
+          text="Edit"
+          onPress={() => onEdit(appointment.id)}
+        />
+      </View>
+    </ScrollView>
   );
 }
 
@@ -49,7 +84,8 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: "#fff",
     borderRadius: 12,
-    padding: 16,
+    padding: 10,
+    gap: 10,
     marginBottom: 16,
     shadowColor: "#000",
     shadowOpacity: 0.1,
@@ -57,26 +93,43 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     elevation: 3,
   },
-  therapyName: {
+  subtitle: {
     fontSize: 18,
-    fontWeight: "600",
-    color: "#118161",
+  },
+  itemName: {
+    fontSize: 18,
+    fontWeight: "400",
+    color: "#6e706f",
     marginBottom: 4,
+    padding: 10,
   },
   date: {
     fontSize: 14,
     color: "#444",
     marginBottom: 12,
   },
+  buttonPanel: {
+    flex: 1,
+    flexDirection: "row",
+    gap: 10,
+    marginTop: 20,
+    justifyContent: "flex-end",
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "500",
+  },
   cancelButton: {
-    backgroundColor: "#ff5c5c",
+    backgroundColor: "#960909",
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+  },
+  editButton: {
+    backgroundColor: "#1b6608",
     paddingVertical: 10,
     borderRadius: 8,
     alignItems: "center",
-  },
-  cancelButtonText: {
-    color: "#fff",
-    fontWeight: "600",
   },
   image: {
     width: "100%",
