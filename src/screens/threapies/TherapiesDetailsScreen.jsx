@@ -36,7 +36,10 @@ export default function TherapyDetailsScreen({ route, navigation }) {
   }, [therapyDocId]);
 
   const onSignUp = (therapyId) => {
-    navigation.navigate("Booking", { therapyId });
+    navigation.navigate("Booking", {
+      type: "therapy",
+      itemId: therapy.id,
+    });
   };
 
   if (isLoading) return <ActivityIndicator size="large" style={{ flex: 1 }} />;
@@ -55,6 +58,7 @@ export default function TherapyDetailsScreen({ route, navigation }) {
 
       <Text style={styles.title}>{therapy.name}</Text>
       <Text style={styles.category}>{therapy.category}</Text>
+      <Text style={styles.price}>{therapy.price} €</Text>
 
       <Text style={styles.sectionTitle}>Description</Text>
       <Text style={styles.description}>{therapy.description}</Text>
@@ -140,6 +144,12 @@ const styles = StyleSheet.create({
   signUpButton: {
     marginTop: 20,
     alignItems: "center",
+  },
+  price: {
+    fontSize: 18,
+    fontWeight: "400",
+    color: "#118161",
+    marginBottom: 6,
   },
   signUpButtonText: {
     color: "#fff",
