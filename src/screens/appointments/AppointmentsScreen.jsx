@@ -10,12 +10,12 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import AppointmentCard from "../components/AppointmentCard";
+import AppointmentCard from "../../components/AppointmentCard";
 
-import * as appointmentsService from "../services/appointmentsService";
-import useAuth from "../auth/useAuth";
+import * as appointmentsService from "../../services/appointmentsService";
+import useAuth from "../../auth/useAuth";
 
-export default function AppointmentsScreen() {
+export default function AppointmentsScreen({ navigation }) {
   const [appointments, setAppointments] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -63,6 +63,20 @@ export default function AppointmentsScreen() {
     );
   };
 
+  const handleEdit = (appointmentData) => {
+    Alert.alert(
+      "Edit Appointment",
+      "Are you sure you want to edit this appointment?",
+      [
+        { text: "No", style: "cancel" },
+        {
+          text: "Yes",
+          onPress: navigation.navigate("EditAppointments", appointmentData),
+        },
+      ],
+    );
+  };
+
   if (isLoading) {
     return <ActivityIndicator size="large" style={styles.loader} />;
   }
@@ -87,7 +101,11 @@ export default function AppointmentsScreen() {
         data={appointments}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <AppointmentCard appointment={item} onCancel={handleCancel} />
+          <AppointmentCard
+            appointment={item}
+            onCancel={handleCancel}
+            onEdit={handleEdit}
+          />
         )}
         contentContainerStyle={{ paddingBottom: 20 }}
       />
