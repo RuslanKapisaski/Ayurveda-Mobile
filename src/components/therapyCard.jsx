@@ -25,7 +25,7 @@ export default function TherapyCard({ therapy, onPress }) {
             <Text style={styles.metaText}>{therapy.durationMinutes} min</Text>
           </View>
 
-          <Text style={styles.price}>{therapy.price} EU</Text>
+          <Text style={styles.price}>{therapy.price} €</Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
   },
   price: {
     fontSize: 15,
-    fontWeight: "700",
+    fontWeight: "400",
     color: "#118161",
   },
 });

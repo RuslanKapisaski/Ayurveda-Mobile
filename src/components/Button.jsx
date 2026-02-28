@@ -1,6 +1,12 @@
 import { StyleSheet, TouchableOpacity, Text } from "react-native";
 
-export default function Button({ style = {}, text, active, onPress }) {
+export default function Button({
+  style = {},
+  textStyle = {},
+  text,
+  active,
+  onPress,
+}) {
   return (
     <TouchableOpacity
       style={[
@@ -10,7 +16,9 @@ export default function Button({ style = {}, text, active, onPress }) {
       ]}
       onPress={onPress}
     >
-      <Text style={active ? styles.primaryText : styles.secondaryText}>
+      <Text
+        style={[active ? styles.primaryText : styles.secondaryText, textStyle]}
+      >
         {text}
       </Text>
     </TouchableOpacity>
@@ -23,7 +31,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     alignItems: "center",
     shadowColor: "#000000",
-    shadowOffset: { width: 10, height: 4 },
+    shadowOffset: { width: 1, height: 40 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
   },
