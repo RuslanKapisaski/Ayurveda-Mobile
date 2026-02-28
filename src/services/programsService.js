@@ -34,7 +34,7 @@ export async function getById(id) {
 
     return { id: snapshot.id, ...snapshot.data() };
   } catch (error) {
-    console.error(`Error fetching prgorams ${error.message}`);
-    throw new Error(`Failed to fetch this prgoram ${error.message}`);
+    console.error(`Error fetching programs ${error.message}`);
+    throw new Error(`${error.message}`);
   }
 }

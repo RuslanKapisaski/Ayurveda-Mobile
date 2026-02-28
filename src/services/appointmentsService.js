@@ -4,10 +4,10 @@ import {
   getDocs,
   query,
   where,
-  getDoc,
   deleteDoc,
   doc,
   serverTimestamp,
+  updateDoc,
 } from "firebase/firestore";
 import { db } from "../fireBaseConfig";
 
@@ -44,12 +44,30 @@ export async function getAllByUser(userId) {
   }
 }
 
+export async function edit(appointmentData, updates) {
+  try {
+    const { id } = { ...appointmentData };
+
+    if (!id) {
+      throw new Error("Appointment ID is required");
+    }
+
+    const docRef = doc(db, "appointments", id);
+    await updateDoc(docRef, updates);
+
+    console.log("Appointment updated successfully!");
+  } catch (error) {
+    console.error(`Error editing appointment:, ${error}`);
+    throw new Error(`Failed to edit appointment: ${error.message}`);
+  }
+}
+
 export async function deleteAppointment(appointmentId) {
   try {
     await deleteDoc(doc(db, "appointments", appointmentId));
     return true;
   } catch (error) {
     console.error("Error deleting appointment:", error);
-    throw new Error("Failed to cancel appointment: " + error.message);
+    throw new Error(`Failed to cancel appointment: ${error.message}`);
   }
 }
