@@ -1,9 +1,8 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import HomeScreen from "../screens/HomeScreen";
-import DetailsScreen from "../screens/DetailsScreen";
-import ReservationScreen from "../screens/ReservationScreen";
 import QusetionUsScreen from "../screens/QuestionUsScreen";
+import CheckupScreen from "../screens/CheckupScreen";
 
 export default function HomeNavigator() {
   const Stack = createNativeStackNavigator();
@@ -16,13 +15,8 @@ export default function HomeNavigator() {
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="DetailsScreen"
-        component={DetailsScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="ReservationScreen"
-        component={ReservationScreen}
+        name="Checkup"
+        component={CheckupScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen
