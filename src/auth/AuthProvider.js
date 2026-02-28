@@ -68,7 +68,7 @@ export function AuthProvider({ children }) {
           name: firestoreUser.name,
           dosha: firestoreUser.dosha,
         },
-        hasCompletedOnBoarding: firestoreUser.hasCompletedOnboarding,
+        hasCompletedOnBoarding: firestoreUser.hasCompletedOnBoarding,
       });
     } catch (err) {
       setError(err.message || "Login failed");
@@ -82,6 +82,7 @@ export function AuthProvider({ children }) {
       setIsLoading(true);
 
       const user = await authService.register(name, email, password);
+      const firestoreUser = await authService.getCurrentUserData();
 
       setAuthState({
         user: {
@@ -90,7 +91,7 @@ export function AuthProvider({ children }) {
           name: user.displayName,
           dosha: null,
         },
-        hasCompletedOnBoarding: false,
+        hasCompletedOnBoarding: firestoreUser?.hasCompletedOnBoarding,
       });
     } catch (err) {
       setError(err.message || "Registration failed");
