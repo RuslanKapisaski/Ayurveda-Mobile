@@ -1,57 +1,77 @@
 import { createContext, useEffect, useMemo, useState } from "react";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "../fireBaseConfig";
-
 import * as authService from "../services/authService";
 
 export const AuthContext = createContext({
   isLoading: false,
   isAuthenticated: false,
+  hasCompletedOnBoarding: false,
   error: null,
   user: null,
-  auth: null,
-  register: async (username, email, password) => {},
-  login: async (email, password) => {},
-  logout: () => {},
+  login: async () => {},
+  register: async () => {},
+  logout: async () => {},
   clearError: () => {},
 });
 
 export function AuthProvider({ children }) {
-  const [authState, setAuthState] = useState({ user: null });
-  const [isLoading, setIsLoading] = useState(false);
+  const [authState, setAuthState] = useState({
+    user: null,
+    hasCompletedOnBoarding: false,
+  });
+
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setAuthState({
-          user: {
-            id: user.uid,
-            email: user.email,
-            name: user.displayName,
-          },
-        });
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser) {
+        try {
+          const firestoreUser = await authService.getCurrentUserData();
+
+          setAuthState({
+            user: {
+              id: firebaseUser.uid,
+              email: firebaseUser.email,
+              name: firebaseUser.displayName,
+              dosha: firestoreUser?.dosha || null,
+            },
+            hasCompletedOnBoarding:
+              firestoreUser?.hasCompletedOnboarding || false,
+          });
+        } catch (err) {
+          setError("Failed to load user data");
+        }
       } else {
-        setAuthState({ user: null });
+        setAuthState({
+          user: null,
+          hasCompletedOnBoarding: false,
+        });
       }
+      setIsLoading(false);
     });
 
-    return () => unsubscribe();
+    return unsubscribe;
   }, []);
 
   const login = async (email, password) => {
     try {
       setIsLoading(true);
-      const user = await authService.login(email, password);
+
+      const { firestoreUser } = await authService.login(email, password);
+
       setAuthState({
         user: {
-          id: user.uid,
-          email: user.email,
-          name: user.displayName,
+          id: firestoreUser.uid,
+          email: firestoreUser.email,
+          name: firestoreUser.name,
+          dosha: firestoreUser.dosha,
         },
+        hasCompletedOnBoarding: firestoreUser.hasCompletedOnboarding,
       });
-    } catch (error) {
-      setError(error.message || "Login error, please try again.");
+    } catch (err) {
+      setError(err.message || "Login failed");
     } finally {
       setIsLoading(false);
     }
@@ -62,38 +82,45 @@ export function AuthProvider({ children }) {
       setIsLoading(true);
 
       const user = await authService.register(name, email, password);
-      
+
       setAuthState({
         user: {
           id: user.uid,
           email: user.email,
           name: user.displayName,
+          dosha: null,
         },
+        hasCompletedOnBoarding: false,
       });
-    } catch (error) {
-      setError(error.message || "Login error, please try again.");
+    } catch (err) {
+      setError(err.message || "Registration failed");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const logout = async () => {
+    try {
+      await signOut(auth);
+      setAuthState({
+        user: null,
+        hasCompletedOnBoarding: false,
+      });
+    } catch (err) {
+      setError("Logout failed");
     }
   };
 
   const contextValue = useMemo(
     () => ({
       isAuthenticated: !!authState.user,
+      hasCompletedOnBoarding: authState.hasCompletedOnBoarding,
       isLoading,
       error,
       user: authState.user,
-      auth: authState,
       login,
       register,
-      logout: async () => {
-        try {
-          await signOut(auth);
-          setAuthState({ user: null });
-        } catch (error) {
-          setError(error.message || "An error occured while logging out");
-        }
-      },
+      logout,
       clearError: () => setError(null),
     }),
     [authState, isLoading, error],

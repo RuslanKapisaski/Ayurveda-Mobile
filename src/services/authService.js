@@ -2,18 +2,18 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   updateProfile,
+  signOut,
 } from "firebase/auth";
-import { auth, db } from "../fireBaseConfig";
-import { setDoc, doc, serverTimestamp } from "firebase/firestore";
 
-export async function login(email, password) {
-  try {
-    const result = await signInWithEmailAndPassword(auth, email, password);
-    return result.user;
-  } catch (error) {
-    throw new Error("Invalid user credentials");
-  }
-}
+import {
+  doc,
+  setDoc,
+  getDoc,
+  updateDoc,
+  serverTimestamp,
+} from "firebase/firestore";
+
+import { auth, db } from "../fireBaseConfig";
 
 export async function register(name, email, password) {
   try {
@@ -23,18 +23,89 @@ export async function register(name, email, password) {
       displayName: name,
     });
 
-    await result.user.reload();
+    const userRef = doc(db, "users", result.user.uid);
 
-    const docRef = await setDoc(doc(db, "users", result.user.uid), {
+    await setDoc(userRef, {
+      uid: result.user.uid,
+
       name,
       email,
-      currentProgramId: null,
-      currentTherapyId: null,
+      photoURL: null,
+      phone: null,
+
+      hasCompletedOnboarding: false,
+
+      dosha: null,
+      doshaScores: {
+        vata: 0,
+        pitta: 0,
+        kapha: 0,
+      },
+
+      goals: [],
+      allergies: [],
+
+      role: "user",
+      isActive: true,
+
       createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
     });
 
-    return auth.currentUser;
-  } catch (e) {
-    throw new Error(e.message || "Unsuccessful registration");
+    return result.user;
+  } catch (error) {
+    throw new Error(error.message || "Registration failed");
   }
+}
+
+export async function login(email, password) {
+  try {
+    const result = await signInWithEmailAndPassword(auth, email, password);
+
+    const userDoc = await getDoc(doc(db, "users", result.user.uid));
+
+    if (!userDoc.exists()) {
+      throw new Error("User document not found");
+    }
+
+    return {
+      authUser: result.user,
+      firestoreUser: userDoc.data(),
+    };
+  } catch (error) {
+    throw new Error("Invalid credentials");
+  }
+}
+
+
+export async function getCurrentUserData() {
+  const currentUser = auth.currentUser;
+
+  if (!currentUser) return null;
+
+  const userDoc = await getDoc(doc(db, "users", currentUser.uid));
+
+  if (!userDoc.exists()) return null;
+
+  return userDoc.data();
+}
+
+export async function completeOnboarding(data) {
+  const currentUser = auth.currentUser;
+
+  if (!currentUser) throw new Error("No user logged in");
+
+  const userRef = doc(db, "users", currentUser.uid);
+
+  await updateDoc(userRef, {
+    dosha: data.dosha,
+    doshaScores: data.doshaScores,
+    goals: data.goals || [],
+    hasCompletedOnboarding: true,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function logout() {
+  await signOut(auth);
 }
