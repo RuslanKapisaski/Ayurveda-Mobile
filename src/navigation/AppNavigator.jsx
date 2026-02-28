@@ -3,26 +3,22 @@ import useAuth from "../auth/useAuth";
 import RootNavigator from "./RootNavigator";
 import AuthNavigator from "./AuthNavigator";
 import { ActivityIndicator } from "react-native";
+import OnBoardingNavigator from "./OnBoardingNavigator";
 
 export default function AppNavigator() {
-  const Stack = createNativeStackNavigator();
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, hasCompletedOnBoarding } = useAuth();
 
   if (isLoading) {
-    return (
-      <ActivityIndicator
-        size="large"
-        style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-      />
-    );
+    return <ActivityIndicator size="large" style={{ flex: 1 }} />;
   }
-  return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      {isAuthenticated ? (
-        <Stack.Screen name="App" component={RootNavigator} />
-      ) : (
-        <Stack.Screen name="Auth" component={AuthNavigator} />
-      )}
-    </Stack.Navigator>
-  );
+
+  if (!isAuthenticated) {
+    return <AuthNavigator />;
+  }
+
+  if (!hasCompletedOnBoarding) {
+    return <OnBoardingNavigator />;
+  }
+
+  return <RootNavigator />;
 }
