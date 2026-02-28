@@ -11,7 +11,7 @@ import {
 import * as therapiesService from "../services/therapiesService";
 import * as programsService from "../services/programsService";
 import Button from "./Button";
-import { formatDate } from "../utils/dateForamater";
+import { formatDate } from "../utils/dateFormater";
 
 export default function AppointmentCard({ appointment, onCancel, onEdit }) {
   const [item, setItem] = useState(null);
@@ -73,7 +73,7 @@ export default function AppointmentCard({ appointment, onCancel, onEdit }) {
           style={styles.editButton}
           textStyle={styles.buttonText}
           text="Edit"
-          onPress={() => onEdit(appointment.id)}
+          onPress={() => onEdit(appointment)}
         />
       </View>
     </ScrollView>
@@ -94,19 +94,14 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   subtitle: {
-    fontSize: 18,
+    fontSize: 20,
+    margin: 4,
   },
   itemName: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "400",
     color: "#6e706f",
     marginBottom: 4,
-    padding: 10,
-  },
-  date: {
-    fontSize: 14,
-    color: "#444",
-    marginBottom: 12,
   },
   buttonPanel: {
     flex: 1,
