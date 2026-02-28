@@ -1,5 +1,19 @@
-export const formatDate = (timestamp) => {
-  const date = timestamp.toDate();
+export const formatDate = (value) => {
+  if (!value) return "";
+  let date;
+
+  // Firestore Timestamp
+  if (typeof value.toDate === "function") {
+    date = value.toDate();
+  }
+  // ISO string or Date
+  else {
+    date = new Date(value);
+  }
+
+  if (isNaN(date.getTime())) {
+    return "Invalid date";
+  }
 
   const day = String(date.getDate()).padStart(2, "0");
   const month = String(date.getMonth() + 1).padStart(2, "0");
