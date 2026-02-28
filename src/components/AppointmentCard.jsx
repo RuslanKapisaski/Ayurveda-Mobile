@@ -41,11 +41,27 @@ export default function AppointmentCard({ appointment, onCancel, onEdit }) {
   return (
     <ScrollView style={styles.card}>
       {item?.imageUrl ? (
-        <Image source={{ uri: item.imageUrl }} style={styles.image} />
+        <Image
+          source={{ uri: item.imageUrl }}
+          style={styles.image}
+          resizeMode="cover"
+        />
+      ) : item?.type === "checkup" ? (
+        <Image
+          source={{
+            uri: "https://st3.depositphotos.com/9998432/19176/v/450/depositphotos_191768074-stock-illustration-default-placeholder-doctor-half-length.jpg",
+          }}
+          style={styles.image}
+          resizeMode="cover"
+        />
       ) : (
-        <View style={styles.imagePlaceholder}>
-          <Text style={styles.imagePlaceholderText}>No Image</Text>
-        </View>
+        <Image
+          source={{
+            uri: "https://media.istockphoto.com/id/2074983548/vector/default-placeholder-doctor-portrait-photo-avatar-on-gray-background-greyscale-female.jpg?s=612x612&w=0&k=20&c=kRx9BZpeg3WruAKBRDfBrd03P6sWyLW2PzLRUaQnueE=",
+          }}
+          style={styles.image}
+          resizeMode="cover"
+        />
       )}
       <Text style={styles.subtitle}>
         Appointment:
