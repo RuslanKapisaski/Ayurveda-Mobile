@@ -50,6 +50,7 @@ export default function ProgramsScreen({ navigation }) {
     <FlatList
       data={programs}
       keyExtractor={(item) => item.id}
+      contentContainerStyle={styles.container}
       renderItem={({ item }) => (
         <ProgramCard
           program={item}
@@ -58,7 +59,6 @@ export default function ProgramsScreen({ navigation }) {
           }
         />
       )}
-      contentContainerStyle={styles.container}
     />
   );
 }

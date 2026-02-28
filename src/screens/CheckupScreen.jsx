@@ -14,23 +14,12 @@ import { Picker } from "@react-native-picker/picker";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import Calendar from "../components/Calendar";
-import Button from "../components/Button";
 import useAuth from "../auth/useAuth";
 import * as appointmentsService from "../services/appointmentsService";
+import confirmAlert from "../utils/confirmAlert";
+import { formatDate } from "../utils/dateFormater";
 
 // Helper to await user confirmation
-const showConfirmAlert = (title, message) =>
-  new Promise((resolve) => {
-    Alert.alert(
-      title,
-      message,
-      [
-        { text: "Cancel", style: "cancel", onPress: () => resolve(false) },
-        { text: "Confirm", onPress: () => resolve(true) },
-      ],
-      { cancelable: false },
-    );
-  });
 
 export default function CheckupScreen({ navigation }) {
   const { user } = useAuth();
@@ -50,11 +39,9 @@ export default function CheckupScreen({ navigation }) {
       return;
     }
     setSelectedDate(new Date(date));
-    console.log(selectedDate);
-
-    const confirmed = await showConfirmAlert(
+    const confirmed = await confirmAlert(
       "Confirm Checkup",
-      `Book a checkup with ${selectedDoctor.name} on ${selectedDate.toLocaleString()}?`,
+      `Book a checkup with ${selectedDoctor.name} on ${formatDate(date)}?`,
     );
 
     if (!confirmed) {

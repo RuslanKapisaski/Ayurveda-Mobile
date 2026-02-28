@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -6,14 +6,13 @@ import {
   FlatList,
   ActivityIndicator,
   Alert,
-  ScrollView,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import AppointmentCard from "../../components/AppointmentCard";
-
 import * as appointmentsService from "../../services/appointmentsService";
 import useAuth from "../../auth/useAuth";
+import confirmAlert from "../../utils/confirmAlert";
 
 export default function AppointmentsScreen({ navigation }) {
   const [appointments, setAppointments] = useState([]);
@@ -21,7 +20,7 @@ export default function AppointmentsScreen({ navigation }) {
   const [error, setError] = useState(null);
   const { user } = useAuth();
 
-  const loadAppointments = async () => {
+  const loadAppointments = useCallback(async () => {
     if (!user?.id) return;
 
     try {
@@ -29,56 +28,52 @@ export default function AppointmentsScreen({ navigation }) {
       const data = await appointmentsService.getAllByUser(user.id);
       setAppointments(data);
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "Failed to load appointments");
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [user?.id]);
 
   useEffect(() => {
     loadAppointments();
-  }, [user?.id]);
+  }, [loadAppointments]);
 
-  const handleCancel = (appointmentId) => {
-    Alert.alert(
+  // Cancel appointment
+  const handleCancel = async (appointmentId) => {
+    const confirmed = await confirmAlert(
       "Cancel Appointment",
       "Are you sure you want to cancel this appointment?",
-      [
-        { text: "No", style: "cancel" },
-        {
-          text: "Yes",
-          onPress: async () => {
-            try {
-              await appointmentsService.deleteAppointment(appointmentId);
-
-              setAppointments((prev) =>
-                prev.filter((item) => item.id !== appointmentId),
-              );
-            } catch (err) {
-              Alert.alert("Error", err.message);
-            }
-          },
-        },
-      ],
     );
+
+    if (!confirmed) return;
+
+    try {
+      await appointmentsService.deleteAppointment(appointmentId);
+      setAppointments((prev) =>
+        prev.filter((item) => item.id !== appointmentId),
+      );
+    } catch (err) {
+      Alert.alert("Error", err.message || "Failed to cancel appointment");
+    }
   };
 
-  const handleEdit = (appointmentData) => {
-    Alert.alert(
+  const handleEdit = async (appointmentData) => {
+    const confirmed = await confirmAlert(
       "Edit Appointment",
       "Are you sure you want to edit this appointment?",
-      [
-        { text: "No", style: "cancel" },
-        {
-          text: "Yes",
-          onPress: navigation.navigate("EditAppointments", appointmentData),
-        },
-      ],
     );
+
+    if (!confirmed) return;
+
+    navigation.navigate("EditAppointments", { appointment: appointmentData });
   };
 
   if (isLoading) {
-    return <ActivityIndicator size="large" style={styles.loader} />;
+    return (
+      <View style={styles.loader}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
   }
 
   if (error) {
@@ -107,6 +102,8 @@ export default function AppointmentsScreen({ navigation }) {
             onEdit={handleEdit}
           />
         )}
+        refreshing={isLoading}
+        onRefresh={loadAppointments}
         contentContainerStyle={{ paddingBottom: 20 }}
       />
     </SafeAreaView>

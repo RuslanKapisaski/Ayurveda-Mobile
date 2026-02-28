@@ -19,27 +19,15 @@ import Calendar from "../components/Calendar";
 import * as therapiesService from "../services/therapiesService";
 import * as programsService from "../services/programsService";
 import * as appointmentsService from "../services/appointmentsService";
-
-const showConfirmAlert = (title, message) => {
-  return new Promise((resolve) => {
-    Alert.alert(
-      title,
-      message,
-      [
-        { text: "Cancel", style: "cancel", onPress: () => resolve(false) },
-        { text: "Confirm", onPress: () => resolve(true) },
-      ],
-      { cancelable: false },
-    );
-  });
-};
+import confirmAlert from "../utils/confirmAlert";
+import { formatDate } from "../utils/dateFormater";
 
 export default function BookingScreen({ route, navigation }) {
   const { type, itemId } = route.params;
   const { user } = useAuth();
 
   const [booking, setBooking] = useState(null);
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(null);
   const [note, setNote] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -68,12 +56,18 @@ export default function BookingScreen({ route, navigation }) {
   }, [itemId, type]);
 
   const handleConfirmBooking = async (date) => {
-    const confirmed = await showConfirmAlert(
+    setSelectedDate(new Date(date));
+    console.log(date);
+
+    const confirmed = await confirmAlert(
       "Confirm Booking",
-      `Book for ${selectedDate.toDateString()}?`,
+      `Book for ${formatDate(date)}?`,
     );
 
-    if (!confirmed) return;
+    if (!confirmed) {
+      selectedDate(null);
+      return;
+    }
 
     try {
       setIsLoading(true);

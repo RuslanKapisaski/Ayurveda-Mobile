@@ -10,13 +10,11 @@ import {
   FlatList,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
 import Button from "../components/Button";
 import useAuth from "../auth/useAuth";
 
-export default function HomeScreen() {
+export default function HomeScreen({ navigation }) {
   const { user } = useAuth();
-  console.log(user);
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -68,10 +66,13 @@ export default function HomeScreen() {
         </View>
 
         {/* QUICK ACTIONS */}
-        <View style={styles.actionsContainer}>
-          <Button text="Book Therapy" active={true} />
-          <Button text="My Progress" active={false} />
-        </View>
+
+        <Button
+          text="Book Consultation"
+          active={true}
+          style={styles.consultationButton}
+          onPress={() => navigation.navigate("Checkup")}
+        />
       </ScrollView>
     </SafeAreaView>
   );
@@ -80,7 +81,6 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: "#f6f1e4",
   },
   header: {
     flexDirection: "row",
@@ -179,5 +179,9 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginBottom: 10,
     marginHorizontal: 40,
+  },
+  consultationButton: {
+    alignSelf: "center",
+    backgroundColor: "#b8e8c8",
   },
 });

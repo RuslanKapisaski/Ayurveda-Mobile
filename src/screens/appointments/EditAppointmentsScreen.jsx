@@ -5,7 +5,6 @@ import Calendar from "../../components/Calendar";
 
 export default function EditAppointmentScreen({ route, navigation }) {
   const { appointment } = route.params;
-
   const [isLoading, setIsLoading] = useState(false);
 
   const onEditHandler = (date) => {
@@ -13,7 +12,11 @@ export default function EditAppointmentScreen({ route, navigation }) {
       "Save Changes",
       `Change appointment to ${date.toLocaleString()}?`,
       [
-        { text: "Cancel", onPress: navigation.goBack(), style: "cancel" },
+        {
+          text: "Cancel",
+          style: "cancel",
+          onPress: () => navigation.goBack(),
+        },
         {
           text: "Confirm",
           onPress: async () => {
@@ -26,12 +29,7 @@ export default function EditAppointmentScreen({ route, navigation }) {
 
               Alert.alert("Success", "Appointment updated successfully!");
 
-              navigation.navigate("AppointmentScreen", {
-                appointmentData: {
-                  ...appointment,
-                  date: date.toISOString(),
-                },
-              });
+              navigation.navigate("AppointmentScreen");
             } catch (err) {
               Alert.alert("Error", err.message);
             } finally {
@@ -40,6 +38,7 @@ export default function EditAppointmentScreen({ route, navigation }) {
           },
         },
       ],
+      { cancelable: false },
     );
   };
 
@@ -62,5 +61,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignContent: "center",
+  },
+  loader: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
