@@ -5,29 +5,41 @@ import {
   Text,
   StyleSheet,
   Platform,
-  TouchableOpacity,
-  ActivityIndicator,
-  Alert,
   Image,
   TextInput,
   KeyboardAvoidingView,
+  ActivityIndicator,
+  Alert,
 } from "react-native";
-import DateTimePicker from "@react-native-community/datetimepicker";
 
 import Button from "../components/Button";
 import useAuth from "../auth/useAuth";
+import Calendar from "../components/Calendar";
 
 import * as therapiesService from "../services/therapiesService";
 import * as programsService from "../services/programsService";
 import * as appointmentsService from "../services/appointmentsService";
 
+const showConfirmAlert = (title, message) => {
+  return new Promise((resolve) => {
+    Alert.alert(
+      title,
+      message,
+      [
+        { text: "Cancel", style: "cancel", onPress: () => resolve(false) },
+        { text: "Confirm", onPress: () => resolve(true) },
+      ],
+      { cancelable: false },
+    );
+  });
+};
+
 export default function BookingScreen({ route, navigation }) {
   const { type, itemId } = route.params;
   const { user } = useAuth();
 
-  const [item, setItem] = useState(null);
-  const [date, setDate] = useState(new Date());
-  const [show, setShow] = useState(false);
+  const [booking, setBooking] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [note, setNote] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -36,7 +48,6 @@ export default function BookingScreen({ route, navigation }) {
     const loadItem = async () => {
       try {
         setIsLoading(true);
-
         let data;
 
         if (type === "therapy") {
@@ -45,7 +56,7 @@ export default function BookingScreen({ route, navigation }) {
           data = await programsService.getById(itemId);
         }
 
-        setItem(data);
+        setBooking(data);
       } catch (err) {
         setError("Failed to load data.");
       } finally {
@@ -56,13 +67,14 @@ export default function BookingScreen({ route, navigation }) {
     loadItem();
   }, [itemId, type]);
 
-  const onChange = (event, selectedDate) => {
-    const currentDate = selectedDate || date;
-    setShow(Platform.OS === "ios");
-    setDate(currentDate);
-  };
+  const handleConfirmBooking = async (date) => {
+    const confirmed = await showConfirmAlert(
+      "Confirm Booking",
+      `Book for ${selectedDate.toDateString()}?`,
+    );
 
-  const onConfirm = async () => {
+    if (!confirmed) return;
+
     try {
       setIsLoading(true);
 
@@ -86,13 +98,6 @@ export default function BookingScreen({ route, navigation }) {
     }
   };
 
-  const handleConfirmBooking = () => {
-    Alert.alert("Confirm Booking", `Book for ${date.toDateString()}?`, [
-      { text: "Cancel", style: "cancel" },
-      { text: "Confirm", onPress: onConfirm },
-    ]);
-  };
-
   if (isLoading) {
     return (
       <View style={styles.loader}>
@@ -107,8 +112,8 @@ export default function BookingScreen({ route, navigation }) {
       style={{ flex: 1 }}
     >
       <ScrollView contentContainerStyle={styles.container}>
-        {item?.imageUrl ? (
-          <Image source={{ uri: item.imageUrl }} style={styles.image} />
+        {booking?.imageUrl ? (
+          <Image source={{ uri: booking.imageUrl }} style={styles.image} />
         ) : (
           <View style={styles.imagePlaceholder}>
             <Text>No Image</Text>
@@ -116,35 +121,28 @@ export default function BookingScreen({ route, navigation }) {
         )}
 
         <Text style={styles.title}>
-          {type === "therapy" ? "Therapy" : "Program"}: {item?.name}
+          {type === "therapy" ? "Therapy" : "Program"}: {booking?.name}
         </Text>
 
-        <TouchableOpacity onPress={() => setShow(true)}>
-          <Text style={styles.label}>Select Date</Text>
+        <View style={styles.bookingSection}>
+          <Text style={styles.label}>Book a therapy</Text>
+          {error && <Text style={styles.error}>{error}</Text>}
 
-          {show && (
-            <DateTimePicker
-              value={date}
-              mode="date"
-              display="default"
-              onChange={onChange}
+          <TextInput
+            multiline
+            placeholder="Leave a note"
+            value={note}
+            onChangeText={setNote}
+            style={styles.textInput}
+          />
+
+          {booking && (
+            <Calendar
+              data={booking}
+              onPress={(date) => handleConfirmBooking(date)}
             />
           )}
-
-          <Text style={styles.dateText}>{date.toDateString()}</Text>
-        </TouchableOpacity>
-
-        <TextInput
-          multiline
-          placeholder="Leave a note"
-          value={note}
-          onChangeText={setNote}
-          style={styles.textInput}
-        />
-
-        {error && <Text style={styles.error}>{error}</Text>}
-
-        <Button text="Confirm Booking" onPress={handleConfirmBooking} />
+        </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -163,18 +161,22 @@ const styles = StyleSheet.create({
     fontSize: 20,
     marginVertical: 20,
   },
-  label: {
-    fontSize: 16,
-    marginBottom: 10,
+  bookingSection: {
+    flex: 1,
+    width: "100%",
+    justifyContent: "center",
+    alignItems: "center",
   },
-  dateText: {
+  label: {
+    marginBottom: 10,
     fontSize: 18,
-    marginBottom: 20,
+    color: "#8d8e8e",
+    alignSelf: "center",
   },
   textInput: {
     minHeight: 100,
+    width: "80%",
     borderWidth: 1,
-    padding: 10,
     marginBottom: 20,
     borderRadius: 8,
   },

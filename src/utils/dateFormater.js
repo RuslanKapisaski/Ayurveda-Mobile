@@ -21,5 +21,5 @@ export const formatDate = (value) => {
   const hour = String(date.getHours()).padStart(2, "0"); // 24-hour
   const minute = String(date.getMinutes()).padStart(2, "0");
 
-  return `${hour}:${minute} ${day}/${month} ${year}`;
+  return `${day}.${month}.${year} - ${hour}:${minute} `;
 };
