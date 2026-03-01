@@ -9,6 +9,7 @@ export const AuthContext = createContext({
   hasCompletedOnBoarding: false,
   error: null,
   user: null,
+  setUser: () => {},
   login: async () => {},
   register: async () => {},
   logout: async () => {},
@@ -112,6 +113,10 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const setUser = (newUserState) => {
+    setAuthState((prev) => ({ ...prev, ...newUserState }));
+  };
+
   const contextValue = useMemo(
     () => ({
       isAuthenticated: !!authState.user,
@@ -119,6 +124,7 @@ export function AuthProvider({ children }) {
       isLoading,
       error,
       user: authState.user,
+      setUser,
       login,
       register,
       logout,
