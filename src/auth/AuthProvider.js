@@ -38,7 +38,7 @@ export function AuthProvider({ children }) {
               dosha: firestoreUser?.dosha || null,
             },
             hasCompletedOnBoarding:
-              firestoreUser?.hasCompletedOnboarding || false,
+              firestoreUser?.hasCompletedOnBoarding || false,
           });
         } catch (err) {
           setError("Failed to load user data");

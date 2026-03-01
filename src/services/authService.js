@@ -27,24 +27,18 @@ export async function register(name, email, password) {
 
     await setDoc(userRef, {
       uid: result.user.uid,
-
       name,
       email,
       photoURL: null,
       phone: null,
-
       hasCompletedOnboarding: false,
-
       dosha: null,
       doshaScores: {
         vata: 0,
         pitta: 0,
         kapha: 0,
       },
-
-      goals: [],
       allergies: [],
-
       role: "user",
       isActive: true,
 
@@ -77,7 +71,6 @@ export async function login(email, password) {
   }
 }
 
-
 export async function getCurrentUserData() {
   const currentUser = auth.currentUser;
 
@@ -100,7 +93,6 @@ export async function completeOnboarding(data) {
   await updateDoc(userRef, {
     dosha: data.dosha,
     doshaScores: data.doshaScores,
-    goals: data.goals || [],
     hasCompletedOnboarding: true,
     updatedAt: serverTimestamp(),
   });

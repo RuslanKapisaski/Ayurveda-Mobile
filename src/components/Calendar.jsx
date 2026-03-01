@@ -11,7 +11,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import Button from "./Button";
 import { formatDate } from "../utils/dateFormater";
 
-export default function Calendar({ data, onPress }) {
+export default function Calendar({ data, onPress, buttonText }) {
   let initialDate;
 
   if (data?.date) {
@@ -63,7 +63,7 @@ export default function Calendar({ data, onPress }) {
       </TouchableOpacity>
 
       <Button
-        text="Save Changes"
+        text={buttonText || "Save Changes"}
         onPress={() => onPress(date)}
         style={styles.button}
       />
@@ -96,6 +96,6 @@ const styles = StyleSheet.create({
     width: "auto",
   },
   button: {
-    marginTop: 20,
+    marginVertical: 20,
   },
 });

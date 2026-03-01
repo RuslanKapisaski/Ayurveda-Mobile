@@ -1,23 +1,29 @@
 import { StyleSheet, TouchableOpacity, Text } from "react-native";
 
 export default function Button({
-  style = {},
   textStyle = {},
-  text,
+  style = {},
+  text = "",
   active,
+  passive,
   onPress,
 }) {
   return (
     <TouchableOpacity
       style={[
         styles.button,
-        active ? styles.primaryButton : styles.secondaryButton,
+        active && styles.primaryButton,
+        passive && styles.secondaryButton,
         style,
       ]}
       onPress={onPress}
     >
       <Text
-        style={[active ? styles.primaryText : styles.secondaryText, textStyle]}
+        style={[
+          active && styles.primaryText,
+          passive && styles.secondaryText,
+          textStyle,
+        ]}
       >
         {text}
       </Text>
@@ -31,7 +37,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     alignItems: "center",
     shadowColor: "#000000",
-    shadowOffset: { width: 1, height: 40 },
+    shadowOffset: { width: 1, height: 10 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
   },
@@ -39,9 +45,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#4A7C59",
   },
   secondaryButton: {
-    backgroundColor: "#ffffff",
+    backgroundColor: "#d0f5db",
   },
-
   primaryText: {
     color: "#e5f9eb",
     fontWeight: "600",
