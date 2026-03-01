@@ -17,7 +17,7 @@ export default function DoshaResultScreen({ route, navigation }) {
 
       setUser({ hasCompletedOnBoarding: true });
     } catch (error) {
-      console.log("Onboarding update error:", error);
+      console.error("Onboarding update error:", error);
     } finally {
       setLoading(false);
     }

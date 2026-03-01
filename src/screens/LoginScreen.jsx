@@ -32,7 +32,7 @@ export default function LoginScreen({ navigation }) {
       >
         <Text style={styles.title}>Login</Text>
 
-        {error && <Text style={styles.error}>{error}</Text>}
+        {error && <Text style={styles.error}>{error.message}</Text>}
 
         <TextInput
           placeholder="Email"

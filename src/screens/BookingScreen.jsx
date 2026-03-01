@@ -57,7 +57,6 @@ export default function BookingScreen({ route, navigation }) {
 
   const handleConfirmBooking = async (date) => {
     setSelectedDate(new Date(date));
-    console.log(date);
 
     const confirmed = await confirmAlert(
       "Confirm Booking",

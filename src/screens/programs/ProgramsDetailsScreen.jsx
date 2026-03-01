@@ -137,6 +137,7 @@ export default function ProgramDetailsScreen({ route, navigation }) {
 
       <Button
         text="Book Program"
+        style={styles.button}
         onPress={(programId) => handleBooking(programId)}
       />
     </ScrollView>
@@ -232,6 +233,9 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     color: "#444",
     marginBottom: 4,
+  },
+  button: {
+    backgroundColor: "#b8e8c8",
   },
   error: {
     color: "red",

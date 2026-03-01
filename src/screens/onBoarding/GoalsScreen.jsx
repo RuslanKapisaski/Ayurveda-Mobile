@@ -25,10 +25,7 @@ export default function GoalsScreen({ navigation }) {
   const handleGoalsSubmit = async () => {
     if (selectedGoals.length > 0) {
       try {
-        console.log("selectedGoals", selectedGoals);
-
         await onBoardingService.saveUserGoals(selectedGoals);
-
         navigation.navigate("AboutAyurveda");
       } catch (error) {
         console.error("Error saving user goals:", error);
