@@ -31,17 +31,11 @@ export async function register(name, email, password) {
       email,
       photoURL: null,
       phone: null,
-      hasCompletedOnboarding: false,
+      hasCompletedOnBoarding: false,
       dosha: null,
-      doshaScores: {
-        vata: 0,
-        pitta: 0,
-        kapha: 0,
-      },
       allergies: [],
       role: "user",
       isActive: true,
-
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     });
