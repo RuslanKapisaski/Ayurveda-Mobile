@@ -57,8 +57,6 @@ export async function saveDoshaResultToUser(
 
 export async function setCompleteOnBoardingStatus(user) {
   try {
-    console.log("user", user);
-
     await updateDoc(doc(db, "users", user.id), {
       hasCompletedOnBoarding: true,
       updatedAt: serverTimestamp(),

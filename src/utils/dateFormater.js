@@ -1,4 +1,5 @@
-export const formatDate = (value) => {
+export function formatDate(value) {
+
   if (!value) return "";
   let date;
 
@@ -22,4 +23,4 @@ export const formatDate = (value) => {
   const minute = String(date.getMinutes()).padStart(2, "0");
 
   return `${day}.${month}.${year} - ${hour}:${minute} `;
-};
+}
