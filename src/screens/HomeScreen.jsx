@@ -4,69 +4,184 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  TouchableOpacity,
   Image,
-  Alert,
-  FlatList,
+  ActivityIndicator,
 } from "react-native";
+import * as appointmentService from "../services/appointmentsService";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Button from "../components/Button";
 import useAuth from "../auth/useAuth";
+import { formatDate } from "../utils/dateFormater"; // Assuming you have a custom date formatter
+import { useFocusEffect } from "@react-navigation/native";
 
 export default function HomeScreen({ navigation }) {
   const { user } = useAuth();
+  const [upcomingAppointments, setUpcomingAppointments] = useState([]);
+  const [pastAppointments, setPastAppointments] = useState([]);
+  const [appointmentsDetails, setAppointmentsDetails] = useState([]);
+  const [therapiesCount, setTherapiesCount] = useState(0);
+  const [programsCount, setProgramsCount] = useState(0);
+  const [checkupsCount, setCheckupsCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const loadCountAppointments = async () => {
+    try {
+      setIsLoading(true);
+      const { appointmentsCount } = await appointmentService.getCount(user.id);
+      setTherapiesCount(appointmentsCount.therapies);
+      setProgramsCount(appointmentsCount.programs);
+      setCheckupsCount(appointmentsCount.checkups);
+    } catch (error) {
+      setError("Failed to load appointments count");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Load Upcoming Appointments
+  const loadUpcomingAppointments = async () => {
+    try {
+      setIsLoading(true);
+      const result = await appointmentService.getUpcommingAppointmets(user.id);
+      setUpcomingAppointments(result);
+      await fetchAppointmentsDetails(result);
+    } catch (error) {
+      setError("Failed to load upcoming appointments");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Load Past Appointments
+  const loadPastAppointments = async () => {
+    try {
+      setIsLoading(true);
+      const result = await appointmentService.getPastAppointmets(user.id);
+      setPastAppointments(result);
+      await fetchAppointmentsDetails(result);
+    } catch (error) {
+      setError("Failed to load past appointments");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Fetch Details for Each Appointment
+  const fetchAppointmentsDetails = async (appointments) => {
+    try {
+      const details = await Promise.all(
+        appointments.map(async (appointment) => {
+          const details = await appointmentService.getById(
+            appointment.itemId,
+            appointment.type,
+          );
+          return { ...appointment, details };
+        }),
+      );
+      setAppointmentsDetails(details);
+    } catch (error) {
+      setError("Failed to load appointment details");
+    }
+  };
+
+  useEffect(() => {
+    if (user?.id) {
+      loadUpcomingAppointments();
+      loadPastAppointments();
+      loadCountAppointments(); // Call the count function on mount
+    }
+  }, [user?.id]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      loadUpcomingAppointments();
+    }, []),
+  );
+
+  if (isLoading) {
+    return <ActivityIndicator size="large" style={{ flex: 1 }} />;
+  }
+
+  if (error) {
+    return <Text style={styles.error}>{error}</Text>;
+  }
 
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* HEADER */}
         <View style={styles.header}>
+          {user?.photoURL ? (
+            <Image source={{ uri: user.avatar }} style={styles.avatar} />
+          ) : (
+            <Image
+              source={{
+                uri: "https://img.freepik.com/premium-vector/profile-icon-vector-image-can-be-used-ui_120816-260932.jpg?semt=ais_rp_progressive&w=740&q=80",
+              }}
+              style={styles.avatar}
+            />
+          )}
           <View>
-            <Text style={styles.greeting}>Good Morning,</Text>
-            <Text style={styles.username}>{user.name} 🌿</Text>
+            <Text style={styles.greeting}>
+              Welcome,
+              <Text style={styles.username}>{user.name} 🌿</Text>
+            </Text>
           </View>
-          <Image source={{ uri: user.avatar }} style={styles.avatar} />
         </View>
 
-        {/* NEXT APPOINTMENT */}
+        {/* Section: Upcoming Appointments */}
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>Next Appointment</Text>
-          <Text style={styles.cardMain}>23 Feb • 14:00</Text>
-          <Text style={styles.cardSub}>Initial Consultation</Text>
+          <Text style={styles.cardTitle}>Upcoming Appointments</Text>
+          {upcomingAppointments.map((appointment, index) => (
+            <View
+              key={index}
+              style={[styles.infoCard, styles.featureInfoCards]}
+            >
+              <Text>Type: {appointment.type}</Text>
+              <Text>
+                Time:{" "}
+                {appointment.createdAt
+                  ? formatDate(appointment.date)
+                  : "Invalid date"}
+              </Text>
+            </View>
+          ))}
         </View>
 
-        {/* ACTIVE THERAPY */}
+        {/* Section: Past Appointments */}
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>Active Therapy</Text>
-          <Text style={styles.cardMain}>Vata Balancing Program</Text>
-          <Text style={styles.cardSub}>Day 7 of 21</Text>
+          <Text style={styles.cardTitle}>Past Appointments</Text>
+          {pastAppointments.map((appointment, index) => (
+            <View key={index} style={[styles.infoCard, styles.pastinfoCards]}>
+              <Text>Type: {appointment.type}</Text>
+              <Text>
+                Time:{" "}
+                {appointment.createdAt
+                  ? formatDate(appointment.date)
+                  : "Invalid date"}
+              </Text>
+            </View>
+          ))}
         </View>
 
-        {/* HERBAL REMINDER */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Today’s Herbal Intake</Text>
-          <Text style={styles.cardSub}>• Ashwagandha – 1 capsule</Text>
-          <Text style={styles.cardSub}>• Triphala – evening</Text>
-        </View>
-
-        {/* PROGRESS */}
+        {/* PROGRESS SECTION */}
         <View style={styles.progressContainer}>
           <View style={styles.progressBox}>
-            <Text style={styles.progressNumber}>3</Text>
+            <Text style={styles.progressNumber}>{therapiesCount}</Text>
             <Text style={styles.progressLabel}>Therapies</Text>
           </View>
           <View style={styles.progressBox}>
-            <Text style={styles.progressNumber}>14</Text>
-            <Text style={styles.progressLabel}>Active Days</Text>
+            <Text style={styles.progressNumber}>{programsCount}</Text>
+            <Text style={styles.progressLabel}>Programs</Text>
           </View>
           <View style={styles.progressBox}>
-            <Text style={styles.progressNumber}>2</Text>
-            <Text style={styles.progressLabel}>Herbal Plans</Text>
+            <Text style={styles.progressNumber}>{checkupsCount}</Text>
+            <Text style={styles.progressLabel}>Checkups</Text>
           </View>
         </View>
 
         {/* QUICK ACTIONS */}
-
         <Button
           text="Book Consultation"
           active={true}
@@ -81,62 +196,36 @@ export default function HomeScreen({ navigation }) {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
+    justifyContent: "center",
+    backgroundColor: "#F8F8F8",
   },
   header: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
-    padding: 20,
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    backgroundColor: "#4A7C59",
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
   },
 
   greeting: {
     fontSize: 16,
-    color: "#777",
+    color: "#fff",
   },
 
   username: {
     fontSize: 22,
     fontWeight: "bold",
-    color: "#2E2E2E",
+    color: "#FFF",
+    marginTop: 4,
   },
 
   avatar: {
     width: 50,
     height: 50,
     borderRadius: 25,
-  },
-
-  card: {
-    backgroundColor: "#FFFFFF",
-    marginHorizontal: 10,
-    // iOS Shadow
-    shadowColor: "#224324",
-    shadowOffset: { width: 10, height: 10 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    // Android Shadow
-    elevation: 8,
-    marginBottom: 16,
-    padding: 20,
-    borderRadius: 16,
-  },
-  cardTitle: {
-    fontSize: 14,
-    color: "#4A7C59",
-    marginBottom: 6,
-  },
-
-  cardMain: {
-    fontSize: 20,
-    fontWeight: "600",
-    height: 80,
-    color: "#012b10",
-  },
-
-  cardSub: {
-    fontSize: 16,
-    color: "#666",
-    marginTop: 4,
+    marginRight: 15,
   },
 
   progressContainer: {
@@ -148,18 +237,18 @@ const styles = StyleSheet.create({
 
   progressBox: {
     backgroundColor: "#FFFFFF",
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    borderRadius: 12,
     flex: 1,
-    marginHorizontal: 10,
-    padding: 20,
-    borderRadius: 16,
-    alignItems: "center",
-    // iOS Shadow
-    shadowColor: "#224324",
-    shadowOffset: { width: 10, height: 10 },
-    shadowOpacity: 0.2,
+    marginHorizontal: 5,
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
     shadowRadius: 4,
-    // Android Shadow
-    elevation: 8,
+    justifyContent: "center",
+    alignItems: "center",
   },
 
   progressNumber: {
@@ -169,19 +258,54 @@ const styles = StyleSheet.create({
   },
 
   progressLabel: {
-    fontSize: 10,
+    fontSize: 14,
     color: "#777",
     marginTop: 4,
   },
 
-  actionsContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 10,
-    marginHorizontal: 40,
+  card: {
+    backgroundColor: "#FFF",
+    marginVertical: 20,
+    marginHorizontal: 20,
+    padding: 20,
+    borderRadius: 12,
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
+
+  cardTitle: {
+    fontSize: 22,
+    color: "#4A7C59",
+    fontWeight: "bold",
+    marginBottom: 8,
+  },
+
+  infoCard: {
+    marginBottom: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    marginBottom: 10,
+  },
+
+  featureInfoCards: {
+    backgroundColor: "#e9f7e3",
+  },
+
+  pastinfoCards: {
+    backgroundColor: "#ead6d6",
+  },
+
   consultationButton: {
+    marginVertical: 20,
+    paddingVertical: 12,
+    backgroundColor: "#4A7C59",
+    borderRadius: 8,
     alignSelf: "center",
-    backgroundColor: "#b8e8c8",
+    width: "80%",
+    textAlign: "center",
   },
 });
