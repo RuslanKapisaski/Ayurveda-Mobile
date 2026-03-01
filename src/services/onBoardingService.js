@@ -1,6 +1,28 @@
 import { doc, setDoc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { db, auth } from "../fireBaseConfig";
 
+export async function saveUserGoals(goals) {
+  const user = auth.currentUser;
+
+  if (!user) {
+    console.log("No authenticated user");
+    return;
+  }
+
+  try {
+    await setDoc(
+      doc(db, "users", user.uid),
+      {
+        goals,
+        updatedAt: serverTimestamp(),
+      },
+      { merge: true },
+    );
+  } catch (error) {
+    console.error("Error saving user goals result:", error);
+  }
+}
+
 export async function saveDoshaResultToUser(
   dominantDosha,
   doshaPercentages,

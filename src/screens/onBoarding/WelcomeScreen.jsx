@@ -14,7 +14,7 @@ export default function WelcomeScreen({ navigation }) {
         text="Get Started"
         style={styles.button}
         active={true}
-        onPress={() => navigation.navigate("AboutAyurveda")}
+        onPress={() => navigation.navigate("Goals")}
       />
     </View>
   );

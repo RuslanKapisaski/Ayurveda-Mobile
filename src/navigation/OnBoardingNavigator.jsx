@@ -12,8 +12,8 @@ export default function OnBoardingNavigator() {
   return (
     <Stack.Navigator>
       <Stack.Screen name="Welcome" component={WelcomeScreen} />
-      <Stack.Screen name="AboutAyurveda" component={AboutAyurvedaScreen} />
       <Stack.Screen name="Goals" component={GoalsScreen} />
+      <Stack.Screen name="AboutAyurveda" component={AboutAyurvedaScreen} />
       <Stack.Screen name="DoshaIntro" component={DoshaIntroScreen} />
       <Stack.Screen name="DoshaTest" component={DoshaTestScreen} />
       <Stack.Screen name="DoshaResult" component={DoshaResultScreen} />
