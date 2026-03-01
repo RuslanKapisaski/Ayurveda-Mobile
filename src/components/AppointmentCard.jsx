@@ -1,12 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
-  View,
-  ScrollView,
-} from "react-native";
+import { Text, StyleSheet, TouchableOpacity, Image, View } from "react-native";
 
 import * as therapiesService from "../services/therapiesService";
 import * as programsService from "../services/programsService";
@@ -19,53 +12,42 @@ export default function AppointmentCard({ appointment, onCancel, onEdit }) {
   useEffect(() => {
     const loadData = async () => {
       try {
-        let result;
+        let result = null;
         if (appointment.type === "therapy") {
           result = await therapiesService.getById(appointment.itemId);
         } else if (appointment.type === "program") {
           result = await programsService.getById(appointment.itemId);
+        } else if (appointment.type === "checkup") {
+          // For checkups, we just use the appointment itself
+          result = { name: "Checkup", type: "checkup" };
         }
-        // } else if (appointment.type === "checkup") {
-        //   result = appointment;
-        // }
-
         setItem(result);
       } catch (error) {
-        console.error(`Error loading appointments: ${error.message}`);
+        console.error(`Error loading appointment: ${error.message}`);
       }
     };
-
     loadData();
-  }, [appointment.therapyId]);
+  }, [appointment]);
+
+  const getImageUri = () => {
+    if (item?.imageUrl) return item.imageUrl;
+    if (appointment.type === "checkup") {
+      return "https://st3.depositphotos.com/9998432/19176/v/450/depositphotos_191768074-stock-illustration-default-placeholder-doctor-half-length.jpg";
+    }
+    return "https://media.istockphoto.com/id/2074983548/vector/default-placeholder-doctor-portrait-photo-avatar-on-gray-background-greyscale-female.jpg?s=612x612&w=0&k=20&c=kRx9BZpeg3WruAKBRDfBrd03P6sWyLW2PzLRUaQnueE=";
+  };
 
   return (
-    <ScrollView style={styles.card}>
-      {item?.imageUrl ? (
-        <Image
-          source={{ uri: item.imageUrl }}
-          style={styles.image}
-          resizeMode="cover"
-        />
-      ) : item?.type === "checkup" ? (
-        <Image
-          source={{
-            uri: "https://st3.depositphotos.com/9998432/19176/v/450/depositphotos_191768074-stock-illustration-default-placeholder-doctor-half-length.jpg",
-          }}
-          style={styles.image}
-          resizeMode="cover"
-        />
-      ) : (
-        <Image
-          source={{
-            uri: "https://media.istockphoto.com/id/2074983548/vector/default-placeholder-doctor-portrait-photo-avatar-on-gray-background-greyscale-female.jpg?s=612x612&w=0&k=20&c=kRx9BZpeg3WruAKBRDfBrd03P6sWyLW2PzLRUaQnueE=",
-          }}
-          style={styles.image}
-          resizeMode="cover"
-        />
-      )}
+    <View style={styles.card}>
+      <Image
+        source={{ uri: getImageUri() }}
+        style={styles.image}
+        resizeMode="cover"
+      />
+
       <Text style={styles.subtitle}>
         Appointment:
-        <Text style={styles.itemName}> {item?.name} </Text>
+        <Text style={styles.itemName}> {item?.name || appointment.type} </Text>
       </Text>
       <Text style={styles.subtitle}>
         Type:
@@ -92,7 +74,7 @@ export default function AppointmentCard({ appointment, onCancel, onEdit }) {
           onPress={() => onEdit(appointment)}
         />
       </View>
-    </ScrollView>
+    </View>
   );
 }
 
@@ -101,7 +83,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderRadius: 12,
     padding: 10,
-    gap: 10,
     marginBottom: 16,
     shadowColor: "#000",
     shadowOpacity: 0.1,
@@ -120,7 +101,6 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   buttonPanel: {
-    flex: 1,
     flexDirection: "row",
     gap: 10,
     marginTop: 20,
@@ -147,17 +127,5 @@ const styles = StyleSheet.create({
     height: 160,
     borderRadius: 8,
     marginBottom: 8,
-  },
-  imagePlaceholder: {
-    height: 160,
-    backgroundColor: "#E9F5F1",
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 8,
-    borderRadius: 8,
-  },
-  imagePlaceholderText: {
-    fontSize: 14,
-    color: "#444",
   },
 });
