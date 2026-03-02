@@ -18,7 +18,6 @@ export default function HomeScreen({ navigation }) {
   const { user } = useAuth();
   const [upcomingAppointments, setUpcomingAppointments] = useState([]);
   const [pastAppointments, setPastAppointments] = useState([]);
-  const [appointmentsDetails, setAppointmentsDetails] = useState([]);
   const [therapiesCount, setTherapiesCount] = useState(0);
   const [programsCount, setProgramsCount] = useState(0);
   const [checkupsCount, setCheckupsCount] = useState(0);
@@ -45,7 +44,6 @@ export default function HomeScreen({ navigation }) {
       setIsLoading(true);
       const result = await appointmentService.getUpcommingAppointmets(user.id);
       setUpcomingAppointments(result);
-      await fetchAppointmentsDetails(result);
     } catch (error) {
       setError("Failed to load upcoming appointments");
     } finally {
@@ -59,29 +57,10 @@ export default function HomeScreen({ navigation }) {
       setIsLoading(true);
       const result = await appointmentService.getPastAppointmets(user.id);
       setPastAppointments(result);
-      await fetchAppointmentsDetails(result);
     } catch (error) {
       setError("Failed to load past appointments");
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  // Fetch Details for Each Appointment
-  const fetchAppointmentsDetails = async (appointments) => {
-    try {
-      const details = await Promise.all(
-        appointments.map(async (appointment) => {
-          const details = await appointmentService.getById(
-            appointment.itemId,
-            appointment.type,
-          );
-          return { ...appointment, details };
-        }),
-      );
-      setAppointmentsDetails(details);
-    } catch (error) {
-      setError("Failed to load appointment details");
     }
   };
 

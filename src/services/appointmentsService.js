@@ -11,6 +11,7 @@ import {
   and,
   getDoc,
   Timestamp,
+  orderBy,
 } from "firebase/firestore";
 import { db } from "../fireBaseConfig";
 
@@ -137,7 +138,6 @@ export async function edit(appointmentData, updates) {
 
     const docRef = doc(db, "appointments", id);
     await updateDoc(docRef, updates);
-
   } catch (error) {
     console.error(`Error editing appointment:, ${error}`);
     throw new Error(`Failed to edit appointment: ${error.message}`);
@@ -169,7 +169,6 @@ export async function getUpcommingAppointmets(userId) {
     querySnapshot.forEach((doc) => {
       upcomingAppointments.push({ id: doc.id, ...doc.data() });
     });
-    console.log(upcomingAppointments);
 
     return upcomingAppointments;
   } catch (error) {
@@ -201,6 +200,34 @@ export async function getPastAppointmets(userId) {
     console.error(`Erorr fetching past appointments: ${error}`);
     throw new Error(
       `Error during fetching past appointments: ${error.message}`,
+    );
+  }
+}
+
+export async function getHistory(userId) {
+  try {
+    console.log("userId", userId);
+
+    const historyQuery = query(
+      collection(db, "appointments"),
+      where("userId", "==", userId),
+      where("date", "<=", Timestamp.fromDate(new Date())),
+      orderBy("date", "desc"),
+    );
+
+    const historySnapshot = await getDocs(historyQuery);
+
+    const history = [];
+
+    historySnapshot.forEach((doc) => {
+      history.push({ id: doc.id, ...doc.data() });
+    });
+
+    return history;
+  } catch (error) {
+    console.error(`Erorr fetching history of appointments: ${error}`);
+    throw new Error(
+      `Error during fetching history of appointments: ${error.message}`,
     );
   }
 }
