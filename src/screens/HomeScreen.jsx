@@ -10,8 +10,8 @@ import {
 import * as appointmentService from "../services/appointmentsService";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Button from "../components/Button";
-import useAuth from "../auth/useAuth";
-import { formatDate } from "../utils/dateFormater"; // Assuming you have a custom date formatter
+import useAuth from "../contexts/auth/useAuth";
+import { formatDate } from "../utils/dateFormater";
 import { useFocusEffect } from "@react-navigation/native";
 
 export default function HomeScreen({ navigation }) {
@@ -112,36 +112,48 @@ export default function HomeScreen({ navigation }) {
         {/* Section: Upcoming Appointments */}
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Upcoming Appointments</Text>
-          {upcomingAppointments.map((appointment, index) => (
-            <View
-              key={index}
-              style={[styles.infoCard, styles.featureInfoCards]}
-            >
-              <Text>Type: {appointment.type}</Text>
-              <Text>
-                Time:{" "}
-                {appointment.createdAt
-                  ? formatDate(appointment.date)
-                  : "Invalid date"}
-              </Text>
-            </View>
-          ))}
+
+          {upcomingAppointments && upcomingAppointments.length > 0 ? (
+            upcomingAppointments.map((appointment, index) => (
+              <View
+                key={index}
+                style={[styles.infoCard, styles.featureInfoCards]}
+              >
+                <Text>Type: {appointment.type}</Text>
+                <Text>
+                  Time:
+                  {appointment.date
+                    ? formatDate(appointment.date)
+                    : "Invalid date"}
+                </Text>
+              </View>
+            ))
+          ) : (
+            <Text style={styles.noAppointmentsText}>
+              No upcoming appointments
+            </Text>
+          )}
         </View>
 
         {/* Section: Past Appointments */}
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Past Appointments</Text>
-          {pastAppointments.map((appointment, index) => (
-            <View key={index} style={[styles.infoCard, styles.pastinfoCards]}>
-              <Text>Type: {appointment.type}</Text>
-              <Text>
-                Time:{" "}
-                {appointment.createdAt
-                  ? formatDate(appointment.date)
-                  : "Invalid date"}
-              </Text>
-            </View>
-          ))}
+
+          {pastAppointments && pastAppointments.length > 0 ? (
+            pastAppointments.map((appointment, index) => (
+              <View key={index} style={[styles.infoCard, styles.pastinfoCards]}>
+                <Text>Type: {appointment.type}</Text>
+                <Text>
+                  Time:{" "}
+                  {appointment.date
+                    ? formatDate(appointment.date)
+                    : "Invalid date"}
+                </Text>
+              </View>
+            ))
+          ) : (
+            <Text style={styles.noAppointmentsText}>No past appointments</Text>
+          )}
         </View>
 
         {/* PROGRESS SECTION */}
@@ -286,5 +298,10 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     width: "80%",
     textAlign: "center",
+  },
+
+  noAppointmentsText: {
+    marginVertical: 20,
+    fontSize: 14,
   },
 });
