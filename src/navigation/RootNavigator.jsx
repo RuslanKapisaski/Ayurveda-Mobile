@@ -9,7 +9,11 @@ import AppointmentsNavigator from "./AppointemntsNavigator";
 
 const Tabs = createBottomTabNavigator();
 
+import { useTheme } from "../contexts/theme/useTheme";
+
 export default function RootNavigator() {
+  const { theme, isDarkMode } = useTheme();
+
   return (
     <Tabs.Navigator
       screenOptions={{
@@ -62,11 +66,13 @@ export default function RootNavigator() {
           ),
         }}
       />
-
       <Tabs.Screen
         name="Profile"
         component={MyProfileScreen}
         options={{
+          headerRight: () => (
+            <ThemeButton toggleTheme={toggleTheme} isDark={isDarkMode} />
+          ), // Тук коригираме пропса
           tabBarLabel: "Profile",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="person" size={size} color={color} />
