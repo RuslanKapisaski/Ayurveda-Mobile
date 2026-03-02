@@ -1,5 +1,4 @@
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import useAuth from "../auth/useAuth";
+import useAuth from "../contexts/auth/useAuth";
 import RootNavigator from "./RootNavigator";
 import AuthNavigator from "./AuthNavigator";
 import { ActivityIndicator } from "react-native";

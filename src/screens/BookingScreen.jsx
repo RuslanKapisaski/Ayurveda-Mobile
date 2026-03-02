@@ -12,8 +12,7 @@ import {
   Alert,
 } from "react-native";
 
-import Button from "../components/Button";
-import useAuth from "../auth/useAuth";
+import useAuth from "../contexts/auth/useAuth";
 import Calendar from "../components/Calendar";
 
 import * as therapiesService from "../services/therapiesService";

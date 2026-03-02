@@ -14,7 +14,7 @@ import { Picker } from "@react-native-picker/picker";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import Calendar from "../components/Calendar";
-import useAuth from "../auth/useAuth";
+import useAuth from "../contexts/auth/useAuth";
 import * as appointmentsService from "../services/appointmentsService";
 import confirmAlert from "../utils/confirmAlert";
 import { formatDate } from "../utils/dateFormater";

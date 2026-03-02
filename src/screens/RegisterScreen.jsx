@@ -6,7 +6,7 @@ import { KeyboardAvoidingView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { validate } from "../utils/validate";
-import useAuth from "../auth/useAuth";
+import useAuth from "../contexts/auth/useAuth";
 import ImagePicker from "../components/ImagePicker";
 
 export default function RegisterScreen({ navigation }) {

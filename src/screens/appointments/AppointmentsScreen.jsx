@@ -11,7 +11,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import AppointmentCard from "../../components/AppointmentCard";
 import * as appointmentsService from "../../services/appointmentsService";
-import useAuth from "../../auth/useAuth";
+import useAuth from "../../contexts/auth/useAuth";
 import confirmAlert from "../../utils/confirmAlert";
 
 export default function AppointmentsScreen({ navigation }) {

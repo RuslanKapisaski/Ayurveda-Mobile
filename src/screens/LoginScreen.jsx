@@ -5,7 +5,7 @@ import { Text } from "react-native";
 import { KeyboardAvoidingView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { validate } from "../utils/validate";
-import useAuth from "../auth/useAuth";
+import useAuth from "../contexts/auth/useAuth";
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");

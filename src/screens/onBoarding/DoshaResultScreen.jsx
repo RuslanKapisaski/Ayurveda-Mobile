@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Animated, Dimensions } from "react-native";
 import Button from "../../components/Button";
 
 import * as onBoardingService from "../../services/onBoardingService";
-import useAuth from "../../auth/useAuth";
+import useAuth from "../../contexts/auth/useAuth";
 
 const { width } = Dimensions.get("window");
 

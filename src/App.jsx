@@ -1,6 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import { NavigationContainer } from "@react-navigation/native";
-import { AuthProvider } from "./auth/AuthProvider";
+import { AuthProvider } from "./contexts/auth/AuthProvider";
 import AppNavigator from "./navigation/AppNavigator";
 export default function App() {
   return (
