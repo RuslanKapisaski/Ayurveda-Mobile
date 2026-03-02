@@ -1,23 +1,25 @@
 import useAuth from "../contexts/auth/useAuth";
 import RootNavigator from "./RootNavigator";
 import AuthNavigator from "./AuthNavigator";
-import { ActivityIndicator } from "react-native";
+import { ActivityIndicator, StatusBar } from "react-native";
 import OnBoardingNavigator from "./OnBoardingNavigator";
+import { NavigationContainer } from "@react-navigation/native";
+import { useTheme } from "../contexts/theme/useTheme";
 
 export default function AppNavigator() {
   const { isAuthenticated, isLoading, hasCompletedOnBoarding } = useAuth();
+  const { theme, isDarkMode } = useTheme();
 
-  if (isLoading) {
-    return <ActivityIndicator size="large" style={{ flex: 1 }} />;
-  }
-
-  if (!isAuthenticated) {
-    return <AuthNavigator />;
-  }
-
-  if (!hasCompletedOnBoarding) {
-    return <OnBoardingNavigator />;
-  }
-
-  return <RootNavigator />;
+  return (
+    <NavigationContainer theme={theme}>
+      <StatusBar style={isDarkMode ? "light" : "dark"} />
+      {!isAuthenticated ? (
+        <AuthNavigator />
+      ) : !hasCompletedOnBoarding ? (
+        <OnBoardingNavigator />
+      ) : (
+        <RootNavigator />
+      )}
+    </NavigationContainer>
+  );
 }
