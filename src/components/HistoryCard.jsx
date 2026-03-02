@@ -4,24 +4,42 @@ import { formatDate } from "../utils/dateFormater";
 export default function HistoryCard({
   imageUrl,
   name,
-  type,
   price,
   startDate,
+  checkup,
 }) {
   return (
     <View style={styles.card}>
-      {imageUrl ? (
-        <Image source={{ uri: imageUrl }} style={styles.image} />
-      ) : (
-        <View style={styles.imagePlaceholder}>
-          <Text style={styles.placeholderText}>No Image</Text>
-        </View>
-      )}
-
       <View style={styles.infoContainer}>
-        <Text style={styles.title}>{name || "N/A"}</Text>
-        <Text style={styles.price}>Price: {price || "N/A"}</Text>
-        {startDate && <Text style={styles.date}>{formatDate(startDate)}</Text>}
+        {checkup.type === "checkup" ? (
+          <>
+            <Text>Type: {checkup?.type || "N/A"}</Text>
+
+            <Text>Doctor: {checkup?.doctor?.name || "N/A"}</Text>
+
+            {checkup?.date && (
+              <Text style={styles.date}>Date: {formatDate(checkup.date)}</Text>
+            )}
+            {checkup?.note && <Text>Note: {checkup.note}</Text>}
+          </>
+        ) : (
+          <>
+            {imageUrl ? (
+              <Image source={{ uri: imageUrl }} style={styles.image} />
+            ) : (
+              <View style={styles.imagePlaceholder}>
+                <Text style={styles.placeholderText}>No Image</Text>
+              </View>
+            )}
+
+            <Text style={styles.title}>{name || "N/A"}</Text>
+            <Text style={styles.price}>Price: {price || "N/A"}</Text>
+
+            {startDate && (
+              <Text style={styles.date}>{formatDate(startDate)}</Text>
+            )}
+          </>
+        )}
       </View>
     </View>
   );

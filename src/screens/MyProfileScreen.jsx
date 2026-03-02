@@ -8,8 +8,9 @@ import {
   ActivityIndicator,
   TextInput,
   TouchableOpacity,
+  Alert,
 } from "react-native";
-import useAuth from "../auth/useAuth";
+import useAuth from "../contexts/auth/useAuth";
 import { formatDate } from "../utils/dateFormater";
 
 import * as appointmentService from "../services/appointmentsService";
@@ -18,7 +19,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import HistoryCard from "../components/HistoryCard";
 
 export default function ProfileScreen() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const [firestoreUser, setFirestoreUser] = useState([]);
   const [historyOfAppointments, setHistoryOfAppointments] = useState([]);
   const [therapiesCount, setTherapiesCount] = useState(0);
@@ -64,12 +65,12 @@ export default function ProfileScreen() {
           const details = await appointmentService.getById(
             appointment.itemId,
             appointment.type,
+            user.id,
           );
           return { details };
         }),
       );
       setDetailedAppointment(details);
-      console.log(details);
     } catch (error) {
       setError("Failed to load appointment details");
     }
@@ -111,6 +112,25 @@ export default function ProfileScreen() {
     setAllergies(updatedAllergies);
   };
 
+  const handleLogout = () => {
+    Alert.alert("Sign Out", "Are you sure you want to sign out?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Sign Out",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            setIsLoading(true);
+            await logout();
+          } catch (error) {
+            console.log("Logout error:", error);
+          } finally {
+            setIsLoading(false);
+          }
+        },
+      },
+    ]);
+  };
   if (isLoading) {
     return <ActivityIndicator size="large" style={{ flex: 1 }} />;
   }
@@ -157,7 +177,7 @@ export default function ProfileScreen() {
           </Text>
           <Text style={styles.infoText}>
             Dosha Scores:
-            {`Kapha: ${user.dosha.scores?.Kapha}, Pitta: ${user.dosha.scores?.Pitta}, Vata: ${user.dosha.scores?.Vata}`}
+            {`Kapha: ${user.dosha?.scores?.Kapha || 0}, Pitta: ${user.dosha?.scores?.Pitta || 0}, Vata: ${user.dosha?.scores?.Vata || 0}`}
           </Text>
         </View>
 
@@ -215,22 +235,6 @@ export default function ProfileScreen() {
           )}
         </View>
 
-        {/* PROGRESS SECTION */}
-        <View style={styles.progressContainer}>
-          <View style={styles.progressBox}>
-            <Text style={styles.progressNumber}>{therapiesCount}</Text>
-            <Text style={styles.progressLabel}>Therapies</Text>
-          </View>
-          <View style={styles.progressBox}>
-            <Text style={styles.progressNumber}>{programsCount}</Text>
-            <Text style={styles.progressLabel}>Programs</Text>
-          </View>
-          <View style={styles.progressBox}>
-            <Text style={styles.progressNumber}>{checkupsCount}</Text>
-            <Text style={styles.progressLabel}>Checkups</Text>
-          </View>
-        </View>
-
         {/* History */}
         <View style={styles.card}>
           <Text style={styles.cardTitle}>History of appointments</Text>
@@ -242,10 +246,25 @@ export default function ProfileScreen() {
                 name={app.details?.name}
                 price={app.details?.price}
                 startDate={app.details?.startDate}
+                checkup={app?.details}
               />
             ))
           ) : (
             <Text>No appointment history available</Text>
+          )}
+        </View>
+
+        {/* SIGN OUT */}
+        <View style={styles.logoutContainer}>
+          {isLoading ? (
+            <ActivityIndicator size="large" />
+          ) : (
+            <TouchableOpacity
+              style={styles.logoutButton}
+              onPress={handleLogout}
+            >
+              <Text style={styles.logoutButtonText}>Sign Out</Text>
+            </TouchableOpacity>
           )}
         </View>
       </ScrollView>
@@ -347,36 +366,22 @@ const styles = StyleSheet.create({
     color: "#555",
     marginTop: 8,
   },
-  progressContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginHorizontal: 20,
-    marginBottom: 20,
-  },
-  progressBox: {
-    backgroundColor: "#FFFFFF",
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    borderRadius: 12,
-    flex: 1,
-    marginHorizontal: 5,
-    elevation: 5,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    justifyContent: "center",
+
+  logoutContainer: {
+    marginTop: 10,
+    marginBottom: 40,
     alignItems: "center",
   },
-  progressNumber: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#4A7C59",
+  logoutButton: {
+    backgroundColor: "#B00020",
+    paddingVertical: 14,
+    paddingHorizontal: 60,
+    borderRadius: 12,
   },
-  progressLabel: {
-    fontSize: 14,
-    color: "#777",
-    marginTop: 4,
+  logoutButtonText: {
+    color: "#FFF",
+    fontSize: 16,
+    fontWeight: "600",
   },
   error: {
     color: "#FF0000",

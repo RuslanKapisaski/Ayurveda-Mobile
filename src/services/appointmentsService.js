@@ -89,45 +89,48 @@ export async function getCount(userId) {
   }
 }
 
-export async function getById(itemId, type) {
+export async function getById(itemId, type, userId) {
   try {
     let itemDetails;
 
     if (type === "therapy") {
       const therapyDocRef = doc(db, "therapies", itemId);
       const therapyDocSnap = await getDoc(therapyDocRef);
-      if (therapyDocSnap.exists()) {
-        itemDetails = therapyDocSnap.data();
-      } else {
+
+      if (!therapyDocSnap.exists()) {
         throw new Error("Therapy item not found");
       }
+
+      itemDetails = therapyDocSnap.data();
     } else if (type === "program") {
       const programDocRef = doc(db, "programs", itemId);
       const programDocSnap = await getDoc(programDocRef);
-      if (programDocSnap.exists()) {
-        itemDetails = programDocSnap.data();
-      } else {
+
+      if (!programDocSnap.exists()) {
         throw new Error("Program item not found");
       }
+
+      itemDetails = programDocSnap.data();
     } else if (type === "checkup") {
-      const checkupDocRef = doc(db, "checkups", itemId);
-      const checkupDocSnap = await getDoc(checkupDocRef);
-      if (checkupDocSnap.exists()) {
-        itemDetails = checkupDocSnap.data();
-      } else {
-        throw new Error("Checkup item not found");
+      const q = query(
+        collection(db, "appointments"),
+        where("userId", "==", userId),
+      );
+      const querySnapshot = await getDocs(q);
+      if (querySnapshot.empty) {
+        throw new Error("No checkups found");
       }
+      itemDetails = querySnapshot.docs[0].data();
     } else {
       throw new Error("Invalid appointment type");
     }
 
     return itemDetails;
   } catch (error) {
-    console.error(`Error fetching details for ${type} appointment:`, error);
+    console.error(`Error fetching details for ${type}:`, error);
     throw new Error(`Error fetching details: ${error.message}`);
   }
 }
-
 export async function edit(appointmentData, updates) {
   try {
     const { id } = { ...appointmentData };
