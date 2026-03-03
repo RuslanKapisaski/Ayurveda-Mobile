@@ -145,8 +145,13 @@ export default function HomeScreen({ navigation }) {
       </View>
 
       {/* PROGRESS SECTION */}
-      <View style={styles.progressContainer}>
-        <View style={styles.progressBox}>
+      <View style={[styles.progressContainer, ,]}>
+        <View
+          style={[
+            styles.progressBox,
+            { backgroundColor: theme.colors.cardColor },
+          ]}
+        >
           <Text style={[styles.progressNumber, { color: theme.colors.text }]}>
             {therapiesCount}
           </Text>
@@ -154,7 +159,12 @@ export default function HomeScreen({ navigation }) {
             Therapies
           </Text>
         </View>
-        <View style={styles.progressBox}>
+        <View
+          style={[
+            styles.progressBox,
+            { backgroundColor: theme.colors.cardColor },
+          ]}
+        >
           <Text style={[styles.progressNumber, { color: theme.colors.text }]}>
             {programsCount}
           </Text>
@@ -162,7 +172,12 @@ export default function HomeScreen({ navigation }) {
             Programs
           </Text>
         </View>
-        <View style={styles.progressBox}>
+        <View
+          style={[
+            styles.progressBox,
+            { backgroundColor: theme.colors.cardColor },
+          ]}
+        >
           <Text style={[styles.progressNumber, { color: theme.colors.text }]}>
             {checkupsCount}
           </Text>

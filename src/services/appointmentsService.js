@@ -209,8 +209,6 @@ export async function getPastAppointmets(userId) {
 
 export async function getHistory(userId) {
   try {
-    console.log("userId", userId);
-
     const historyQuery = query(
       collection(db, "appointments"),
       where("userId", "==", userId),

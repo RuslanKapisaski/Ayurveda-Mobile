@@ -5,8 +5,10 @@ import * as therapiesService from "../services/therapiesService";
 import * as programsService from "../services/programsService";
 import Button from "./Button";
 import { formatDate } from "../utils/dateFormater";
+import { useTheme } from "../contexts/theme/useTheme";
 
 export default function AppointmentCard({ appointment, onCancel, onEdit }) {
+  const { theme } = useTheme();
   const [item, setItem] = useState(null);
 
   useEffect(() => {
@@ -18,7 +20,6 @@ export default function AppointmentCard({ appointment, onCancel, onEdit }) {
         } else if (appointment.type === "program") {
           result = await programsService.getById(appointment.itemId);
         } else if (appointment.type === "checkup") {
-          // For checkups, we just use the appointment itself
           result = { name: "Checkup", type: "checkup" };
         }
         setItem(result);
@@ -38,31 +39,37 @@ export default function AppointmentCard({ appointment, onCancel, onEdit }) {
   };
 
   return (
-    <View style={styles.card}>
+    <View style={[styles.card, { backgroundColor: theme.colors.cardColor }]}>
       <Image
         source={{ uri: getImageUri() }}
         style={styles.image}
         resizeMode="cover"
       />
 
-      <Text style={styles.subtitle}>
+      <Text style={[styles.subtitle, { color: theme.colors.text }]}>
         Appointment:
-        <Text style={styles.itemName}> {item?.name || appointment.type} </Text>
+        <Text style={[styles.itemName, { color: theme.colors.text }]}>
+          {" "}
+          {item?.name || appointment.type}{" "}
+        </Text>
       </Text>
-      <Text style={styles.subtitle}>
+      <Text style={[styles.subtitle, { color: theme.colors.text }]}>
         Type:
-        <Text style={styles.itemName}> {appointment?.type}</Text>
+        <Text style={[styles.itemName, { color: theme.colors.text }]}>
+          {" "}
+          {appointment?.type}
+        </Text>
       </Text>
-      <Text style={styles.subtitle}>
+      <Text style={[styles.subtitle, { color: theme.colors.text }]}>
         Date:
-        <Text style={styles.itemName}>
+        <Text style={[styles.itemName, { color: theme.colors.text }]}>
           {appointment?.date && formatDate(appointment.date)}
         </Text>
       </Text>
 
       <View style={styles.buttonPanel}>
         <Button
-          style={styles.cancelButton}
+          style={[styles.cancelButton]}
           textStyle={styles.buttonText}
           text="Cancel"
           onPress={() => onCancel(appointment.id)}
@@ -80,7 +87,6 @@ export default function AppointmentCard({ appointment, onCancel, onEdit }) {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "#fff",
     borderRadius: 12,
     padding: 10,
     marginBottom: 16,
@@ -97,7 +103,6 @@ const styles = StyleSheet.create({
   itemName: {
     fontSize: 16,
     fontWeight: "400",
-    color: "#6e706f",
     marginBottom: 4,
   },
   buttonPanel: {
@@ -111,16 +116,16 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   cancelButton: {
-    backgroundColor: "#960909",
     paddingVertical: 10,
     paddingHorizontal: 12,
     borderRadius: 8,
+    backgroundColor: "#c25555",
   },
   editButton: {
-    backgroundColor: "#1b6608",
     paddingVertical: 10,
     borderRadius: 8,
     alignItems: "center",
+    backgroundColor: "#4A7C59",
   },
   image: {
     width: "100%",

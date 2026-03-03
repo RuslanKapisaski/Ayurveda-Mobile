@@ -6,19 +6,22 @@ import {
   FlatList,
   ActivityIndicator,
   Alert,
+  ScrollView,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
 import AppointmentCard from "../../components/AppointmentCard";
 import * as appointmentsService from "../../services/appointmentsService";
 import useAuth from "../../contexts/auth/useAuth";
 import confirmAlert from "../../utils/confirmAlert";
+import { useTheme } from "../../contexts/theme/useTheme"; 
+import { useFocusEffect } from "@react-navigation/native"; 
 
 export default function AppointmentsScreen({ navigation }) {
+  const { user } = useAuth();
+  const { theme } = useTheme();
   const [appointments, setAppointments] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const { user } = useAuth();
 
   const loadAppointments = useCallback(async () => {
     if (!user?.id) return;
@@ -34,9 +37,11 @@ export default function AppointmentsScreen({ navigation }) {
     }
   }, [user?.id]);
 
-  useEffect(() => {
-    loadAppointments();
-  }, [loadAppointments]);
+  useFocusEffect(
+    useCallback(() => {
+      loadAppointments();
+    }, [loadAppointments]),
+  );
 
   // Cancel appointment
   const handleCancel = async (appointmentId) => {
@@ -65,32 +70,44 @@ export default function AppointmentsScreen({ navigation }) {
 
     if (!confirmed) return;
 
-    navigation.navigate("EditAppointments", { appointment: appointmentData });
+    navigation.navigate("Edit", { appointment: appointmentData });
   };
 
   if (isLoading) {
     return (
-      <View style={styles.loader}>
+      <View
+        style={[styles.loader, { backgroundColor: theme.colors.background }]}
+      >
         <ActivityIndicator size="large" />
       </View>
     );
   }
 
   if (error) {
-    return <Text style={styles.error}>{error}</Text>;
+    return (
+      <Text style={[styles.error, { color: theme.colors.text }]}>{error}</Text>
+    );
   }
 
   if (appointments.length === 0) {
     return (
-      <SafeAreaView style={styles.container}>
-        <Text style={styles.noAppointments}>No upcoming appointments</Text>
+      <SafeAreaView
+        style={[styles.container, { backgroundColor: theme.colors.background }]}
+      >
+        <Text style={[styles.noAppointments, { color: theme.colors.text }]}>
+          No upcoming appointments
+        </Text>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Your Appointments</Text>
+    <View
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
+    >
+      <Text style={[styles.title, { color: theme.colors.text }]}>
+        Your Appointments
+      </Text>
 
       <FlatList
         data={appointments}
@@ -104,9 +121,12 @@ export default function AppointmentsScreen({ navigation }) {
         )}
         refreshing={isLoading}
         onRefresh={loadAppointments}
-        contentContainerStyle={{ paddingBottom: 20 }}
+        contentContainerStyle={{
+          paddingBottom: 20,
+          flexGrow: 1,
+        }}
       />
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -114,7 +134,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: "#f6f1e4",
   },
   title: {
     fontSize: 20,
@@ -127,7 +146,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   error: {
-    color: "red",
     textAlign: "center",
     marginTop: 80,
   },
@@ -135,6 +153,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: "center",
     marginTop: 40,
-    color: "#666",
   },
 });

@@ -8,8 +8,10 @@ import {
 } from "react-native";
 import * as therapiesService from "../../services/therapiesService";
 import TherapyCard from "../../components/therapyCard.jsx";
+import { useTheme } from "../../contexts/theme/useTheme"; // Импортиране на useTheme за динамични стилове
 
 export default function TherapiesScreen({ navigation }) {
+  const { theme } = useTheme(); // Извличаме текущата тема
   const [isLoading, setIsLoading] = useState(false);
   const [therapies, setTherapies] = useState([]);
   const [error, setError] = useState(null);
@@ -31,11 +33,18 @@ export default function TherapiesScreen({ navigation }) {
   }, []);
 
   if (isLoading) return <ActivityIndicator size="large" style={{ flex: 1 }} />;
-  if (error) return <Text style={styles.error}>{error}</Text>;
+  if (error)
+    return (
+      <Text style={[styles.error, { color: theme.colors.text }]}>{error}</Text>
+    );
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.subtitle}>Choose your healing journey</Text>
+    <View
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
+    >
+      <Text style={[styles.subtitle, { color: theme.colors.text }]}>
+        Choose your healing journey
+      </Text>
 
       <FlatList
         data={therapies}
@@ -44,7 +53,7 @@ export default function TherapiesScreen({ navigation }) {
           <TherapyCard
             therapy={item}
             onPress={() =>
-              navigation.navigate("TherapyDetails", { therapyDocId: item.id })
+              navigation.navigate("Details", { therapyDocId: item.id })
             }
           />
         )}
@@ -55,7 +64,17 @@ export default function TherapiesScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { backgroundColor: "#f6f1e4", flex: 1, padding: 16 },
-  subtitle: { fontSize: 18, fontWeight: "500", marginBottom: 16 },
-  error: { color: "red", textAlign: "center", marginTop: 20 },
+  container: {
+    flex: 1,
+    padding: 16,
+  },
+  subtitle: {
+    fontSize: 18,
+    fontWeight: "500",
+    marginBottom: 16,
+  },
+  error: {
+    textAlign: "center",
+    marginTop: 20,
+  },
 });

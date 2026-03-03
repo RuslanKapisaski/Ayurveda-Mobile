@@ -16,7 +16,6 @@ import { db } from "../fireBaseConfig";
 
 export async function getUserData(userId) {
   try {
-
     const userDocRef = doc(db, "users", userId);
     const userDocSnap = await getDoc(userDocRef);
 

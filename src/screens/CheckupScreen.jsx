@@ -18,10 +18,10 @@ import useAuth from "../contexts/auth/useAuth";
 import * as appointmentsService from "../services/appointmentsService";
 import confirmAlert from "../utils/confirmAlert";
 import { formatDate } from "../utils/dateFormater";
-
-// Helper to await user confirmation
+import { useTheme } from "../contexts/theme/useTheme";
 
 export default function CheckupScreen({ navigation }) {
+  const { theme } = useTheme();
   const { user } = useAuth();
   const [doctors] = useState([
     { id: "d1", name: "Dr. Mahesh Vilas Garje" },
@@ -32,43 +32,45 @@ export default function CheckupScreen({ navigation }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-const handleConfirmBooking = async (date) => {
-  if (!selectedDoctor) {
-    Alert.alert("Please select a doctor");
-    return;
-  }
+  const handleConfirmBooking = async (date) => {
+    if (!selectedDoctor) {
+      Alert.alert("Please select a doctor");
+      return;
+    }
 
-  const bookingDate = new Date(date);
+    const bookingDate = new Date(date);
 
-  const confirmed = await confirmAlert(
-    "Confirm Checkup",
-    `Book a checkup with ${selectedDoctor.name} on ${formatDate(date)}?`,
-  );
+    const confirmed = await confirmAlert(
+      "Confirm Checkup",
+      `Book a checkup with ${selectedDoctor.name} on ${formatDate(date)}?`,
+    );
 
-  if (!confirmed) return;
+    if (!confirmed) return;
 
-  try {
-    setIsLoading(true);
+    try {
+      setIsLoading(true);
 
-    const data = {
-      userId: user.id,
-      doctorId: selectedDoctor.id,
-      doctorName: selectedDoctor.name,
-      date: bookingDate,
-      type: "checkup",
-      note: note || "",
-    };
+      const data = {
+        userId: user.id,
+        date: bookingDate,
+        type: "checkup",
+        note: note || "",
+        doctor: {
+          doctorId: selectedDoctor.id,
+          name: selectedDoctor.name,
+        },
+      };
 
-    await appointmentsService.create(data);
+      await appointmentsService.create(data);
 
-    Alert.alert("Success", "Appointment booked successfully!");
-    navigation.navigate("Appointments");
-  } catch (err) {
-    Alert.alert("Error", err.message);
-  } finally {
-    setIsLoading(false);
-  }
-};
+      Alert.alert("Success", "Appointment booked successfully!");
+      navigation.navigate("Appointments");
+    } catch (err) {
+      Alert.alert("Error", err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -85,14 +87,19 @@ const handleConfirmBooking = async (date) => {
         style={{ flex: 1 }}
       >
         <ScrollView contentContainerStyle={styles.container}>
-          <Text style={styles.label}>Select Doctor</Text>
-          <View style={styles.pickerContainer}>
+          <Text style={[styles.label, { color: theme.colors.text }]}>
+            Select Doctor
+          </Text>
+          <View
+            style={[styles.pickerContainer, { borderColor: theme.colors.text }]}
+          >
             <Picker
               selectedValue={selectedDoctor.id}
               onValueChange={(itemValue) => {
                 const doctor = doctors.find((d) => d.id === itemValue);
                 setSelectedDoctor(doctor);
               }}
+              style={{ color: theme.colors.text }}
             >
               {doctors.map((doctor) => (
                 <Picker.Item
@@ -104,11 +111,27 @@ const handleConfirmBooking = async (date) => {
             </Picker>
           </View>
 
-          <Text style={styles.label}>Add a Note</Text>
+          <Text
+            style={[
+              styles.label,
+              {
+                color: theme.colors.text,
+              },
+            ]}
+          >
+            Add a Note
+          </Text>
           <TextInput
-            style={styles.textInput}
             multiline
             placeholder="Optional note..."
+            style={[
+              styles.textInput,
+              {
+                color: theme.colors.text,
+                borderColor: theme.colors.text,
+                borderWidth: 1,
+              },
+            ]}
             value={note}
             onChangeText={setNote}
           />

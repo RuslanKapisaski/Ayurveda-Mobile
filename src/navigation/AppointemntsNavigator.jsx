@@ -17,7 +17,7 @@ export default function AppointmentsNavigator() {
         component={AppointmentsScreen}
         options={{
           headerRight: () => (
-            <ThemeButton toggleTheme={toggleTheme} isDarkMode={isDarkMode} />
+            <ThemeButton toggleTheme={toggleTheme} isDark={isDarkMode} />
           ),
         }}
       />
@@ -26,7 +26,7 @@ export default function AppointmentsNavigator() {
         component={EditAppointmentsScreen}
         options={{
           headerRight: () => (
-            <ThemeButton toggleTheme={toggleTheme} isDarkMode={isDarkMode} />
+            <ThemeButton toggleTheme={toggleTheme} isDark={isDarkMode} />
           ),
         }}
       />

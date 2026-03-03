@@ -24,7 +24,7 @@ export default function TherapiesNavigator() {
       />
 
       <Stack.Screen
-        name="TherapyDetails"
+        name="Details"
         component={TherapiesDetailsScreen}
         options={{
           headerRight: () => (

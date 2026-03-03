@@ -1,4 +1,5 @@
 import { StyleSheet, TouchableOpacity, Text } from "react-native";
+import { useTheme } from "../contexts/theme/useTheme";
 
 export default function Button({
   textStyle = {},
@@ -8,6 +9,7 @@ export default function Button({
   passive,
   onPress,
 }) {
+  const { theme } = useTheme();
   return (
     <TouchableOpacity
       style={[
@@ -23,6 +25,7 @@ export default function Button({
           active && styles.primaryText,
           passive && styles.secondaryText,
           textStyle,
+          { color: theme.colors.buttonText },
         ]}
       >
         {text}
@@ -41,6 +44,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 4,
   },
+
   primaryButton: {
     backgroundColor: "#4A7C59",
   },

@@ -1,39 +1,60 @@
 import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { useTheme } from "../contexts/theme/useTheme";
 
 export default function TherapyCard({ therapy, onPress }) {
+  const { theme } = useTheme();
+
   return (
-    <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.9}>
+    <TouchableOpacity
+      style={[styles.card, { backgroundColor: theme.colors.cardColor }]}
+      onPress={onPress}
+      activeOpacity={0.9}
+    >
       {therapy.imageUrl ? (
         <Image source={{ uri: therapy.imageUrl }} style={styles.image} />
       ) : (
-        <View style={styles.placeholder}>
+        <View
+          style={[
+            styles.placeholder,
+            { backgroundColor: theme.colors.placeholderBackground },
+          ]}
+        >
           <Ionicons name="leaf-outline" size={28} color="#118161" />
         </View>
       )}
 
       <View style={styles.content}>
-        <Text style={styles.title}>{therapy.name}</Text>
+        <Text style={[styles.title, { color: theme.colors.text }]}>
+          {therapy.name}
+        </Text>
 
-        <Text style={styles.description} numberOfLines={2}>
+        <Text
+          style={[styles.description, { color: theme.colors.text }]}
+          numberOfLines={2}
+        >
           {therapy.shortDescription}
         </Text>
 
         <View style={styles.footer}>
           <View style={styles.info}>
             <Ionicons name="time-outline" size={14} color="#666" />
-            <Text style={styles.metaText}>{therapy.durationMinutes} min</Text>
+            <Text style={[styles.metaText, { color: theme.colors.text }]}>
+              {therapy.durationMinutes} min
+            </Text>
           </View>
 
-          <Text style={styles.price}>{therapy.price} €</Text>
+          <Text style={[styles.price, { color: theme.colors.text }]}>
+            {therapy.price} €
+          </Text>
         </View>
       </View>
     </TouchableOpacity>
   );
 }
+
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "#fff",
     borderRadius: 16,
     marginBottom: 16,
     overflow: "hidden",
@@ -49,7 +70,6 @@ const styles = StyleSheet.create({
   },
   placeholder: {
     height: 160,
-    backgroundColor: "#E9F5F1",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -60,11 +80,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     marginBottom: 6,
-    color: "#222",
   },
   description: {
     fontSize: 13,
-    color: "#666",
     marginBottom: 12,
   },
   footer: {
@@ -79,11 +97,9 @@ const styles = StyleSheet.create({
   },
   metaText: {
     fontSize: 12,
-    color: "#666",
   },
   price: {
     fontSize: 15,
     fontWeight: "400",
-    color: "#118161",
   },
 });

@@ -14,11 +14,11 @@ export default function ProgramsNavigator() {
   return (
     <Stack.Navigator>
       <Stack.Screen
-        name="ProgramsScreen"
+        name="Programs"
         component={ProgramsScreen}
         options={{
           headerRight: () => (
-            <ThemeButton toggleTheme={toggleTheme} isDarkMode />
+            <ThemeButton toggleTheme={toggleTheme} isDark={isDarkMode} />
           ),
         }}
       />
@@ -28,7 +28,7 @@ export default function ProgramsNavigator() {
         component={ProgramDetailsScreen}
         options={{
           headerRight: () => (
-            <ThemeButton toggleTheme={toggleTheme} isDarkMode />
+            <ThemeButton toggleTheme={toggleTheme} isDark={isDarkMode} />
           ),
         }}
       />
@@ -38,7 +38,7 @@ export default function ProgramsNavigator() {
         component={BookingScreen}
         options={{
           headerRight: () => (
-            <ThemeButton toggleTheme={toggleTheme} isDarkMode />
+            <ThemeButton toggleTheme={toggleTheme} isDark={isDarkMode} />
           ),
         }}
       />

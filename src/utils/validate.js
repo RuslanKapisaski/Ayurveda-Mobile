@@ -1,5 +1,5 @@
 export const validate = (data, type = "register") => {
-  console.log("validate", data);
+  ("validate", data);
   const { username, email, password, confirmPassword } = data;
   let errors = {};
 

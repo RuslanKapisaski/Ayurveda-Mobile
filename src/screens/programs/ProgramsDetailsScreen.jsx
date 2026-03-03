@@ -1,37 +1,39 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
   ActivityIndicator,
+  StyleSheet,
+  Text,
+  View,
   ScrollView,
+  Image,
 } from "react-native";
-
-import Button from "../../components/Button";
 import * as programsService from "../../services/programsService";
 import * as therapiesService from "../../services/therapiesService";
 import ProgramTherapiesGrid from "../../components/ProgramTherapiesGrid";
+import Button from "../../components/Button";
+import { useTheme } from "../../contexts/theme/useTheme";
 
 export default function ProgramDetailsScreen({ route, navigation }) {
   const { programId } = route.params;
   const [program, setProgram] = useState(null);
-  const [therapies, setTherapies] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [therapies, setTherapies] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  const { theme } = useTheme();
+
   useEffect(() => {
-    const loadProgramData = async () => {
+    const loadProgram = async () => {
       try {
-        const result = await programsService.getById(programId);
-        setProgram(result);
+        setIsLoading(true);
+        const data = await programsService.getById(programId);
+        setProgram(data);
 
-        const therapyIds = result.therapyIds.map((id) => String(id));
-
-        if (therapyIds?.length) {
-          const therapiesResult =
-            await therapiesService.getTherapiesByIds(therapyIds);
-          setTherapies(therapiesResult);
+        if (data?.therapyIds?.length) {
+          const result = await therapiesService.getTherapiesByIds(
+            data.therapyIds.map(String),
+          );
+          setTherapies(result);
         }
       } catch (err) {
         setError("Failed to load program.");
@@ -40,105 +42,109 @@ export default function ProgramDetailsScreen({ route, navigation }) {
       }
     };
 
-    loadProgramData();
+    loadProgram();
   }, [programId]);
-
-  const handleTherapyPress = (therapyId) => {
-    navigation.navigate("TherapiesStack", {
-      screen: "TherapyDetails",
-      params: { therapyDocId: therapyId },
-    });
-  };
 
   const handleBooking = () => {
     navigation.navigate("Booking", {
       type: "program",
-      itemId: programId,
+      itemId: program.id,
     });
   };
-  if (isLoading) {
-    return (
-      <View style={styles.loader}>
-        <ActivityIndicator size="large" />
-      </View>
-    );
-  }
 
-  if (error) {
+  const handleTherapyPress = (therapyId) => {
+    navigation.navigate("TherapiesStack", {
+      screen: "Details",
+      params: { therapyDocId: therapyId },
+    });
+  };
+
+  if (isLoading) return <ActivityIndicator size="large" style={{ flex: 1 }} />;
+
+  if (error)
     return (
-      <View style={styles.loader}>
-        <Text style={styles.error}>{error}</Text>
-      </View>
+      <Text style={[styles.error, { color: theme.colors.text }]}>{error}</Text>
     );
-  }
 
   if (!program) return null;
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
+    >
       {program.imageUrl ? (
         <Image source={{ uri: program.imageUrl }} style={styles.image} />
       ) : (
         <View style={styles.imagePlaceholder}>
-          <Text>No Image</Text>
+          <Text style={styles.imagePlaceholderText}>No Image</Text>
         </View>
       )}
 
-      <Text style={styles.title}>{program.name}</Text>
+      <Text style={[styles.title, { color: theme.colors.text }]}>
+        {program.name}
+      </Text>
 
-      <View style={styles.infoContainer}>
-        <Text style={styles.subTitle}>Information</Text>
+      <Text style={[styles.price, { color: theme.colors.primary }]}>
+        {program.price} €
+      </Text>
 
-        <Text style={styles.infoText}>
-          <Text style={styles.label}>Start:</Text> {program.startDate}
-        </Text>
-        <Text style={styles.infoText}>
-          <Text style={styles.label}>End:</Text> {program.endDate}
-        </Text>
-        <Text style={styles.infoText}>
-          <Text style={styles.label}>Duration:</Text> {program.durationDays}{" "}
-          days
-        </Text>
-        <Text style={styles.infoText}>
-          <Text style={styles.label}>Origin:</Text> {program.origin}
-        </Text>
+      <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+        Information
+      </Text>
 
-        <Text style={styles.infoText}>
-          Price:
-          <Text style={styles.price}> {program.price} €</Text>
-        </Text>
-      </View>
+      <Text style={[styles.infoText, { color: theme.colors.text }]}>
+        Start: {program.startDate}
+      </Text>
+      <Text style={[styles.infoText, { color: theme.colors.text }]}>
+        End: {program.endDate}
+      </Text>
+      <Text style={[styles.infoText, { color: theme.colors.text }]}>
+        Duration: {program.durationDays} days
+      </Text>
+      <Text style={[styles.infoText, { color: theme.colors.text }]}>
+        Origin: {program.origin}
+      </Text>
 
-      <View style={styles.card}>
-        <Text style={styles.subTitle}>Description</Text>
-        <Text style={styles.description}>{program.description}</Text>
-      </View>
+      <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+        Description
+      </Text>
+      <Text style={[styles.description, { color: theme.colors.text }]}>
+        {program.description}
+      </Text>
 
       {program.benefits?.length > 0 && (
-        <View style={styles.card}>
-          <Text style={styles.subTitle}>Benefits</Text>
+        <>
+          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+            Benefits
+          </Text>
           {program.benefits.map((benefit, index) => (
-            <Text key={index} style={styles.benefitText}>
+            <Text
+              key={index}
+              style={[styles.benefitItem, { color: theme.colors.text }]}
+            >
               • {benefit}
             </Text>
           ))}
-        </View>
+        </>
       )}
 
       {therapies?.length > 0 && (
-        <View style={styles.card}>
-          <Text style={styles.subTitle}>Included Therapies</Text>
+        <>
+          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+            Included Therapies
+          </Text>
           <ProgramTherapiesGrid
             therapies={therapies}
             onTherapyPress={handleTherapyPress}
           />
-        </View>
+        </>
       )}
 
       <Button
         text="Book Program"
-        style={styles.button}
-        onPress={(programId) => handleBooking(programId)}
+        active={true}
+        onPress={handleBooking}
+        style={styles.signUpButton}
       />
     </ScrollView>
   );
@@ -146,99 +152,66 @@ export default function ProgramDetailsScreen({ route, navigation }) {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
-    backgroundColor: "#f6f1e4",
-  },
-  loader: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingBottom: 30,
   },
   image: {
     width: "100%",
-    height: 220,
-    borderRadius: 16,
+    height: 200,
+    borderRadius: 12,
     marginBottom: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
   },
   imagePlaceholder: {
     width: "100%",
-    height: 220,
-    backgroundColor: "#D9F0E5",
-    borderRadius: 16,
+    height: 200,
+    borderRadius: 12,
+    backgroundColor: "#ddd",
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 20,
   },
-  title: {
-    fontSize: 26,
-    fontWeight: "700",
-    color: "#118161",
-    marginBottom: 16,
-  },
-  infoContainer: {
-    marginBottom: 10,
-    backgroundColor: "#fff",
-    padding: 16,
-    borderRadius: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  infoText: {
+  imagePlaceholderText: {
+    color: "#888",
     fontSize: 16,
-    color: "#444",
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "700",
     marginBottom: 6,
   },
-  label: {
-    fontWeight: "400",
-    color: "#118161",
-  },
-  price: {
+  sectionTitle: {
     fontSize: 18,
-    fontWeight: "700",
-    color: "#4A7C59",
-    marginTop: 8,
-  },
-  card: {
-    backgroundColor: "#fff",
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 20,
-    shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 2,
-  },
-  subTitle: {
-    fontSize: 24,
-    padding: 2,
-    fontWeight: "400",
-    color: "#118161",
-    marginBottom: 10,
+    fontWeight: "600",
+    marginTop: 16,
+    marginBottom: 8,
   },
   description: {
     fontSize: 16,
     lineHeight: 22,
-    color: "#444",
+    marginBottom: 16,
   },
-  benefitText: {
+  benefitItem: {
     fontSize: 16,
-    lineHeight: 22,
-    color: "#444",
+    marginLeft: 8,
     marginBottom: 4,
   },
-  button: {
-    backgroundColor: "#b8e8c8",
+  infoText: {
+    fontSize: 16,
+    marginBottom: 6,
+  },
+  price: {
+    fontSize: 18,
+    fontWeight: "600",
+    marginBottom: 16,
+  },
+  signUpButton: {
+    marginTop: 20,
+    marginBottom: 40,
+    alignItems: "center",
   },
   error: {
-    color: "red",
-    fontSize: 16,
+    textAlign: "center",
+    marginTop: 20,
   },
 });

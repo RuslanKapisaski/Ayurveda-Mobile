@@ -11,8 +11,11 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import Button from "./Button";
 import { formatDate } from "../utils/dateFormater";
 
+import { useTheme } from "../contexts/theme/useTheme";
+
 export default function Calendar({ data, onPress, buttonText }) {
   let initialDate;
+  const { theme } = useTheme();
 
   if (data?.date) {
     if (typeof data.date.toDate === "function") {
@@ -23,7 +26,7 @@ export default function Calendar({ data, onPress, buttonText }) {
       initialDate = new Date(data.date);
     }
   } else {
-    initialDate = new Date(); // fallback
+    initialDate = new Date();
   }
 
   const [date, setDate] = useState(initialDate);
@@ -65,7 +68,12 @@ export default function Calendar({ data, onPress, buttonText }) {
       <Button
         text={buttonText || "Save Changes"}
         onPress={() => onPress(date)}
-        style={styles.button}
+        style={[
+          styles.button,
+          {
+            backgroundColor: theme.colors.primary,
+          },
+        ]}
       />
     </ScrollView>
   );
@@ -96,6 +104,7 @@ const styles = StyleSheet.create({
     width: "auto",
   },
   button: {
+    color: "#fff",
     marginVertical: 20,
   },
 });

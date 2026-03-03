@@ -13,9 +13,13 @@ export default function ThemeProvider({ children }) {
       dark: false,
       colors: {
         ...DefaultTheme.colors,
-        primary: "#4d7534",
-        background: "#fbfbe2",
-        text: "#747474",
+        primary: "#4A7C59",
+        secondary: "#dcf9e1d6",
+        cardColor: "#ffffff",
+        background: "#ecf0ea",
+        header: "#4A7C59",
+        text: "#035910",
+        buttonText:"#fff"
       },
       fonts: Platform.select({
         ios: "San Francisco",
@@ -32,9 +36,13 @@ export default function ThemeProvider({ children }) {
       dark: true,
       colors: {
         ...DarkTheme.colors,
-        primary: "#4d7534",
-        background: "#110424",
-        text: "#f2f2f2",
+        background: "#303030",
+        cardColor: "#4e4e4e",
+        primary: "#c25555",
+        secondary: "#00da91",
+        header: "#000000",
+        text: "#ffffff",
+        buttonText: "#fff",
       },
       fonts: Platform.select({
         ios: "San Francisco",

@@ -1,23 +1,24 @@
+import { useEffect, useState } from "react";
 import {
-  View,
-  Text,
+  ActivityIndicator,
+  FlatList,
   StyleSheet,
-  TouchableOpacity,
+  Text,
+  View,
   ScrollView,
   Image,
-  ActivityIndicator,
 } from "react-native";
-import { useState, useEffect } from "react";
-import Ionicons from "@expo/vector-icons/Ionicons";
-
 import * as therapiesService from "../../services/therapiesService";
 import Button from "../../components/Button";
+import { useTheme } from "../../contexts/theme/useTheme";
 
 export default function TherapyDetailsScreen({ route, navigation }) {
   const { therapyDocId } = route.params;
   const [therapy, setTherapy] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  const { theme } = useTheme();
 
   useEffect(() => {
     const loadTherapy = async () => {
@@ -43,11 +44,16 @@ export default function TherapyDetailsScreen({ route, navigation }) {
   };
 
   if (isLoading) return <ActivityIndicator size="large" style={{ flex: 1 }} />;
-  if (error) return <Text style={styles.error}>{error}</Text>;
+  if (error)
+    return (
+      <Text style={[styles.error, { color: theme.colors.text }]}>{error}</Text>
+    );
   if (!therapy) return null;
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
+    >
       {therapy.imageUrl ? (
         <Image source={{ uri: therapy.imageUrl }} style={styles.image} />
       ) : (
@@ -56,27 +62,47 @@ export default function TherapyDetailsScreen({ route, navigation }) {
         </View>
       )}
 
-      <Text style={styles.title}>{therapy.name}</Text>
-      <Text style={styles.category}>{therapy.category}</Text>
-      <Text style={styles.price}>{therapy.price} €</Text>
+      <Text style={[styles.title, { color: theme.colors.text }]}>
+        {therapy.name}
+      </Text>
+      <Text style={[styles.category, { color: theme.colors.text }]}>
+        {therapy.category}
+      </Text>
+      <Text style={[styles.price, { color: theme.colors.primary }]}>
+        {therapy.price} €
+      </Text>
 
-      <Text style={styles.sectionTitle}>Description</Text>
-      <Text style={styles.description}>{therapy.description}</Text>
+      <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+        Description
+      </Text>
+      <Text style={[styles.description, { color: theme.colors.text }]}>
+        {therapy.description}
+      </Text>
 
-      <Text style={styles.sectionTitle}>Benefits</Text>
+      <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+        Benefits
+      </Text>
       {therapy.benefits?.map((benefit, index) => (
-        <Text key={index} style={styles.benefitItem}>
+        <Text
+          key={index}
+          style={[styles.benefitItem, { color: theme.colors.text }]}
+        >
           • {benefit}
         </Text>
       ))}
 
-      <Text style={styles.sectionTitle}>Duration</Text>
-      <Text style={styles.duration}>{therapy.durationMinutes} minutes</Text>
+      <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+        Duration
+      </Text>
+      <Text style={[styles.duration, { color: theme.colors.text }]}>
+        {therapy.durationMinutes} minutes
+      </Text>
 
       <Button
         text="Sign Up for Therapy"
         active={true}
         onPress={() => onSignUp(therapy.id)}
+        style={styles.signUpButton}
       />
     </ScrollView>
   );
@@ -84,14 +110,15 @@ export default function TherapyDetailsScreen({ route, navigation }) {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
-    backgroundColor: "#f6f1e4",
+    flex: 1,
+    paddingHorizontal: 20,
+    paddingBottom: 30,
   },
   image: {
     width: "100%",
     height: 200,
     borderRadius: 12,
-    marginBottom: 16,
+    marginBottom: 20,
   },
   imagePlaceholder: {
     width: "100%",
@@ -100,7 +127,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#ddd",
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 16,
+    marginBottom: 20,
   },
   imagePlaceholderText: {
     color: "#888",
@@ -109,13 +136,11 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: "700",
-    marginBottom: 4,
-    color: "#118161",
+    marginBottom: 6,
   },
   category: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#666",
     marginBottom: 12,
     fontStyle: "italic",
   },
@@ -124,36 +149,39 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginTop: 16,
     marginBottom: 8,
-    color: "#333",
   },
   description: {
     fontSize: 16,
-    color: "#444",
     lineHeight: 22,
+    marginBottom: 16,
   },
   benefitItem: {
     fontSize: 16,
-    color: "#444",
     marginLeft: 8,
     marginBottom: 4,
   },
   duration: {
     fontSize: 16,
-    color: "#444",
-  },
-  signUpButton: {
-    marginTop: 20,
-    alignItems: "center",
+    marginBottom: 20,
   },
   price: {
     fontSize: 18,
     fontWeight: "400",
-    color: "#118161",
-    marginBottom: 6,
+    marginBottom: 16,
+  },
+  signUpButton: {
+    marginBottom: 40,
+    alignItems: "center",
   },
   signUpButtonText: {
     color: "#fff",
     fontSize: 16,
     fontWeight: "700",
+  },
+
+  error: {
+    color: "red",
+    textAlign: "center",
+    marginTop: 20,
   },
 });

@@ -160,14 +160,9 @@ export default function ProfileScreen() {
   }
 
   return (
-    <ScrollView
-      showsVerticalScrollIndicator={false}
-      style={[styles.safe, { backgroundColor: theme.colors.background }]}
-    >
+    <ScrollView showsVerticalScrollIndicator={false} style={[styles.safe]}>
       {/*Header*/}
-      <View
-        style={[styles.header, { backgroundColor: theme.colors.background }]}
-      >
+      <View style={[styles.header, { backgroundColor: theme.colors.header }]}>
         {user?.photoURL ? (
           <Image source={{ uri: user.avatar }} style={styles.avatar} />
         ) : (
@@ -179,9 +174,8 @@ export default function ProfileScreen() {
           />
         )}
         <View>
-          <Text style={{ color: theme.colors.text }}>
-            Welcome,
-            <Text style={styles.username}>{user.name} 🌿</Text>
+          <Text style={[styles.welcome, { color: theme.colors.secondary }]}>
+            Welcome, <Text style={styles.username}>{user.name} 🌿</Text>
           </Text>
         </View>
         <ThemeButton toggleTheme={toggleTheme} isDark={isDarkMode} />
@@ -193,27 +187,42 @@ export default function ProfileScreen() {
           User Information
         </Text>
         <Text
-          style={[styles.infoText, { backgroundColor: theme.colors.secondary }]}
+          style={[
+            styles.infoText,
+            { color: theme.colors.text, borderColor: theme.colors.text },
+          ]}
         >
           Active since: {formatDate(firestoreUser.createdAt)}
         </Text>
         <Text
-          style={[styles.infoText, { backgroundColor: theme.colors.secondary }]}
+          style={[
+            styles.infoText,
+            { color: theme.colors.text, borderColor: theme.colors.text },
+          ]}
         >
           Name: {firestoreUser.name || "Not available"}
         </Text>
         <Text
-          style={[styles.infoText, { backgroundColor: theme.colors.secondary }]}
+          style={[
+            styles.infoText,
+            { color: theme.colors.text, borderColor: theme.colors.text },
+          ]}
         >
           Email: {firestoreUser.email || "Not available"}
         </Text>
         <Text
-          style={[styles.infoText, { backgroundColor: theme.colors.secondary }]}
+          style={[
+            styles.infoText,
+            { color: theme.colors.text, borderColor: theme.colors.text },
+          ]}
         >
           Dominant Dosha: {firestoreUser.dosha?.dominant || "Not available"}
         </Text>
         <Text
-          style={[styles.infoText, { backgroundColor: theme.colors.secondary }]}
+          style={[
+            styles.infoText,
+            { color: theme.colors.text, borderColor: theme.colors.text },
+          ]}
         >
           Dosha Scores:
           {`Kapha: ${user.dosha?.scores?.Kapha || 0}, Pitta: ${user.dosha?.scores?.Pitta || 0}, Vata: ${user.dosha?.scores?.Vata || 0}`}
@@ -222,21 +231,33 @@ export default function ProfileScreen() {
 
       {/*Allergies Section*/}
       <View style={[styles.card, { backgroundColor: theme.colors.cardColor }]}>
-        <Text style={[styles.cardTitle, { color: theme.colors.text }]}>
+        <Text
+          style={[
+            styles.cardTitle,
+            { color: theme.colors.text, borderColor: theme.colors.text },
+          ]}
+        >
           Allergies
         </Text>
         {editingAllergies ? (
           allergies.map((allergy, index) => (
             <TextInput
               key={index}
-              style={styles.textInput}
+              style={[
+                { color: theme.colors.text, borderColor: theme.colors.text },
+              ]}
               value={allergy}
               onChangeText={(value) => handleAllergyChange(index, value)}
               placeholder={`Allergy #${index + 1}`}
             />
           ))
         ) : (
-          <Text style={styles.infoText}>
+          <Text
+            style={[
+              styles.infoText,
+              { color: theme.colors.text, borderColor: theme.colors.text },
+            ]}
+          >
             {allergies.length > 0
               ? allergies.join(", ")
               : "No allergies listed"}
@@ -261,17 +282,29 @@ export default function ProfileScreen() {
 
       {/*GOALS Section*/}
       <View style={[styles.card, { backgroundColor: theme.colors.cardColor }]}>
-        <Text style={[styles.cardTitle, { color: theme.colors.text }]}>
+        <Text
+          style={[
+            styles.cardTitle,
+            { color: theme.colors.text },
+            { borderColor: theme.colors.text },
+          ]}
+        >
           Goals
         </Text>
         {firestoreUser.goals?.length > 0 ? (
           firestoreUser.goals.map((goal, index) => (
-            <Text key={index} style={styles.goalText}>
+            <Text
+              key={index}
+              style={[
+                styles.goalText,
+                { color: theme.colors.text, borderColor: theme.colors.text },
+              ]}
+            >
               {goal}
             </Text>
           ))
         ) : (
-          <Text>No goals set</Text>
+          <Text style={[{ borderColor: theme.colors.text }]}>No goals set</Text>
         )}
       </View>
 
@@ -322,11 +355,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderBottomWidth: 1,
   },
+  welcome: {
+    fontSize: 18,
+  },
   username: {
-    fontSize: 16,
-    fontWeight: "bold",
+    fontSize: 18,
+    fontWeight: "500",
     color: "#f2f8c4",
-    marginTop: 4,
   },
   avatar: {
     width: 50,
@@ -354,10 +389,12 @@ const styles = StyleSheet.create({
   },
   infoText: {
     fontSize: 16,
-    color: "#777",
-    marginTop: 4,
-    paddingVertical: 6,
-    paddingHorizontal: 8,
+    borderWidth: 1,
+    borderRadius: 8,
+    color: "#e9e5e5",
+    marginTop: 6,
+    paddingVertical: 10,
+    paddingHorizontal: 10,
   },
   textInput: {
     fontSize: 16,
@@ -393,9 +430,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   goalText: {
-    fontSize: 14,
+    fontSize: 16,
     color: "#555",
     marginTop: 8,
+    borderWidth: 1,
+    paddingVertical: 15,
+    paddingHorizontal: 12,
+    borderRadius: 8,
   },
   logoutContainer: {
     marginTop: 10,

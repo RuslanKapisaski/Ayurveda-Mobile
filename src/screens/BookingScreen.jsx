@@ -13,6 +13,7 @@ import {
 } from "react-native";
 
 import useAuth from "../contexts/auth/useAuth";
+import { useTheme } from "../contexts/theme/useTheme";
 import Calendar from "../components/Calendar";
 
 import * as therapiesService from "../services/therapiesService";
@@ -24,7 +25,7 @@ import { formatDate } from "../utils/dateFormater";
 export default function BookingScreen({ route, navigation }) {
   const { type, itemId } = route.params;
   const { user } = useAuth();
-
+  const { theme } = useTheme();
   const [booking, setBooking] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
   const [note, setNote] = useState("");
@@ -108,16 +109,18 @@ export default function BookingScreen({ route, navigation }) {
           <Image source={{ uri: booking.imageUrl }} style={styles.image} />
         ) : (
           <View style={styles.imagePlaceholder}>
-            <Text>No Image</Text>
+            <Text style={{ color: theme.colors.text }}>No Image</Text>
           </View>
         )}
 
-        <Text style={styles.title}>
+        <Text style={[styles.title, { color: theme.colors.text }]}>
           {type === "therapy" ? "Therapy" : "Program"}: {booking?.name}
         </Text>
 
-        <View style={styles.bookingSection}>
-          <Text style={styles.label}>Book a therapy</Text>
+        <View style={[styles.bookingSection]}>
+          <Text style={[styles.label, { color: theme.colors.text }]}>
+            Book a therapy
+          </Text>
           {error && <Text style={styles.error}>{error}</Text>}
 
           <TextInput
@@ -125,7 +128,10 @@ export default function BookingScreen({ route, navigation }) {
             placeholder="Leave a note"
             value={note}
             onChangeText={setNote}
-            style={styles.textInput}
+            style={[
+              styles.textInput,
+              { color: theme.colors.text, borderColor: theme.colors.text },
+            ]}
           />
 
           {booking && (
@@ -162,7 +168,6 @@ const styles = StyleSheet.create({
   label: {
     marginBottom: 10,
     fontSize: 18,
-    color: "#8d8e8e",
     alignSelf: "center",
   },
   textInput: {
