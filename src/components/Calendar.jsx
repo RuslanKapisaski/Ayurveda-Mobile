@@ -1,73 +1,109 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   ScrollView,
   Text,
   StyleSheet,
   Platform,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 
 import Button from "./Button";
 import { formatDate } from "../utils/dateFormater";
-
 import { useTheme } from "../contexts/theme/useTheme";
 
-export default function Calendar({ data, onPress, buttonText }) {
-  let initialDate;
-  const { theme } = useTheme();
+function clampWorkingHours(d) {
+  const x = new Date(d);
 
-  if (data?.date) {
-    if (typeof data.date.toDate === "function") {
-      // Firestore Timestamp
-      initialDate = data.date.toDate();
-    } else {
-      // ISO string or JS Date
-      initialDate = new Date(data.date);
-    }
-  } else {
-    initialDate = new Date();
+  const h = x.getHours();
+  const m = x.getMinutes();
+
+  // Минимум 09:00
+  if (h < 9) {
+    x.setHours(9, 0, 0, 0);
+    return x;
   }
 
-  const [date, setDate] = useState(initialDate);
+  // Максимум 17:30
+  if (h > 17 || (h === 17 && m > 30)) {
+    x.setHours(17, 30, 0, 0);
+    return x;
+  }
+
+  return x;
+}
+
+export default function Calendar({ data, onPress, buttonText }) {
+  const { theme } = useTheme();
+
+  const initialDate = useMemo(() => {
+    if (data?.date) {
+      if (typeof data.date.toDate === "function") return data.date.toDate(); // Firestore Timestamp
+      return new Date(data.date); // ISO string или Date
+    }
+    return new Date();
+  }, [data]);
+
+  const [date, setDate] = useState(clampWorkingHours(initialDate));
   const [show, setShow] = useState(false);
 
   const onChange = (event, selectedDate) => {
-    const currentDate = selectedDate || date;
+    if (Platform.OS === "android") {
+      setShow(false);
 
-    // Restrict time between 09:00 and 17:30
-    const hour = currentDate.getHours();
-    if (hour < 9) currentDate.setHours(9, 0);
-    if (hour > 17 || (hour === 17 && currentDate.getMinutes() > 30))
-      currentDate.setHours(17, 30);
+      if (event?.type !== "set" || !selectedDate) return;
+    }
 
-    setShow(Platform.OS === "ios");
-    setDate(currentDate);
+    if (!selectedDate) return;
+
+    const clamped = clampWorkingHours(selectedDate);
+    setDate(clamped);
+
+  
+    if (Platform.OS === "ios") setShow(true);
+  };
+
+  const handleSave = () => {
+    if (!(date instanceof Date) || isNaN(date.getTime())) {
+      Alert.alert("Грешка", "Невалидна дата/час.");
+      return;
+    }
+    onPress(date);
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.label}>Select new date & time:</Text>
+      <Text style={[styles.label, { color: theme.colors.text ?? "#8d8e8e" }]}>
+        Select new date & time:
+      </Text>
 
       {show && (
         <DateTimePicker
           value={date}
           mode="datetime"
           minimumDate={new Date()}
-          display="inline"
+          display={Platform.OS === "ios" ? "inline" : "default"}
           onChange={onChange}
+          is24Hour={true}
         />
       )}
+
       <TouchableOpacity
         onPress={() => setShow(true)}
-        style={styles.dateContainer}
+        style={[
+          styles.dateContainer,
+          { backgroundColor: theme.colors.card ?? "#f0f0f0" },
+        ]}
       >
-        <Text style={styles.dateText}>{formatDate(date)}</Text>
+        <Text style={[styles.dateText, { color: theme.colors.text ?? "#000" }]}>
+          {formatDate(date)}
+        </Text>
       </TouchableOpacity>
 
       <Button
         text={buttonText || "Save Changes"}
-        onPress={() => onPress(date)}
+        onPress={handleSave}
         style={[
           styles.button,
           {
@@ -88,7 +124,6 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 18,
-    color: "#8d8e8e",
     marginBottom: 10,
     alignSelf: "center",
   },
@@ -97,7 +132,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 8,
     marginBottom: 20,
-    backgroundColor: "#f0f0f0",
   },
   dateText: {
     fontSize: 24,
