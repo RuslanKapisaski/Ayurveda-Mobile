@@ -28,46 +28,47 @@ export default function CheckupScreen({ navigation }) {
     { id: "d2", name: "Dr. Balaji Pavar " },
   ]);
   const [selectedDoctor, setSelectedDoctor] = useState(doctors[0]);
-  const [selectedDate, setSelectedDate] = useState();
   const [note, setNote] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const handleConfirmBooking = async (date) => {
-    if (!selectedDoctor) {
-      Alert.alert("Please select a doctor");
-      return;
-    }
-    setSelectedDate(new Date(date));
-    const confirmed = await confirmAlert(
-      "Confirm Checkup",
-      `Book a checkup with ${selectedDoctor.name} on ${formatDate(date)}?`,
-    );
+const handleConfirmBooking = async (date) => {
+  if (!selectedDoctor) {
+    Alert.alert("Please select a doctor");
+    return;
+  }
 
-    if (!confirmed) {
-      setSelectedDate(null);
-      return;
-    }
+  const bookingDate = new Date(date);
 
-    try {
-      setIsLoading(true);
+  const confirmed = await confirmAlert(
+    "Confirm Checkup",
+    `Book a checkup with ${selectedDoctor.name} on ${formatDate(date)}?`,
+  );
 
-      await appointmentsService.create({
-        userId: user.id,
-        doctor: selectedDoctor,
-        date: selectedDate,
-        type: "checkup",
-        note,
-      });
+  if (!confirmed) return;
 
-      Alert.alert("Success", "Appointment booked successfully!");
-      navigation.navigate("Appointments");
-    } catch (err) {
-      Alert.alert("Error", err.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  try {
+    setIsLoading(true);
+
+    const data = {
+      userId: user.id,
+      doctorId: selectedDoctor.id,
+      doctorName: selectedDoctor.name,
+      date: bookingDate,
+      type: "checkup",
+      note: note || "",
+    };
+
+    await appointmentsService.create(data);
+
+    Alert.alert("Success", "Appointment booked successfully!");
+    navigation.navigate("Appointments");
+  } catch (err) {
+    Alert.alert("Error", err.message);
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   if (isLoading) {
     return (

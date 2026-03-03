@@ -15,33 +15,24 @@ import {
 import { db } from "../fireBaseConfig";
 
 export async function getUserData(userId) {
-
   try {
-    const userDataQuery = query(
-      collection(db, "users"),
-      where("uid", "==", userId),
-    );
 
-    const userDataSnapshot = await getDocs(userDataQuery);
+    const userDocRef = doc(db, "users", userId);
+    const userDocSnap = await getDoc(userDocRef);
 
-    if (userDataSnapshot.empty) {
-      throw new Error("No user found withthe given userId");
+    if (!userDocSnap.exists()) {
+      throw new Error("No user found with the given userId");
     }
 
-    const firestoreUser = userDataSnapshot.docs[0].data();
-
     return {
-      id: userDataSnapshot.docs[0].id,
-      ...firestoreUser,
+      id: userDocSnap.id,
+      ...userDocSnap.data(),
     };
   } catch (error) {
-    console.error("Error fetching dosha info", error);
-    throw new Error(
-      `Error during fetching dosha of the user, ${error.message}`,
-    );
+    console.error("Error fetching user info", error);
+    throw new Error(`Error during fetching user data: ${error.message}`);
   }
 }
-
 export async function setUserAllergies(userId, updatedAllergies) {
   try {
     const docRef = doc(db, "users", userId);
@@ -55,11 +46,8 @@ export async function setUserAllergies(userId, updatedAllergies) {
     await updateDoc(docRef, {
       allergies: updatedAllergies,
     });
-
   } catch (error) {
     console.error("Error setting user allergies", error);
     throw new Error(`Error during setting user allergies, ${error.message}`);
   }
 }
-
-
