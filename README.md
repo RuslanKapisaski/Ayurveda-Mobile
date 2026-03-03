@@ -1,9 +1,9 @@
 # Ayurveda Mobile
 
-### 1. Project Overview
+## 1. Project Overview
 
 > Application Name:
-> Ayurveda Mobile
+> Ayurveda Mobile  v.1.0.0
 
 **Application Category / Topic:**
 > Health & Wellness / Fitness
@@ -16,7 +16,8 @@ In addition, the application allows users to book appointments for consultations
 
 ---
 
-### 2. User Access & Permissions
+## 2. User Access & Permissions
+
 
 > #### Guest (Not Authenticated)
 
@@ -32,59 +33,56 @@ In addition, the application allows users to book appointments for consultations
 
 - Therapies
 
-- Herbal medicines
-
 - Programs
 
-- Personalized recommendations
+- Appointments
+
 
 > #### Authenticated User
 
 *A logged-in user can access:*
 
-- Main sections / tabs:
+**Main sections / tabs:**
 
-Home
+- Home
 
-Therapies
+- Therapies
 
-Appointments
+- Appointments
 
-Programs
+- Programs
 
-Profile
+- Profile
 
 - Details screens:
 
-Therapy details
+- Therapy details
 
-Appointment details
+- Appointment details
 
-Program details
+- Program details
 
-Personalized recommendation
+**Create / Edit / Delete actions:**
 
-- Create / Edit / Delete actions:
+- Update profile information
 
-Update profile information
+- Complete dosha test
 
-Complete dosha test
-
-Save onboarding data
+- Save onboarding data
 
 
 *(Future extension: Save favorite therapies/programs)*
 
 ---
 
-### 3. Authentication & Session Handling
+## 3. Authentication & Session Handling
 >Authentication Flow
 
 When the app starts, onAuthStateChanged from Firebase Auth is triggered.
 
 The app checks whether a Firebase user session exists.
 
-#### If authenticated:
+### If authenticated:
 
 The app fetches user data from Firestore.
 
@@ -98,7 +96,7 @@ Authenticated but onboarding incomplete → OnBoardingNavigator
 
 Authenticated and onboarding complete → RootNavigator (Main App)
 
-#### On logout:
+### On logout:
 
 Firebase session is cleared.
 
@@ -117,7 +115,7 @@ When the app restarts, Firebase restores the session automatically.
 onAuthStateChanged ensures automatic login without re-entering credentials.
 
 ---
-### 4. Navigation Structure
+## 4. Navigation Structure
 >Root Navigation Logic
 
 **Navigation is split into two main states:**
@@ -177,7 +175,7 @@ ProgramsStack → ProgramsList → ProgramDetails
 
 - Programs
 
-Data is fetched from Firestore collections.
+*Data is fetched from Firestore collections.*
 
 **User interaction:**
 
@@ -214,171 +212,147 @@ Additional metadata
 Backend Type:
 Firebase (Real Backend)
 
-Services used:
+**Services used:**
 
-Firebase Authentication
+* Firebase Authentication
 
-Cloud Firestore
+* Cloud Firestore
 
-Firebase Storage (for images)
+* Firebase Storage (for images)
 
-7. Data Operations (CRUD)
-   Read (GET)
+---
 
-Fetching therapies
+### 7. Data Operations (CRUD)
 
 
-Fetching programs
+  #### Read (GET)
 
+- Fetching therapies
 
-Fetching user profile data
 
-Data is retrieved from Firestore collections using getDocs().
+- Fetching programs
 
-Create (POST)
 
-User registration
+- Fetching user profile data
 
-Creating user Firestore document
+- Data is retrieved from Firestore collections using getDocs().
 
-Saving dosha test results
+#### Create (POST)
 
-Completing onboarding
+- User registration
 
-Update / Delete (Mutation)
+- Creating user Firestore document
 
-Update:
+- Saving dosha test results
 
-Update user profile
+- Completing onboarding
 
-Update onboarding status
+- Update / Delete (Mutation)
 
-Update dosha results
+- Add Allergies
 
-UI update:
+**Update:**
 
-React state updates
+- Update appointments
 
-AuthContext state update
 
-Navigation re-render based on state change
+#### UI update:
 
-(Delete functionality can be extended later for saved items or bookings.)
+* React state updates
 
-8. Forms & Validation
-   Forms Used
+* AuthContext state update
 
-Login Form
+* Navigation re-render based on state change
 
-Registration Form
+*(Delete functionality can be extended later for saved items or bookings)*
 
-Dosha Test Form
+---
 
-Profile Update Form
+## 8. Forms & Validation
 
-Validation Rules
+* Login Form
 
-Examples:
+* Registration Form
 
-Email:
+* Dosha Test Form
 
-Required
+* Profile Update Form
 
-Must match valid email pattern
+* Validation Rules
 
-Password:
+---
 
-Required
+## 9. Native Device Features
 
-Minimum length (e.g. 6 characters)
 
-Confirm Password:
+* Image Picker (Camera / Gallery)
 
-Must match password
 
-Username:
+*Used in user registration*
 
-Required
 
-Minimum length validation
+>Functionality: Allows the user to select or capture a profile image. Image URL can be stored in Firestore and displayed in the profile.
 
-9. Native Device Features
-   Used Native Feature(s)
+---
 
-Image Picker (Camera / Gallery)
+ ## 10. Typical User Flow
 
-Usage Description
+* User installs and opens the app.
 
-Used in:
+* Registers or logs in.
 
-User registration
+* Completes onboarding.
 
-Profile screen
+* Takes Dosha test.
 
-Functionality:
+* Views personalized result.
 
-Allows the user to select or capture a profile image.
+* Enters main application.
 
-Image URL can be stored in Firestore and displayed in the profile.
+* Browses therapies, herbal medicines, and programs.
 
-10. Typical User Flow
+* Receives animated content based on dominant dosha.
+---
 
-User installs and opens the app.
+## 11. Error & Edge Case Handling
 
-Registers or logs in.
+**Authentication Errors**
 
-Completes onboarding.
+* Invalid email/password
 
-Takes Dosha test.
+* Registration failures
 
-Views personalized result.
+**Network or Data Errors**
 
-Enters main application.
+* Try/catch blocks for Firestore requests
 
-Browses therapies, herbal medicines, and programs.
+* Console error logging
 
-Receives content based on dominant dosha.
+* Loading indicators during async operations
 
-11. Error & Edge Case Handling
-    Authentication Errors
+* Empty or Missing Data States
 
-Invalid email/password
+* Loading spinners while fetching data
 
-Registration failures
+* Fallback default values
 
-Firebase errors displayed via context state
+* Graceful UI when no items exist
 
-Network or Data Errors
+### Future Improvements
 
-Try/catch blocks for Firestore requests
+* Favorites system
 
-Console error logging
+* Booking system
 
-Loading indicators during async operations
+* Push notifications
 
-Empty or Missing Data States
+* Real-time Firestore listeners
 
-Loading spinners while fetching data
+* Advanced personalization logic
 
-Fallback default values
+* Dual dosha calculation support
 
-Graceful UI when no items exist
-
-Future Improvements
-
-Favorites system
-
-Booking system
-
-Push notifications
-
-Real-time Firestore listeners
-
-Advanced personalization logic
-
-Dual dosha calculation support
-
-Admin content management panel
+* Admin content management panel
 
 ### Walk Through
 

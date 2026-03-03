@@ -29,7 +29,7 @@ export default function EditAppointmentScreen({ route, navigation }) {
 
               Alert.alert("Success", "Appointment updated successfully!");
 
-              navigation.navigate("AppointmentScreen");
+              navigation.navigate("Appointments");
             } catch (err) {
               Alert.alert("Error", err.message);
             } finally {

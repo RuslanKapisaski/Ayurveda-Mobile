@@ -108,9 +108,6 @@ export default function HistoryCard({ item, formatDate }) {
 
         <Text style={{ color: theme.colors.text }}>Price: {data.price} €</Text>
 
-        <Text style={{ color: theme.colors.text }}>
-          Rating: ⭐ {data.rating}
-        </Text>
       </View>
     </View>
   );

@@ -229,8 +229,8 @@ const styles = StyleSheet.create({
   },
 
   progressNumber: {
-    fontSize: 24,
-    fontWeight: "bold",
+    fontSize: 18,
+    fontWeight: "600",
   },
 
   progressLabel: {
@@ -268,11 +268,11 @@ const styles = StyleSheet.create({
   },
 
   featureInfoCards: {
-    backgroundColor: "#e9f7e3",
+    backgroundColor: "#78d0a1",
   },
 
   pastinfoCards: {
-    backgroundColor: "#ead6d6",
+    backgroundColor: "#eebebe",
   },
 
   consultationButton: {
