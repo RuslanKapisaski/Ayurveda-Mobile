@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -12,14 +12,17 @@ import {
 } from "react-native";
 import useAuth from "../contexts/auth/useAuth";
 import { formatDate } from "../utils/dateFormater";
-
 import * as appointmentService from "../services/appointmentsService";
 import * as userService from "../services/userService";
 import { SafeAreaView } from "react-native-safe-area-context";
 import HistoryCard from "../components/HistoryCard";
+import ThemeButton from "../components/ThemeButton";
+import { useTheme } from "../contexts/theme/useTheme";
+import { useFocusEffect } from "@react-navigation/native";
 
 export default function ProfileScreen() {
   const { user, logout } = useAuth();
+  const { toggleTheme, isDarkMode, theme } = useTheme();
   const [firestoreUser, setFirestoreUser] = useState([]);
   const [historyOfAppointments, setHistoryOfAppointments] = useState([]);
   const [therapiesCount, setTherapiesCount] = useState(0);
@@ -62,37 +65,53 @@ export default function ProfileScreen() {
     try {
       const details = await Promise.all(
         appointments.map(async (appointment) => {
-          const details = await appointmentService.getById(
-            appointment.itemId,
-            appointment.type,
-            user.id,
-          );
-          return { details };
+          let fetchedDetails = {};
+
+          if (appointment.itemId) {
+            const result = await appointmentService.getById(
+              appointment.itemId,
+              appointment.type,
+              user.id,
+            );
+
+            fetchedDetails = result || {};
+          }
+
+          return {
+            details: {
+              ...fetchedDetails,
+              type: appointment.type,
+              date: appointment.date,
+              doctor: appointment.doctor || null,
+              doctorName: appointment.doctorName || null,
+            },
+          };
         }),
       );
+
       setDetailedAppointment(details);
     } catch (error) {
       setError("Failed to load appointment details");
     }
   };
-
   const loadUserData = async () => {
     try {
       const result = await userService.getUserData(user.id);
       setFirestoreUser(result);
       setAllergies(result.allergies || []);
     } catch (error) {
-      setError(error);
+      setError(error.message);
     }
   };
 
-  useEffect(() => {
-    if (user?.id) {
+  useFocusEffect(
+    useCallback(() => {
+      if (!user?.id) return;
       loadHistoryOfAppointments();
       loadCountAppointments();
       loadUserData();
-    }
-  }, [user?.id]);
+    }, [user?.id]),
+  );
 
   const handleEditAllergies = () => {
     if (editingAllergies) {
@@ -131,6 +150,7 @@ export default function ProfileScreen() {
       },
     ]);
   };
+
   if (isLoading) {
     return <ActivityIndicator size="large" style={{ flex: 1 }} />;
   }
@@ -140,160 +160,172 @@ export default function ProfileScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.safe}>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <View style={styles.header}>
-          {user?.photoURL ? (
-            <Image source={{ uri: user.avatar }} style={styles.avatar} />
-          ) : (
-            <Image
-              source={{
-                uri: "https://img.freepik.com/premium-vector/profile-icon-vector-image-can-be-used-ui_120816-260932.jpg?semt=ais_rp_progressive&w=740&q=80",
-              }}
-              style={styles.avatar}
+    <ScrollView
+      showsVerticalScrollIndicator={false}
+      style={[styles.safe, { backgroundColor: theme.colors.background }]}
+    >
+      {/*Header*/}
+      <View
+        style={[styles.header, { backgroundColor: theme.colors.background }]}
+      >
+        {user?.photoURL ? (
+          <Image source={{ uri: user.avatar }} style={styles.avatar} />
+        ) : (
+          <Image
+            source={{
+              uri: "https://img.freepik.com/premium-vector/profile-icon-vector-image-can-be-used-ui_120816-260932.jpg?semt=ais_rp_progressive&w=740&q=80",
+            }}
+            style={styles.avatar}
+          />
+        )}
+        <View>
+          <Text style={{ color: theme.colors.text }}>
+            Welcome,
+            <Text style={styles.username}>{user.name} 🌿</Text>
+          </Text>
+        </View>
+        <ThemeButton toggleTheme={toggleTheme} isDark={isDarkMode} />
+      </View>
+
+      {/*User Information Section*/}
+      <View style={[styles.card, { backgroundColor: theme.colors.cardColor }]}>
+        <Text style={[styles.cardTitle, { color: theme.colors.text }]}>
+          User Information
+        </Text>
+        <Text
+          style={[styles.infoText, { backgroundColor: theme.colors.secondary }]}
+        >
+          Active since: {formatDate(firestoreUser.createdAt)}
+        </Text>
+        <Text
+          style={[styles.infoText, { backgroundColor: theme.colors.secondary }]}
+        >
+          Name: {firestoreUser.name || "Not available"}
+        </Text>
+        <Text
+          style={[styles.infoText, { backgroundColor: theme.colors.secondary }]}
+        >
+          Email: {firestoreUser.email || "Not available"}
+        </Text>
+        <Text
+          style={[styles.infoText, { backgroundColor: theme.colors.secondary }]}
+        >
+          Dominant Dosha: {firestoreUser.dosha?.dominant || "Not available"}
+        </Text>
+        <Text
+          style={[styles.infoText, { backgroundColor: theme.colors.secondary }]}
+        >
+          Dosha Scores:
+          {`Kapha: ${user.dosha?.scores?.Kapha || 0}, Pitta: ${user.dosha?.scores?.Pitta || 0}, Vata: ${user.dosha?.scores?.Vata || 0}`}
+        </Text>
+      </View>
+
+      {/*Allergies Section*/}
+      <View style={[styles.card, { backgroundColor: theme.colors.cardColor }]}>
+        <Text style={[styles.cardTitle, { color: theme.colors.text }]}>
+          Allergies
+        </Text>
+        {editingAllergies ? (
+          allergies.map((allergy, index) => (
+            <TextInput
+              key={index}
+              style={styles.textInput}
+              value={allergy}
+              onChangeText={(value) => handleAllergyChange(index, value)}
+              placeholder={`Allergy #${index + 1}`}
             />
-          )}
-          <View>
-            <Text style={styles.greeting}>
-              Welcome,
-              <Text style={styles.username}>{user.name} 🌿</Text>
-            </Text>
-          </View>
-        </View>
+          ))
+        ) : (
+          <Text style={styles.infoText}>
+            {allergies.length > 0
+              ? allergies.join(", ")
+              : "No allergies listed"}
+          </Text>
+        )}
 
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>User Information</Text>
-          <Text style={styles.infoText}>
-            Active since: {formatDate(firestoreUser.createdAt)}
-          </Text>
-          <Text style={styles.infoText}>
-            Name: {firestoreUser.name || "Not available"}
-          </Text>
-          <Text style={styles.infoText}>
-            Email: {firestoreUser.email || "Not available"}
-          </Text>
-          <Text style={styles.infoText}>
-            Dominant Dosha: {firestoreUser.dosha?.dominant || "Not available"}
-          </Text>
-          <Text style={styles.infoText}>
-            Dosha Scores:
-            {`Kapha: ${user.dosha?.scores?.Kapha || 0}, Pitta: ${user.dosha?.scores?.Pitta || 0}, Vata: ${user.dosha?.scores?.Vata || 0}`}
-          </Text>
-        </View>
-
-        {/* Allergies Section */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Allergies</Text>
-          {editingAllergies ? (
-            allergies.map((allergy, index) => (
-              <TextInput
-                key={index}
-                style={styles.textInput}
-                value={allergy}
-                onChangeText={(value) => handleAllergyChange(index, value)}
-                placeholder={`Allergy #${index + 1}`}
-              />
-            ))
-          ) : (
-            <Text style={styles.infoText}>
-              {allergies.length > 0
-                ? allergies.join(", ")
-                : "No allergies listed"}
-            </Text>
-          )}
-
-          {editingAllergies && (
-            <TouchableOpacity
-              style={styles.addButton}
-              onPress={handleAddAllergy}
-            >
-              <Text style={styles.addButtonText}>+ Add Allergy</Text>
-            </TouchableOpacity>
-          )}
-
-          <TouchableOpacity
-            onPress={handleEditAllergies}
-            style={styles.editButton}
-          >
-            <Text style={styles.editButtonText}>
-              {editingAllergies ? "Save" : "Edit"}
-            </Text>
+        {editingAllergies && (
+          <TouchableOpacity style={styles.addButton} onPress={handleAddAllergy}>
+            <Text style={[styles.addButtonText]}>+ Add Allergy</Text>
           </TouchableOpacity>
-        </View>
+        )}
 
-        {/* GOALS */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Goals</Text>
-          {firestoreUser.goals?.length > 0 ? (
-            firestoreUser.goals.map((goal, index) => (
-              <Text key={index} style={styles.goalText}>
-                {goal}
-              </Text>
-            ))
-          ) : (
-            <Text>No goals set</Text>
-          )}
-        </View>
+        <TouchableOpacity
+          onPress={handleEditAllergies}
+          style={styles.editButton}
+        >
+          <Text style={styles.editButtonText}>
+            {editingAllergies ? "Save" : "Edit"}
+          </Text>
+        </TouchableOpacity>
+      </View>
 
-        {/* History */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>History of appointments</Text>
-          {detailedAppointments.length > 0 ? (
-            detailedAppointments.map((app, index) => (
-              <HistoryCard
-                key={index}
-                imageUrl={app.details?.imageUrl}
-                name={app.details?.name}
-                price={app.details?.price}
-                startDate={app.details?.startDate}
-                checkup={app?.details}
-              />
-            ))
-          ) : (
-            <Text>No appointment history available</Text>
-          )}
-        </View>
+      {/*GOALS Section*/}
+      <View style={[styles.card, { backgroundColor: theme.colors.cardColor }]}>
+        <Text style={[styles.cardTitle, { color: theme.colors.text }]}>
+          Goals
+        </Text>
+        {firestoreUser.goals?.length > 0 ? (
+          firestoreUser.goals.map((goal, index) => (
+            <Text key={index} style={styles.goalText}>
+              {goal}
+            </Text>
+          ))
+        ) : (
+          <Text>No goals set</Text>
+        )}
+      </View>
 
-        {/* SIGN OUT */}
-        <View style={styles.logoutContainer}>
-          {isLoading ? (
-            <ActivityIndicator size="large" />
-          ) : (
-            <TouchableOpacity
-              style={styles.logoutButton}
-              onPress={handleLogout}
-            >
-              <Text style={styles.logoutButtonText}>Sign Out</Text>
-            </TouchableOpacity>
-          )}
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+      {/*History Section*/}
+      <View style={[styles.card, { backgroundColor: theme.colors.cardColor }]}>
+        <Text style={[styles.cardTitle, { color: theme.colors.text }]}>
+          History of appointments
+        </Text>
+        {detailedAppointments.length > 0 ? (
+          detailedAppointments.map((app, index) => (
+            <HistoryCard key={index} item={app} formatDate={formatDate} />
+          ))
+        ) : (
+          <Text>No history yet</Text>
+        )}
+      </View>
+
+      {/*SIGN OUT Section*/}
+      <View style={styles.logoutContainer}>
+        {isLoading ? (
+          <ActivityIndicator size="large" />
+        ) : (
+          <TouchableOpacity
+            onPress={handleLogout}
+            style={[
+              styles.logoutButton,
+              { backgroundColor: theme.colors.primary },
+            ]}
+          >
+            <Text style={styles.logoutButtonText}>Sign Out</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: "#F8F8F8",
   },
   header: {
+    paddingTop: 60,
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "space-between",
     paddingVertical: 15,
     paddingHorizontal: 20,
-    backgroundColor: "#4A7C59",
     borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
-  },
-  greeting: {
-    fontSize: 16,
-    color: "#fff",
   },
   username: {
-    fontSize: 22,
+    fontSize: 16,
     fontWeight: "bold",
-    color: "#FFF",
+    color: "#f2f8c4",
     marginTop: 4,
   },
   avatar: {
@@ -326,7 +358,6 @@ const styles = StyleSheet.create({
     marginTop: 4,
     paddingVertical: 6,
     paddingHorizontal: 8,
-    backgroundColor: "#f5f5f5",
   },
   textInput: {
     fontSize: 16,
@@ -366,7 +397,6 @@ const styles = StyleSheet.create({
     color: "#555",
     marginTop: 8,
   },
-
   logoutContainer: {
     marginTop: 10,
     marginBottom: 40,

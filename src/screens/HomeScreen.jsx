@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  Image,
   ActivityIndicator,
 } from "react-native";
 import * as appointmentService from "../services/appointmentsService";
@@ -13,9 +12,11 @@ import Button from "../components/Button";
 import useAuth from "../contexts/auth/useAuth";
 import { formatDate } from "../utils/dateFormater";
 import { useFocusEffect } from "@react-navigation/native";
+import { useTheme } from "../contexts/theme/useTheme";
 
 export default function HomeScreen({ navigation }) {
   const { user } = useAuth();
+  const { theme } = useTheme();
   const [upcomingAppointments, setUpcomingAppointments] = useState([]);
   const [pastAppointments, setPastAppointments] = useState([]);
   const [therapiesCount, setTherapiesCount] = useState(0);
@@ -64,18 +65,13 @@ export default function HomeScreen({ navigation }) {
     }
   };
 
-  useEffect(() => {
-    if (user?.id) {
-      loadUpcomingAppointments();
-      loadPastAppointments();
-      loadCountAppointments(); // Call the count function on mount
-    }
-  }, [user?.id]);
-
   useFocusEffect(
     React.useCallback(() => {
+      if (!user?.id) return;
       loadUpcomingAppointments();
-    }, []),
+      loadPastAppointments();
+      loadCountAppointments();
+    }, [user?.id]),
   );
 
   if (isLoading) {
@@ -83,142 +79,117 @@ export default function HomeScreen({ navigation }) {
   }
 
   if (error) {
-    return <Text style={styles.error}>{error}</Text>;
+    return (
+      <Text style={[styles.error, { color: theme.colors.text }]}>{error}</Text>
+    );
   }
 
   return (
-    <SafeAreaView style={styles.safe}>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {/* HEADER */}
-        <View style={styles.header}>
-          {user?.photoURL ? (
-            <Image source={{ uri: user.avatar }} style={styles.avatar} />
-          ) : (
-            <Image
-              source={{
-                uri: "https://img.freepik.com/premium-vector/profile-icon-vector-image-can-be-used-ui_120816-260932.jpg?semt=ais_rp_progressive&w=740&q=80",
-              }}
-              style={styles.avatar}
-            />
-          )}
-          <View>
-            <Text style={styles.greeting}>
-              Welcome,
-              <Text style={styles.username}>{user.name} 🌿</Text>
-            </Text>
-          </View>
+    <ScrollView
+      showsVerticalScrollIndicator={false}
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
+    >
+      {/* Section: Upcoming Appointments */}
+      <View style={[styles.card, { backgroundColor: theme.colors.cardColor }]}>
+        <Text style={[styles.cardTitle, { color: theme.colors.text }]}>
+          Upcoming Appointments
+        </Text>
+        {upcomingAppointments && upcomingAppointments.length > 0 ? (
+          upcomingAppointments.map((appointment, index) => (
+            <View
+              key={index}
+              style={[styles.infoCard, styles.featureInfoCards]}
+            >
+              <Text style={{ color: theme.colors.text }}>
+                Type: {appointment.type}
+              </Text>
+              <Text style={{ color: theme.colors.text }}>
+                Time:
+                {appointment.date
+                  ? formatDate(appointment.date)
+                  : "Invalid date"}
+              </Text>
+            </View>
+          ))
+        ) : (
+          <Text
+            style={[styles.noAppointmentsText, { color: theme.colors.text }]}
+          >
+            No upcoming appointments
+          </Text>
+        )}
+      </View>
+
+      {/* Section: Past Appointments */}
+      <View style={[styles.card, { backgroundColor: theme.colors.cardColor }]}>
+        <Text style={[styles.cardTitle, { color: theme.colors.text }]}>
+          Past Appointments
+        </Text>
+        {pastAppointments && pastAppointments.length > 0 ? (
+          pastAppointments.map((appointment, index) => (
+            <View key={index} style={[styles.infoCard, styles.pastinfoCards]}>
+              <Text style={{ color: theme.colors.text }}>
+                Type: {appointment.type}
+              </Text>
+              <Text style={{ color: theme.colors.text }}>
+                Time:{" "}
+                {appointment.date
+                  ? formatDate(appointment.date)
+                  : "Invalid date"}
+              </Text>
+            </View>
+          ))
+        ) : (
+          <Text style={{ color: theme.colors.text }}>No past appointments</Text>
+        )}
+      </View>
+
+      {/* PROGRESS SECTION */}
+      <View style={styles.progressContainer}>
+        <View style={styles.progressBox}>
+          <Text style={[styles.progressNumber, { color: theme.colors.text }]}>
+            {therapiesCount}
+          </Text>
+          <Text style={[styles.progressLabel, { color: theme.colors.text }]}>
+            Therapies
+          </Text>
         </View>
-
-        {/* Section: Upcoming Appointments */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Upcoming Appointments</Text>
-
-          {upcomingAppointments && upcomingAppointments.length > 0 ? (
-            upcomingAppointments.map((appointment, index) => (
-              <View
-                key={index}
-                style={[styles.infoCard, styles.featureInfoCards]}
-              >
-                <Text>Type: {appointment.type}</Text>
-                <Text>
-                  Time:
-                  {appointment.date
-                    ? formatDate(appointment.date)
-                    : "Invalid date"}
-                </Text>
-              </View>
-            ))
-          ) : (
-            <Text style={styles.noAppointmentsText}>
-              No upcoming appointments
-            </Text>
-          )}
+        <View style={styles.progressBox}>
+          <Text style={[styles.progressNumber, { color: theme.colors.text }]}>
+            {programsCount}
+          </Text>
+          <Text style={[styles.progressLabel, { color: theme.colors.text }]}>
+            Programs
+          </Text>
         </View>
-
-        {/* Section: Past Appointments */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Past Appointments</Text>
-
-          {pastAppointments && pastAppointments.length > 0 ? (
-            pastAppointments.map((appointment, index) => (
-              <View key={index} style={[styles.infoCard, styles.pastinfoCards]}>
-                <Text>Type: {appointment.type}</Text>
-                <Text>
-                  Time:{" "}
-                  {appointment.date
-                    ? formatDate(appointment.date)
-                    : "Invalid date"}
-                </Text>
-              </View>
-            ))
-          ) : (
-            <Text style={styles.noAppointmentsText}>No past appointments</Text>
-          )}
+        <View style={styles.progressBox}>
+          <Text style={[styles.progressNumber, { color: theme.colors.text }]}>
+            {checkupsCount}
+          </Text>
+          <Text style={[styles.progressLabel, { color: theme.colors.text }]}>
+            Checkups
+          </Text>
         </View>
+      </View>
 
-        {/* PROGRESS SECTION */}
-        <View style={styles.progressContainer}>
-          <View style={styles.progressBox}>
-            <Text style={styles.progressNumber}>{therapiesCount}</Text>
-            <Text style={styles.progressLabel}>Therapies</Text>
-          </View>
-          <View style={styles.progressBox}>
-            <Text style={styles.progressNumber}>{programsCount}</Text>
-            <Text style={styles.progressLabel}>Programs</Text>
-          </View>
-          <View style={styles.progressBox}>
-            <Text style={styles.progressNumber}>{checkupsCount}</Text>
-            <Text style={styles.progressLabel}>Checkups</Text>
-          </View>
-        </View>
-
-        {/* QUICK ACTIONS */}
-        <Button
-          text="Book Consultation"
-          active={true}
-          style={styles.consultationButton}
-          onPress={() => navigation.navigate("Checkup")}
-        />
-      </ScrollView>
-    </SafeAreaView>
+      {/* QUICK ACTIONS */}
+      <Button
+        text="Book Consultation"
+        active={true}
+        style={[
+          styles.consultationButton,
+          { backgroundColor: theme.colors.primary },
+        ]}
+        onPress={() => navigation.navigate("Checkup")}
+      />
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: {
+  container: {
     flex: 1,
-    justifyContent: "center",
-    backgroundColor: "#F8F8F8",
   },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    backgroundColor: "#4A7C59",
-    borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
-  },
-
-  greeting: {
-    fontSize: 16,
-    color: "#fff",
-  },
-
-  username: {
-    fontSize: 22,
-    fontWeight: "bold",
-    color: "#FFF",
-    marginTop: 4,
-  },
-
-  avatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    marginRight: 15,
-  },
-
   progressContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -245,7 +216,6 @@ const styles = StyleSheet.create({
   progressNumber: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#4A7C59",
   },
 
   progressLabel: {
@@ -255,7 +225,7 @@ const styles = StyleSheet.create({
   },
 
   card: {
-    backgroundColor: "#FFF",
+    backgroundColor: "#c13f3f",
     marginVertical: 20,
     marginHorizontal: 20,
     padding: 20,
