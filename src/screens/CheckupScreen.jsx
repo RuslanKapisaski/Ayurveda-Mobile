@@ -82,6 +82,7 @@ export default function CheckupScreen({ navigation }) {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
+      <ScrollView>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         style={{ flex: 1 }}
@@ -144,6 +145,7 @@ export default function CheckupScreen({ navigation }) {
           {error && <Text style={styles.error}>{error}</Text>}
         </ScrollView>
       </KeyboardAvoidingView>
+      </ScrollView>
     </SafeAreaView>
   );
 }

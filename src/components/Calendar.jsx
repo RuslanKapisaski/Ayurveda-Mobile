@@ -19,16 +19,12 @@ function clampWorkingHours(d) {
   const h = x.getHours();
   const m = x.getMinutes();
 
-  // Минимум 09:00
   if (h < 9) {
     x.setHours(9, 0, 0, 0);
-    return x;
   }
 
-  // Максимум 17:30
   if (h > 17 || (h === 17 && m > 30)) {
     x.setHours(17, 30, 0, 0);
-    return x;
   }
 
   return x;
@@ -37,38 +33,87 @@ function clampWorkingHours(d) {
 export default function Calendar({ data, onPress, buttonText }) {
   const { theme } = useTheme();
 
+  const now = clampWorkingHours(new Date());
+
   const initialDate = useMemo(() => {
     if (data?.date) {
-      if (typeof data.date.toDate === "function") return data.date.toDate(); // Firestore Timestamp
-      return new Date(data.date); // ISO string или Date
+      if (typeof data.date.toDate === "function") return data.date.toDate();
+      return new Date(data.date);
     }
-    return new Date();
+    return now;
   }, [data]);
 
-  const [date, setDate] = useState(clampWorkingHours(initialDate));
+  // 🚀 Гарантираме, че началната дата не е в миналото
+  const safeInitial =
+    initialDate instanceof Date && !isNaN(initialDate)
+      ? initialDate < now
+        ? now
+        : initialDate
+      : now;
+
+  const [date, setDate] = useState(safeInitial);
   const [show, setShow] = useState(false);
+  const [mode, setMode] = useState("date"); // само за Android
 
   const onChange = (event, selectedDate) => {
-    if (Platform.OS === "android") {
+    if (!selectedDate) {
       setShow(false);
-
-      if (event?.type !== "set" || !selectedDate) return;
+      return;
     }
 
-    if (!selectedDate) return;
+    if (Platform.OS === "android") {
+      if (event.type === "dismissed") {
+        setShow(false);
+        return;
+      }
 
-    const clamped = clampWorkingHours(selectedDate);
-    setDate(clamped);
+      if (mode === "date") {
+        const updated = new Date(selectedDate);
+        setDate(updated);
+        setMode("time");
+        return;
+      }
 
-  
-    if (Platform.OS === "ios") setShow(true);
+      if (mode === "time") {
+        let updated = new Date(selectedDate);
+
+        // 🚀 Забраняваме минали дати
+        if (updated < now) {
+          Alert.alert("Invalid date", "You cannot select a past date.");
+          updated = now;
+        }
+
+        updated = clampWorkingHours(updated);
+
+        setDate(updated);
+        setShow(false);
+        setMode("date");
+        return;
+      }
+    } else {
+      let updated = new Date(selectedDate);
+
+      if (updated < now) {
+        Alert.alert("Invalid date", "You cannot select a past date.");
+        updated = now;
+      }
+
+      updated = clampWorkingHours(updated);
+      setDate(updated);
+    }
   };
 
   const handleSave = () => {
     if (!(date instanceof Date) || isNaN(date.getTime())) {
-      Alert.alert("Грешка", "Невалидна дата/час.");
+      Alert.alert("Error", "Invalid date.");
       return;
     }
+
+    if (date < now) {
+      Alert.alert("Invalid date", "You cannot select a past date.");
+      return;
+    }
+
     onPress(date);
   };
 
@@ -81,8 +126,8 @@ export default function Calendar({ data, onPress, buttonText }) {
       {show && (
         <DateTimePicker
           value={date}
-          mode="datetime"
-          minimumDate={new Date()}
+          mode={Platform.OS === "ios" ? "datetime" : mode}
+          minimumDate={now}
           display={Platform.OS === "ios" ? "inline" : "default"}
           onChange={onChange}
           is24Hour={true}
@@ -90,7 +135,10 @@ export default function Calendar({ data, onPress, buttonText }) {
       )}
 
       <TouchableOpacity
-        onPress={() => setShow(true)}
+        onPress={() => {
+          setMode("date");
+          setShow(true);
+        }}
         style={[
           styles.dateContainer,
           { backgroundColor: theme.colors.card ?? "#f0f0f0" },
@@ -106,9 +154,7 @@ export default function Calendar({ data, onPress, buttonText }) {
         onPress={handleSave}
         style={[
           styles.button,
-          {
-            backgroundColor: theme.colors.primary,
-          },
+          { backgroundColor: theme.colors.primary },
         ]}
       />
     </ScrollView>
@@ -135,10 +181,8 @@ const styles = StyleSheet.create({
   },
   dateText: {
     fontSize: 24,
-    width: "auto",
   },
   button: {
-    color: "#fff",
     marginVertical: 20,
   },
 });
