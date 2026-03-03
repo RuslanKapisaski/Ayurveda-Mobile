@@ -14,36 +14,42 @@ import {
 } from "firebase/firestore";
 
 import { auth, db } from "../fireBaseConfig";
+import { uploadProfileImage } from "./uploadImageService.js";
 
-export async function register(name, email, password) {
-  try {
-    const result = await createUserWithEmailAndPassword(auth, email, password);
+export async function register(name, email, password, imageUri) {
+	try {
+		const result = await createUserWithEmailAndPassword(auth, email, password);
 
-    await updateProfile(result.user, {
-      displayName: name,
-    });
+		await setDoc(doc(db, "users", result.user.uid), {
+			uid: result.user.uid,
+			name,
+			email,
+			photoURL: null,
+			hasCompletedOnBoarding: false,
+			dosha: null,
+			createdAt: serverTimestamp(),
+			updatedAt: serverTimestamp(),
+		});
 
-    const userRef = doc(db, "users", result.user.uid);
+		if (imageUri) {
+			try {
+				const photoURL = await uploadProfileImage(imageUri, result.user.uid);
 
-    await setDoc(userRef, {
-      uid: result.user.uid,
-      name,
-      email,
-      photoURL: null,
-      phone: null,
-      hasCompletedOnBoarding: false,
-      dosha: null,
-      allergies: [],
-      role: "user",
-      isActive: true,
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-    });
+				await updateDoc(doc(db, "users", result.user.uid), {
+					photoURL,
+					updatedAt: serverTimestamp(),
+				});
 
-    return result.user;
-  } catch (error) {
-    throw new Error(error.message || "Registration failed");
-  }
+				await updateProfile(result.user, { photoURL });
+			} catch (uploadError) {
+				console.log("Image upload failed but user created");
+			}
+		}
+
+		return result.user;
+	} catch (error) {
+		throw error;
+	}
 }
 
 export async function login(email, password) {

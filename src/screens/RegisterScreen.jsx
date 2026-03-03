@@ -29,18 +29,22 @@ export default function RegisterScreen({ navigation }) {
 
     setErrors(validationErrors);
 
-    if (Object.keys(validationErrors).length === 0) {
-      register(username, email, password);
-    }
-  };
-  return (
-    <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.inner}
-      >
-        <Text style={styles.title}>Register</Text>
-        {error && <Text style={styles.error}>{error}</Text>}
+		if (Object.keys(validationErrors).length === 0) {
+			register(username, email, password, imageUri);
+		}
+	};
+	return (
+		<SafeAreaView style={styles.container}>
+			<KeyboardAvoidingView
+				behavior={Platform.OS === "ios" ? "padding" : "height"}
+				style={styles.inner}
+			>
+				<Text style={styles.title}>Register</Text>
+				{error && (
+					<Text style={styles.error}>
+						Registration failed. Please try again later. {error.text}
+					</Text>
+				)}
 
         <ImagePicker onImagePicked={setImageUrl} imageUri={imageUrl} />
         <TextInput

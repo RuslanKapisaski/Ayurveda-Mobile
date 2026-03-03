@@ -159,27 +159,31 @@ export default function ProfileScreen() {
     return <Text style={styles.error}>{error}</Text>;
   }
 
-  return (
-    <ScrollView showsVerticalScrollIndicator={false} style={[styles.safe]}>
-      {/*Header*/}
-      <View style={[styles.header, { backgroundColor: theme.colors.header }]}>
-        {user?.photoURL ? (
-          <Image source={{ uri: user.avatar }} style={styles.avatar} />
-        ) : (
-          <Image
-            source={{
-              uri: "https://img.freepik.com/premium-vector/profile-icon-vector-image-can-be-used-ui_120816-260932.jpg?semt=ais_rp_progressive&w=740&q=80",
-            }}
-            style={styles.avatar}
-          />
-        )}
-        <View>
-          <Text style={[styles.welcome, { color: theme.colors.secondary }]}>
-            Welcome, <Text style={styles.username}>{user.name} 🌿</Text>
-          </Text>
-        </View>
-        <ThemeButton toggleTheme={toggleTheme} isDark={isDarkMode} />
-      </View>
+	return (
+		<ScrollView showsVerticalScrollIndicator={false} style={[styles.safe]}>
+			{/*Header*/}
+			<View style={[styles.header, { backgroundColor: theme.colors.header }]}>
+				{firestoreUser?.photoURL ? (
+					<Image
+						source={{ uri: firestoreUser.photoURL }}
+						style={styles.avatar}
+					/>
+				) : (
+					<Image
+						source={{
+							uri: "https://img.freepik.com/premium-vector/profile-icon-vector-image-can-be-used-ui_120816-260932.jpg?semt=ais_rp_progressive&w=740&q=80",
+						}}
+						style={styles.avatar}
+					/>
+				)}
+				<View>
+					<Text style={[styles.welcome, { color: theme.colors.secondary }]}>
+						Welcome,{" "}
+						<Text style={styles.username}>{firestoreUser.name} 🌿</Text>
+					</Text>
+				</View>
+				<ThemeButton toggleTheme={toggleTheme} isDark={isDarkMode} />
+			</View>
 
       {/*User Information Section*/}
       <View style={[styles.card, { backgroundColor: theme.colors.cardColor }]}>
