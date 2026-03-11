@@ -30,7 +30,7 @@ export default function RegisterScreen({ navigation }) {
     setErrors(validationErrors);
 
 		if (Object.keys(validationErrors).length === 0) {
-			register(username, email, password, imageUri);
+			register(username, email, password, imageUrl);
 		}
 	};
 	return (
