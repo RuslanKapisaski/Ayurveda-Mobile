@@ -368,6 +368,6 @@ pass: Stoyan123
 
 _Enjoy_
 
-# [Download](https://expo.dev/accounts/ruslann/projects/Ayurveda-Mobile/builds/ac249af1-3c26-403c-b323-36b16732dedd)
+# [Download](https://drive.google.com/file/d/13cBaC_tIAO4-3yJWVWijr15XhvMzzp_h/view?usp=drive_link)
 
 
