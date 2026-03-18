@@ -1,3 +1,4 @@
+// CheckupScreen.js
 import { useState } from "react";
 import {
   View,
@@ -25,12 +26,29 @@ export default function CheckupScreen({ navigation }) {
   const { user } = useAuth();
   const [doctors] = useState([
     { id: "d1", name: "Dr. Mahesh Vilas Garje" },
-    { id: "d2", name: "Dr. Balaji Pavar " },
+    { id: "d2", name: "Dr. Balaji Pavar" },
   ]);
+  const type = "checkup";
+
   const [selectedDoctor, setSelectedDoctor] = useState(doctors[0]);
+  const [bookedSlots, setBookedSlots] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(null);
   const [note, setNote] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  const loadSlots = async (date) => {
+    const slots = await appointmentsService.getBookedSlots({
+      date,
+      doctorId: selectedDoctor.id,
+    });
+    setBookedSlots(slots);
+  };
+
+  const handleSelectedDate = async (date) => {
+    setSelectedDate(date);
+    await loadSlots(date);
+  };
 
   const handleConfirmBooking = async (date) => {
     if (!selectedDoctor) {
@@ -53,7 +71,7 @@ export default function CheckupScreen({ navigation }) {
       const data = {
         userId: user.id,
         date: bookingDate,
-        type: "checkup",
+        type,
         note: note || "",
         doctor: {
           doctorId: selectedDoctor.id,
@@ -64,12 +82,19 @@ export default function CheckupScreen({ navigation }) {
       await appointmentsService.create(data);
 
       Alert.alert("Success", "Appointment booked successfully!");
-      navigation.navigate("Appointments");
+      navigation.replace("HomeScreen"); // replace navigation
     } catch (err) {
       Alert.alert("Error", err.message);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleDoctorChange = (doctorId) => {
+    const doctor = doctors.find((d) => d.id === doctorId);
+    setSelectedDoctor(doctor);
+    setSelectedDate(null);
+    setBookedSlots([]);
   };
 
   if (isLoading) {
@@ -83,68 +108,59 @@ export default function CheckupScreen({ navigation }) {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-        style={{ flex: 1 }}
-      >
-        <ScrollView contentContainerStyle={styles.container}>
-          <Text style={[styles.label, { color: theme.colors.text }]}>
-            Select Doctor
-          </Text>
-          <View
-            style={[styles.pickerContainer, { borderColor: theme.colors.text }]}
-          >
-            <Picker
-              selectedValue={selectedDoctor.id}
-              onValueChange={(itemValue) => {
-                const doctor = doctors.find((d) => d.id === itemValue);
-                setSelectedDoctor(doctor);
-              }}
-              style={{ color: theme.colors.text }}
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          style={{ flex: 1 }}
+        >
+          <ScrollView contentContainerStyle={styles.container}>
+            <Text style={[styles.label, { color: theme.colors.text }]}>
+              Select Doctor
+            </Text>
+            <View
+              style={[
+                styles.pickerContainer,
+                { borderColor: theme.colors.text },
+              ]}
             >
-              {doctors.map((doctor) => (
-                <Picker.Item
-                  key={doctor.id}
-                  label={doctor.name}
-                  value={doctor.id}
-                />
-              ))}
-            </Picker>
-          </View>
+              <Picker
+                selectedValue={selectedDoctor.id}
+                onValueChange={handleDoctorChange}
+                style={{ color: theme.colors.text }}
+              >
+                {doctors.map((doctor) => (
+                  <Picker.Item
+                    key={doctor.id}
+                    label={doctor.name}
+                    value={doctor.id}
+                  />
+                ))}
+              </Picker>
+            </View>
 
-          <Text
-            style={[
-              styles.label,
-              {
-                color: theme.colors.text,
-              },
-            ]}
-          >
-            Add a Note
-          </Text>
-          <TextInput
-            multiline
-            placeholder="Optional note..."
-            style={[
-              styles.textInput,
-              {
-                color: theme.colors.text,
-                borderColor: theme.colors.text,
-                borderWidth: 1,
-              },
-            ]}
-            value={note}
-            onChangeText={setNote}
-          />
+            <Text style={[styles.label, { color: theme.colors.text }]}>
+              Add a Note
+            </Text>
+            <TextInput
+              multiline
+              placeholder="Optional note..."
+              style={[
+                styles.textInput,
+                { color: theme.colors.text, borderColor: theme.colors.text },
+              ]}
+              value={note}
+              onChangeText={setNote}
+            />
 
-          <Calendar
-            data={selectedDoctor}
-            onPress={(date) => handleConfirmBooking(date)}
-          />
+            <Calendar
+              bookedSlots={bookedSlots}
+              onSelectDate={handleSelectedDate}
+              onPress={handleConfirmBooking}
+              type={type}
+            />
 
-          {error && <Text style={styles.error}>{error}</Text>}
-        </ScrollView>
-      </KeyboardAvoidingView>
+            {error && <Text style={styles.error}>{error}</Text>}
+          </ScrollView>
+        </KeyboardAvoidingView>
       </ScrollView>
     </SafeAreaView>
   );
@@ -158,9 +174,8 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 18,
-    marginBottom: 20,
-    fontWeight: "500",
     marginBottom: 10,
+    fontWeight: "500",
     alignSelf: "flex-start",
     color: "#8d8e8e",
   },

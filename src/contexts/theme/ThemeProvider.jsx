@@ -58,6 +58,7 @@ export default function ThemeProvider({ children }) {
   };
 
   const contextValue = {
+    setIsDarkMode,
     toggleTheme,
     isDarkMode,
     theme: isDarkMode ? darkTheme : lightTheme,

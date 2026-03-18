@@ -27,6 +27,7 @@ export default function BookingScreen({ route, navigation }) {
   const { user } = useAuth();
   const { theme } = useTheme();
   const [booking, setBooking] = useState(null);
+  const [bookedSlots, setBookedSlots] = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
   const [note, setNote] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -55,13 +56,31 @@ export default function BookingScreen({ route, navigation }) {
     loadItem();
   }, [itemId, type]);
 
+  const loadSlots = async (date) => {
+    const slots = await appointmentsService.getBookedSlots({
+      date,
+      itemId,
+    });
+
+    setBookedSlots(slots);
+  };
+
+  const handleSelectedDate = async (date) => {
+    setSelectedDate(date);
+    await loadSlots(date);
+  };
+
   const handleConfirmBooking = async (date) => {
     setSelectedDate(new Date(date));
 
-    const confirmed = await confirmAlert(
-      "Confirm Booking",
-      `Book for ${formatDate(date)}?`,
-    );
+    const title = type === "program" ? "Request Program" : "Confirm Booking";
+
+    const message =
+      type === "program"
+        ? `Request a program for ${formatDate(date)}? \n Please note that we will contact you for confirmation.`
+        : `Book for ${formatDate(date)}?`;
+
+    const confirmed = await confirmAlert(title, message);
 
     if (!confirmed) {
       selectedDate(null);
@@ -118,14 +137,12 @@ export default function BookingScreen({ route, navigation }) {
         </Text>
 
         <View style={[styles.bookingSection]}>
-          <Text style={[styles.label, { color: theme.colors.text }]}>
-            Book a therapy
-          </Text>
           {error && <Text style={styles.error}>{error}</Text>}
 
           <TextInput
-            multiline
             placeholder="Leave a note"
+            multiline
+            placeholderTextColor={theme.colors.text}
             value={note}
             onChangeText={setNote}
             style={[
@@ -136,8 +153,10 @@ export default function BookingScreen({ route, navigation }) {
 
           {booking && (
             <Calendar
-              data={booking}
-              onPress={(date) => handleConfirmBooking(date)}
+              bookedSlots={bookedSlots}
+              onSelectDate={handleSelectedDate}
+              onPress={handleConfirmBooking}
+              type={type}
             />
           )}
         </View>
@@ -148,7 +167,7 @@ export default function BookingScreen({ route, navigation }) {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
+    padding: 10,
   },
   loader: {
     flex: 1,
@@ -157,7 +176,8 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    marginVertical: 20,
+    marginTop: 6,
+    marginBottom: 40,
   },
   bookingSection: {
     flex: 1,
@@ -172,10 +192,12 @@ const styles = StyleSheet.create({
   },
   textInput: {
     minHeight: 100,
-    width: "80%",
+    width: "90%",
     borderWidth: 1,
     marginBottom: 20,
     borderRadius: 8,
+    paddingLeft: 10,
+    textAlignVertical: "top",
   },
   image: {
     width: "100%",

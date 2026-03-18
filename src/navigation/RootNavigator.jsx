@@ -72,7 +72,7 @@ export default function RootNavigator() {
         options={{
           headerRight: () => (
             <ThemeButton toggleTheme={toggleTheme} isDark={isDarkMode} />
-          ), // Тук коригираме пропса
+          ), 
           tabBarLabel: "Profile",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="person" size={size} color={color} />

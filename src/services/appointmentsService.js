@@ -89,6 +89,40 @@ export async function getCount(userId) {
   }
 }
 
+export async function getBookedSlots({ date, doctorId, itemId }) {
+  try {
+    const start = new Date(date);
+    start.setHours(9, 0, 0, 0);
+
+    const end = new Date(date);
+    end.setHours(17, 30, 0, 0);
+
+    const constraints = [where("date", ">=", start), where("date", "<=", end)];
+
+    if (doctorId) {
+      constraints.push(where("doctor.doctorId", "==", doctorId));
+    }
+
+    if (itemId) {
+      constraints.push(where("itemId", "==", itemId));
+    }
+
+    const q = query(collection(db, "appointments"), ...constraints);
+
+    const snapshot = await getDocs(q);
+
+    return snapshot.docs.map((doc) => {
+      const d = doc.data().date.toDate();
+      const h = d.getHours();
+      const m = d.getMinutes().toString().padStart(2, "0");
+      return `${h}:${m}`;
+    });
+  } catch (error) {
+    console.error("Error loading appointments: ", error);
+    throw new Error("Failed appointment load: " + error.message);
+  }
+}
+
 export async function getById(itemId, type, userId) {
   try {
     let itemDetails;

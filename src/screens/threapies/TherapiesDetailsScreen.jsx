@@ -102,7 +102,11 @@ export default function TherapyDetailsScreen({ route, navigation }) {
         text="Sign Up for Therapy"
         active={true}
         onPress={() => onSignUp(therapy.id)}
-        style={styles.signUpButton}
+        style={[
+          styles.signUpButton,
+          { color: theme.colors.text },
+          { backgroundColor: theme.colors.primary },
+        ]}
       />
     </ScrollView>
   );
@@ -111,7 +115,8 @@ export default function TherapyDetailsScreen({ route, navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 20,
+    paddingHorizontal: 10,
+    paddingTop: 10,
     paddingBottom: 30,
   },
   image: {

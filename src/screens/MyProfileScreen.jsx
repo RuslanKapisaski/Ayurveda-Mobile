@@ -22,7 +22,7 @@ import { useFocusEffect } from "@react-navigation/native";
 
 export default function ProfileScreen() {
   const { user, logout } = useAuth();
-  const { toggleTheme, isDarkMode, theme } = useTheme();
+  const { toggleTheme, isDarkMode, setIsDarkMode, theme } = useTheme();
   const [firestoreUser, setFirestoreUser] = useState([]);
   const [historyOfAppointments, setHistoryOfAppointments] = useState([]);
   const [therapiesCount, setTherapiesCount] = useState(0);
@@ -140,6 +140,7 @@ export default function ProfileScreen() {
         onPress: async () => {
           try {
             setIsLoading(true);
+            setIsDarkMode(false);
             await logout();
           } catch (error) {
             console.log("Logout error:", error);
@@ -159,31 +160,31 @@ export default function ProfileScreen() {
     return <Text style={styles.error}>{error}</Text>;
   }
 
-	return (
-		<ScrollView showsVerticalScrollIndicator={false} style={[styles.safe]}>
-			{/*Header*/}
-			<View style={[styles.header, { backgroundColor: theme.colors.header }]}>
-				{firestoreUser?.photoURL ? (
-					<Image
-						source={{ uri: firestoreUser.photoURL }}
-						style={styles.avatar}
-					/>
-				) : (
-					<Image
-						source={{
-							uri: "https://img.freepik.com/premium-vector/profile-icon-vector-image-can-be-used-ui_120816-260932.jpg?semt=ais_rp_progressive&w=740&q=80",
-						}}
-						style={styles.avatar}
-					/>
-				)}
-				<View>
-					<Text style={[styles.welcome, { color: theme.colors.secondary }]}>
-						Welcome,{" "}
-						<Text style={styles.username}>{firestoreUser.name} 🌿</Text>
-					</Text>
-				</View>
-				<ThemeButton toggleTheme={toggleTheme} isDark={isDarkMode} />
-			</View>
+  return (
+    <ScrollView showsVerticalScrollIndicator={false} style={[styles.safe]}>
+      {/*Header*/}
+      <View style={[styles.header, { backgroundColor: theme.colors.header }]}>
+        {firestoreUser?.photoURL ? (
+          <Image
+            source={{ uri: firestoreUser.photoURL }}
+            style={styles.avatar}
+          />
+        ) : (
+          <Image
+            source={{
+              uri: "https://img.freepik.com/premium-vector/profile-icon-vector-image-can-be-used-ui_120816-260932.jpg?semt=ais_rp_progressive&w=740&q=80",
+            }}
+            style={styles.avatar}
+          />
+        )}
+        <View>
+          <Text style={[styles.welcome, { color: theme.colors.secondary }]}>
+            Welcome,{" "}
+            <Text style={styles.username}>{firestoreUser.name} 🌿</Text>
+          </Text>
+        </View>
+        <ThemeButton toggleTheme={toggleTheme} isDark={isDarkMode} />
+      </View>
 
       {/*User Information Section*/}
       <View style={[styles.card, { backgroundColor: theme.colors.cardColor }]}>
@@ -276,7 +277,13 @@ export default function ProfileScreen() {
 
         <TouchableOpacity
           onPress={handleEditAllergies}
-          style={styles.editButton}
+          style={[
+            styles.editButton,
+            {
+              color: theme.colors.buttonText,
+              backgroundColor: theme.colors.primary,
+            },
+          ]}
         >
           <Text style={styles.editButtonText}>
             {editingAllergies ? "Save" : "Edit"}

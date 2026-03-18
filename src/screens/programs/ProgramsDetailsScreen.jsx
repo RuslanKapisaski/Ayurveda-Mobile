@@ -144,7 +144,11 @@ export default function ProgramDetailsScreen({ route, navigation }) {
         text="Book Program"
         active={true}
         onPress={handleBooking}
-        style={styles.signUpButton}
+        style={[
+          styles.signUpButton,
+          { color: theme.colors.text },
+          { backgroundColor: theme.colors.primary },
+        ]}
       />
     </ScrollView>
   );
