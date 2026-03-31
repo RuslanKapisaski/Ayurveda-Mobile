@@ -40,8 +40,8 @@ export default function CheckupScreen({ navigation }) {
       const data = await doctorService.getAll();
       setDoctors(data);
 
-      if (data.length() > 0) {
-        setSelectedDoctor([data[0]]);
+      if (data.length > 0) {
+        setSelectedDoctor(data[0]);
       }
     };
     fetchDoctors();
