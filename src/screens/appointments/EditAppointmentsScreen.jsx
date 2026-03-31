@@ -24,7 +24,7 @@ export default function EditAppointmentScreen({ route, navigation }) {
               setIsLoading(true);
 
               await appointmentsService.edit(appointment, {
-                date: date.toISOString(),
+                date,
               });
 
               Alert.alert("Success", "Appointment updated successfully!");
@@ -61,6 +61,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignContent: "center",
+    justifyContent: "center",
   },
   loader: {
     flex: 1,
