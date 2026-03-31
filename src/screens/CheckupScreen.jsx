@@ -1,5 +1,5 @@
 // CheckupScreen.js
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -20,22 +20,32 @@ import * as appointmentsService from "../services/appointmentsService";
 import confirmAlert from "../utils/confirmAlert";
 import { formatDate } from "../utils/dateFormater";
 import { useTheme } from "../contexts/theme/useTheme";
+import * as doctorService from "../services/doctorService";
 
 export default function CheckupScreen({ navigation }) {
   const { theme } = useTheme();
   const { user } = useAuth();
-  const [doctors] = useState([
-    { id: "d1", name: "Dr. Mahesh Vilas Garje" },
-    { id: "d2", name: "Dr. Balaji Pavar" },
-  ]);
   const type = "checkup";
 
-  const [selectedDoctor, setSelectedDoctor] = useState(doctors[0]);
+  const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [bookedSlots, setBookedSlots] = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
   const [note, setNote] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [doctors, setDoctors] = useState([]);
+
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      const data = await doctorService.getAll();
+      setDoctors(data);
+
+      if (data.length() > 0) {
+        setSelectedDoctor([data[0]]);
+      }
+    };
+    fetchDoctors();
+  }, []);
 
   const loadSlots = async (date) => {
     const slots = await appointmentsService.getBookedSlots({
@@ -46,6 +56,10 @@ export default function CheckupScreen({ navigation }) {
   };
 
   const handleSelectedDate = async (date) => {
+    if (!selectedDoctor) {
+      Alert.alert("Please select a doctor first");
+      return;
+    }
     setSelectedDate(date);
     await loadSlots(date);
   };
@@ -55,8 +69,6 @@ export default function CheckupScreen({ navigation }) {
       Alert.alert("Please select a doctor");
       return;
     }
-
-    const bookingDate = new Date(date);
 
     const confirmed = await confirmAlert(
       "Confirm Checkup",
@@ -70,7 +82,7 @@ export default function CheckupScreen({ navigation }) {
 
       const data = {
         userId: user.id,
-        date: bookingDate,
+        date,
         type,
         note: note || "",
         doctor: {
@@ -82,7 +94,7 @@ export default function CheckupScreen({ navigation }) {
       await appointmentsService.create(data);
 
       Alert.alert("Success", "Appointment booked successfully!");
-      navigation.replace("HomeScreen"); // replace navigation
+      navigation.replace("HomeScreen");
     } catch (err) {
       Alert.alert("Error", err.message);
     } finally {
@@ -123,7 +135,7 @@ export default function CheckupScreen({ navigation }) {
               ]}
             >
               <Picker
-                selectedValue={selectedDoctor.id}
+                selectedValue={selectedDoctor?.id}
                 onValueChange={handleDoctorChange}
                 style={{ color: theme.colors.text }}
               >

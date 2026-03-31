@@ -165,9 +165,10 @@ export async function getById(itemId, type, userId) {
     throw new Error(`Error fetching details: ${error.message}`);
   }
 }
+
 export async function edit(appointmentData, updates) {
   try {
-    const { id } = { ...appointmentData };
+    const id = appointmentData?.id;
 
     if (!id) {
       throw new Error("Appointment ID is required");
