@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import {
   View,
   Text,
@@ -12,103 +12,52 @@ import {
 } from "react-native";
 import useAuth from "../contexts/auth/useAuth";
 import { formatDate } from "../utils/dateFormater";
-import * as appointmentService from "../services/appointmentsService";
 import * as userService from "../services/userService";
-import { SafeAreaView } from "react-native-safe-area-context";
 import HistoryCard from "../components/HistoryCard";
 import ThemeButton from "../components/ThemeButton";
 import { useTheme } from "../contexts/theme/useTheme";
 import { useFocusEffect } from "@react-navigation/native";
+import useFetchCount from "../hooks/useFetchCount";
+import useFetchHistory from "../hooks/useFetchHistory";
+import useFetch from "../hooks/useFetch";
+import useFetchUserData from "../hooks/useFetchUserData";
 
 export default function ProfileScreen() {
   const { user, logout } = useAuth();
   const { toggleTheme, isDarkMode, setIsDarkMode, theme } = useTheme();
-  const [firestoreUser, setFirestoreUser] = useState([]);
-  const [historyOfAppointments, setHistoryOfAppointments] = useState([]);
-  const [therapiesCount, setTherapiesCount] = useState(0);
-  const [programsCount, setProgramsCount] = useState(0);
-  const [checkupsCount, setCheckupsCount] = useState(0);
+
   const [detailedAppointments, setDetailedAppointment] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [allergies, setAllergies] = useState([]);
+
   const [editingAllergies, setEditingAllergies] = useState(false);
+  const [logoutLoading, setLogoutLoading] = useState(false);
 
-  const loadCountAppointments = async () => {
-    try {
-      setIsLoading(true);
-      const { appointmentsCount } = await appointmentService.getCount(user.id);
-      setTherapiesCount(appointmentsCount.therapies);
-      setProgramsCount(appointmentsCount.programs);
-      setCheckupsCount(appointmentsCount.checkups);
-    } catch (error) {
-      setError("Failed to load appointments count");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const {
+    counts,
+    loadCount,
+    isLoading: countsLoading,
+    error: countsError,
+  } = useFetchCount(user.id);
 
-  const loadHistoryOfAppointments = async () => {
-    try {
-      setIsLoading(true);
-      const result = await appointmentService.getHistory(user.id);
-      setHistoryOfAppointments(result);
-      await fetchAppointmentsDetails(result);
-    } catch (error) {
-      setError("Failed to load history of appointments");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const {
+    historyOfAppointments,
+    loadHistoryOfAppointments,
+    isLoading: historyLoading,
+    error: historyError,
+  } = useFetchHistory(user.id);
 
-  const fetchAppointmentsDetails = async (appointments) => {
-    try {
-      const details = await Promise.all(
-        appointments.map(async (appointment) => {
-          let fetchedDetails = {};
-
-          if (appointment.itemId) {
-            const result = await appointmentService.getById(
-              appointment.itemId,
-              appointment.type,
-              user.id,
-            );
-
-            fetchedDetails = result || {};
-          }
-
-          return {
-            details: {
-              ...fetchedDetails,
-              type: appointment.type,
-              date: appointment.date,
-              doctor: appointment.doctor || null,
-              doctorName: appointment.doctorName || null,
-            },
-          };
-        }),
-      );
-
-      setDetailedAppointment(details);
-    } catch (error) {
-      setError("Failed to load appointment details");
-    }
-  };
-  const loadUserData = async () => {
-    try {
-      const result = await userService.getUserData(user.id);
-      setFirestoreUser(result);
-      setAllergies(result.allergies || []);
-    } catch (error) {
-      setError(error.message);
-    }
-  };
+  const {
+    allergies,
+    firestoreUser,
+    loadUserData,
+    isLoading: userLoading,
+    error: userError,
+  } = useFetchUserData(user.id);
 
   useFocusEffect(
     useCallback(() => {
       if (!user?.id) return;
       loadHistoryOfAppointments();
-      loadCountAppointments();
+      loadCount();
       loadUserData();
     }, [user?.id]),
   );
@@ -139,18 +88,21 @@ export default function ProfileScreen() {
         style: "destructive",
         onPress: async () => {
           try {
-            setIsLoading(true);
+            setLogoutLoading(true);
             setIsDarkMode(false);
             await logout();
           } catch (error) {
             console.log("Logout error:", error);
           } finally {
-            setIsLoading(false);
+            setLogoutLoading(false);
           }
         },
       },
     ]);
   };
+
+  const isLoading = countsLoading || historyLoading || userLoading;
+  const error = countsError || historyError || userError;
 
   if (isLoading) {
     return <ActivityIndicator size="large" style={{ flex: 1 }} />;
@@ -161,22 +113,17 @@ export default function ProfileScreen() {
   }
 
   return (
-    <ScrollView showsVerticalScrollIndicator={false} style={[styles.safe]}>
-      {/*Header*/}
+    <ScrollView showsVerticalScrollIndicator={false} style={styles.safe}>
+      {/* Header */}
       <View style={[styles.header, { backgroundColor: theme.colors.header }]}>
-        {firestoreUser?.photoURL ? (
-          <Image
-            source={{ uri: firestoreUser.photoURL }}
-            style={styles.avatar}
-          />
-        ) : (
-          <Image
-            source={{
-              uri: "https://img.freepik.com/premium-vector/profile-icon-vector-image-can-be-used-ui_120816-260932.jpg?semt=ais_rp_progressive&w=740&q=80",
-            }}
-            style={styles.avatar}
-          />
-        )}
+        <Image
+          source={{
+            uri:
+              firestoreUser?.photoURL ||
+              "https://img.freepik.com/premium-vector/profile-icon-vector-image-can-be-used-ui_120816-260932.jpg?semt=ais_rp_progressive&w=740&q=80",
+          }}
+          style={styles.avatar}
+        />
         <View>
           <Text style={[styles.welcome, { color: theme.colors.secondary }]}>
             Welcome,{" "}
@@ -186,62 +133,36 @@ export default function ProfileScreen() {
         <ThemeButton toggleTheme={toggleTheme} isDark={isDarkMode} />
       </View>
 
-      {/*User Information Section*/}
+      {/* User Information Section */}
       <View style={[styles.card, { backgroundColor: theme.colors.cardColor }]}>
         <Text style={[styles.cardTitle, { color: theme.colors.text }]}>
           User Information
         </Text>
-        <Text
-          style={[
-            styles.infoText,
-            { color: theme.colors.text, borderColor: theme.colors.text },
-          ]}
-        >
-          Active since: {formatDate(firestoreUser.createdAt)}
-        </Text>
-        <Text
-          style={[
-            styles.infoText,
-            { color: theme.colors.text, borderColor: theme.colors.text },
-          ]}
-        >
-          Name: {firestoreUser.name || "Not available"}
-        </Text>
-        <Text
-          style={[
-            styles.infoText,
-            { color: theme.colors.text, borderColor: theme.colors.text },
-          ]}
-        >
-          Email: {firestoreUser.email || "Not available"}
-        </Text>
-        <Text
-          style={[
-            styles.infoText,
-            { color: theme.colors.text, borderColor: theme.colors.text },
-          ]}
-        >
-          Dominant Dosha: {firestoreUser.dosha?.dominant || "Not available"}
-        </Text>
-        <Text
-          style={[
-            styles.infoText,
-            { color: theme.colors.text, borderColor: theme.colors.text },
-          ]}
-        >
-          Dosha Scores:
-          {`Kapha: ${user.dosha?.scores?.Kapha || 0}, Pitta: ${user.dosha?.scores?.Pitta || 0}, Vata: ${user.dosha?.scores?.Vata || 0}`}
-        </Text>
+        {[
+          { label: "Active since", value: formatDate(firestoreUser.createdAt) },
+          { label: "Name", value: firestoreUser.name },
+          { label: "Email", value: firestoreUser.email },
+          { label: "Dominant Dosha", value: firestoreUser.dosha?.dominant },
+          {
+            label: "Dosha Scores",
+            value: `Kapha: ${user.dosha?.scores?.Kapha || 0}, Pitta: ${user.dosha?.scores?.Pitta || 0}, Vata: ${user.dosha?.scores?.Vata || 0}`,
+          },
+        ].map(({ label, value }) => (
+          <Text
+            key={label}
+            style={[
+              styles.infoText,
+              { color: theme.colors.text, borderColor: theme.colors.text },
+            ]}
+          >
+            {label}: {value || "Not available"}
+          </Text>
+        ))}
       </View>
 
-      {/*Allergies Section*/}
+      {/* Allergies Section */}
       <View style={[styles.card, { backgroundColor: theme.colors.cardColor }]}>
-        <Text
-          style={[
-            styles.cardTitle,
-            { color: theme.colors.text, borderColor: theme.colors.text },
-          ]}
-        >
+        <Text style={[styles.cardTitle, { color: theme.colors.text }]}>
           Allergies
         </Text>
         {editingAllergies ? (
@@ -249,6 +170,7 @@ export default function ProfileScreen() {
             <TextInput
               key={index}
               style={[
+                styles.textInput,
                 { color: theme.colors.text, borderColor: theme.colors.text },
               ]}
               value={allergy}
@@ -271,19 +193,13 @@ export default function ProfileScreen() {
 
         {editingAllergies && (
           <TouchableOpacity style={styles.addButton} onPress={handleAddAllergy}>
-            <Text style={[styles.addButtonText]}>+ Add Allergy</Text>
+            <Text style={styles.addButtonText}>+ Add Allergy</Text>
           </TouchableOpacity>
         )}
 
         <TouchableOpacity
           onPress={handleEditAllergies}
-          style={[
-            styles.editButton,
-            {
-              color: theme.colors.buttonText,
-              backgroundColor: theme.colors.primary,
-            },
-          ]}
+          style={[styles.editButton, { backgroundColor: theme.colors.primary }]}
         >
           <Text style={styles.editButtonText}>
             {editingAllergies ? "Save" : "Edit"}
@@ -291,15 +207,9 @@ export default function ProfileScreen() {
         </TouchableOpacity>
       </View>
 
-      {/*GOALS Section*/}
+      {/* Goals Section */}
       <View style={[styles.card, { backgroundColor: theme.colors.cardColor }]}>
-        <Text
-          style={[
-            styles.cardTitle,
-            { color: theme.colors.text },
-            { borderColor: theme.colors.text },
-          ]}
-        >
+        <Text style={[styles.cardTitle, { color: theme.colors.text }]}>
           Goals
         </Text>
         {firestoreUser.goals?.length > 0 ? (
@@ -315,11 +225,11 @@ export default function ProfileScreen() {
             </Text>
           ))
         ) : (
-          <Text style={[{ borderColor: theme.colors.text }]}>No goals set</Text>
+          <Text style={{ color: theme.colors.text }}>No goals set</Text>
         )}
       </View>
 
-      {/*History Section*/}
+      {/* History Section */}
       <View style={[styles.card, { backgroundColor: theme.colors.cardColor }]}>
         <Text style={[styles.cardTitle, { color: theme.colors.text }]}>
           History of appointments
@@ -329,13 +239,13 @@ export default function ProfileScreen() {
             <HistoryCard key={index} item={app} formatDate={formatDate} />
           ))
         ) : (
-          <Text>No history yet</Text>
+          <Text style={{ color: theme.colors.text }}>No history yet</Text>
         )}
       </View>
 
-      {/*SIGN OUT Section*/}
+      {/* Sign Out Section */}
       <View style={styles.logoutContainer}>
-        {isLoading ? (
+        {logoutLoading ? (
           <ActivityIndicator size="large" />
         ) : (
           <TouchableOpacity
@@ -381,7 +291,6 @@ const styles = StyleSheet.create({
     marginRight: 15,
   },
   card: {
-    backgroundColor: "#FFF",
     marginHorizontal: 20,
     marginVertical: 10,
     padding: 20,
@@ -394,7 +303,6 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: 18,
-    color: "#4A7C59",
     fontWeight: "bold",
     marginBottom: 8,
   },
@@ -402,7 +310,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     borderWidth: 1,
     borderRadius: 8,
-    color: "#e9e5e5",
     marginTop: 6,
     paddingVertical: 10,
     paddingHorizontal: 10,
@@ -432,7 +339,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
     paddingVertical: 8,
     paddingHorizontal: 12,
-    backgroundColor: "#4A7C59",
     borderRadius: 8,
   },
   editButtonText: {
@@ -442,7 +348,6 @@ const styles = StyleSheet.create({
   },
   goalText: {
     fontSize: 16,
-    color: "#555",
     marginTop: 8,
     borderWidth: 1,
     paddingVertical: 15,
@@ -455,7 +360,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   logoutButton: {
-    backgroundColor: "#B00020",
     paddingVertical: 14,
     paddingHorizontal: 60,
     borderRadius: 12,

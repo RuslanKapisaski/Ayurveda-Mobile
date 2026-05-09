@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -13,64 +13,29 @@ import useAuth from "../contexts/auth/useAuth";
 import { formatDate } from "../utils/dateFormater";
 import { useFocusEffect } from "@react-navigation/native";
 import { useTheme } from "../contexts/theme/useTheme";
+import useFetchCount from "../hooks/useFetchCount";
+import useFetchAppointments from "../hooks/useFetchAppointments";
 
 export default function HomeScreen({ navigation }) {
   const { user } = useAuth();
   const { theme } = useTheme();
-  const [upcomingAppointments, setUpcomingAppointments] = useState([]);
-  const [pastAppointments, setPastAppointments] = useState([]);
-  const [therapiesCount, setTherapiesCount] = useState(0);
-  const [programsCount, setProgramsCount] = useState(0);
-  const [checkupsCount, setCheckupsCount] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
 
-  const loadCountAppointments = async () => {
-    try {
-      setIsLoading(true);
-      const { appointmentsCount } = await appointmentService.getCount(user.id);
-      setTherapiesCount(appointmentsCount.therapies);
-      setProgramsCount(appointmentsCount.programs);
-      setCheckupsCount(appointmentsCount.checkups);
-    } catch (error) {
-      setError("Failed to load appointments count");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Load Upcoming Appointments
-  const loadUpcomingAppointments = async () => {
-    try {
-      setIsLoading(true);
-      const result = await appointmentService.getUpcommingAppointmets(user.id);
-      setUpcomingAppointments(result);
-    } catch (error) {
-      setError("Failed to load upcoming appointments");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Load Past Appointments
-  const loadPastAppointments = async () => {
-    try {
-      setIsLoading(true);
-      const result = await appointmentService.getPastAppointmets(user.id);
-      setPastAppointments(result);
-    } catch (error) {
-      setError("Failed to load past appointments");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const { counts, loadCount } = useFetchCount(user.id);
+  const {
+    upcomingAppointments,
+    pastAppointments,
+    loadUpcoming,
+    loadPast,
+    isLoading,
+    error,
+  } = useFetchAppointments(user.id);
 
   useFocusEffect(
-    React.useCallback(() => {
+    useCallback(() => {
       if (!user?.id) return;
-      loadUpcomingAppointments();
-      loadPastAppointments();
-      loadCountAppointments();
+      loadUpcoming();
+      loadPast();
+      loadCount();
     }, [user?.id]),
   );
 
@@ -153,7 +118,7 @@ export default function HomeScreen({ navigation }) {
           ]}
         >
           <Text style={[styles.progressNumber, { color: theme.colors.text }]}>
-            {therapiesCount}
+            {counts.therapies}
           </Text>
           <Text style={[styles.progressLabel, { color: theme.colors.text }]}>
             Therapies
@@ -166,7 +131,7 @@ export default function HomeScreen({ navigation }) {
           ]}
         >
           <Text style={[styles.progressNumber, { color: theme.colors.text }]}>
-            {programsCount}
+            {counts.programs}
           </Text>
           <Text style={[styles.progressLabel, { color: theme.colors.text }]}>
             Programs
@@ -179,7 +144,7 @@ export default function HomeScreen({ navigation }) {
           ]}
         >
           <Text style={[styles.progressNumber, { color: theme.colors.text }]}>
-            {checkupsCount}
+            {counts.checkups}
           </Text>
           <Text style={[styles.progressLabel, { color: theme.colors.text }]}>
             Checkups

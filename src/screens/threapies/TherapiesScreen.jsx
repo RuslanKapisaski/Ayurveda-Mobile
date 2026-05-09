@@ -8,10 +8,10 @@ import {
 } from "react-native";
 import * as therapiesService from "../../services/therapiesService";
 import TherapyCard from "../../components/therapyCard.jsx";
-import { useTheme } from "../../contexts/theme/useTheme"; // Импортиране на useTheme за динамични стилове
+import { useTheme } from "../../contexts/theme/useTheme"; 
 
 export default function TherapiesScreen({ navigation }) {
-  const { theme } = useTheme(); // Извличаме текущата тема
+  const { theme } = useTheme();
   const [isLoading, setIsLoading] = useState(false);
   const [therapies, setTherapies] = useState([]);
   const [error, setError] = useState(null);
