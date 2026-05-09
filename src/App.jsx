@@ -1,7 +1,7 @@
 import { StatusBar } from "expo-status-bar";
 import { NavigationContainer } from "@react-navigation/native";
 import { AuthProvider } from "./contexts/auth/AuthProvider";
-import AppNavigator from "./navigation/AppNavigator";
+import RootNavigator from "./navigation/RootNavigator";
 import ThemeProvider from "./contexts/theme/ThemeProvider";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
@@ -10,7 +10,7 @@ export default function App() {
     <ThemeProvider>
       <SafeAreaProvider>
         <AuthProvider>
-          <AppNavigator />
+          <RootNavigator />
         </AuthProvider>
       </SafeAreaProvider>
     </ThemeProvider>
