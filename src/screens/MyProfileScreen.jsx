@@ -18,15 +18,13 @@ import ThemeButton from "../components/ThemeButton";
 import { useTheme } from "../contexts/theme/useTheme";
 import { useFocusEffect } from "@react-navigation/native";
 import useFetchCount from "../hooks/useFetchCount";
-import useFetchHistory from "../hooks/useFetchHistory";
 import useFetch from "../hooks/useFetch";
 import useFetchUserData from "../hooks/useFetchUserData";
+import useFetchAppointmentDetails from "../hooks/useFetchAppointmentDetails";
 
 export default function ProfileScreen() {
   const { user, logout } = useAuth();
   const { toggleTheme, isDarkMode, setIsDarkMode, theme } = useTheme();
-
-  const [detailedAppointments, setDetailedAppointment] = useState([]);
 
   const [editingAllergies, setEditingAllergies] = useState(false);
   const [logoutLoading, setLogoutLoading] = useState(false);
@@ -39,11 +37,11 @@ export default function ProfileScreen() {
   } = useFetchCount(user.id);
 
   const {
-    historyOfAppointments,
-    loadHistoryOfAppointments,
-    isLoading: historyLoading,
-    error: historyError,
-  } = useFetchHistory(user.id);
+    detailedAppointments,
+    loadDetails,
+    isLoading: detailsLoading,
+    error: detailsError,
+  } = useFetchAppointmentDetails(user.id);
 
   const {
     allergies,
@@ -56,7 +54,7 @@ export default function ProfileScreen() {
   useFocusEffect(
     useCallback(() => {
       if (!user?.id) return;
-      loadHistoryOfAppointments();
+      loadDetails();
       loadCount();
       loadUserData();
     }, [user?.id]),
@@ -101,8 +99,8 @@ export default function ProfileScreen() {
     ]);
   };
 
-  const isLoading = countsLoading || historyLoading || userLoading;
-  const error = countsError || historyError || userError;
+  const isLoading = countsLoading || detailsLoading || userLoading;
+  const error = countsError || detailsError || userError;
 
   if (isLoading) {
     return <ActivityIndicator size="large" style={{ flex: 1 }} />;

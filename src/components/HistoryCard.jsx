@@ -3,13 +3,16 @@ import { View, Text, Image, StyleSheet } from "react-native";
 import { useTheme } from "../contexts/theme/useTheme";
 
 export default function HistoryCard({ item, formatDate }) {
-  const data = item?.details || {};
+  console.log("data:", item);
+
+  const data = item.details || {};
+
   const { theme } = useTheme();
 
   const getType = () => {
     if (data.type === "checkup") return "checkup";
     if (data.durationDays) return "program";
-    if (data.durationMinutes) return "therapy";
+    if (data.type === "therapy") return "therapy";
     return "unknown";
   };
 
@@ -107,7 +110,6 @@ export default function HistoryCard({ item, formatDate }) {
         </Text>
 
         <Text style={{ color: theme.colors.text }}>Price: {data.price} €</Text>
-
       </View>
     </View>
   );
@@ -151,7 +153,7 @@ const styles = StyleSheet.create({
     height: 90,
     backgroundColor: "#ccc",
     justifyContent: "center",
-    alignItems: "center",
+    aligndatas: "center",
     borderRadius: 10,
   },
   imageCardContent: {
