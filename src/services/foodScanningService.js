@@ -4,9 +4,13 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 
 export const uploadImage = async (uri, userId) => {
+    if (!userId) throw new Error("User ID is undefined")
+
     const response = await fetch(uri);
     const blob = await response.blob();
+
     const imageRef = ref(storage, `scans/${userId}/${Date.now()}.jpg`);
+    
     await uploadBytes(imageRef, blob);
     return await getDownloadURL(imageRef);
 };
@@ -33,4 +37,11 @@ export const getAllByUser = async (userId) => {
 
 export const deleteScanning = async (scanId) => {
     await deleteDoc(doc(db, "scans", scanId));
+};
+
+export const createScanFeedback = async (data) => {
+  return await addDoc(collection(db, "scan_feedback"), {
+    ...data,
+    createdAt: new Date(),
+  });
 };
