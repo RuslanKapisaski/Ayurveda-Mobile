@@ -6,13 +6,15 @@ import MyProfileScreen from "../screens/MyProfileScreen";
 import ProgramsNavigator from "./ProgramsNavigator";
 import TherapiesNavigator from "./TherapiesNavigator";
 import AppointmentsNavigator from "./AppointemntsNavigator";
-
-const Tabs = createBottomTabNavigator();
+import ScanNaviagator from "./ScanNavigator";
 
 import { useTheme } from "../contexts/theme/useTheme";
+import ThemeButton from "../components/ThemeButton";
 
 export default function AppNavigator() {
-  const { theme, isDarkMode } = useTheme();
+  const Tabs = createBottomTabNavigator();
+
+  const { theme, toggleTheme,isDarkMode } = useTheme();
 
   return (
     <Tabs.Navigator
@@ -46,14 +48,18 @@ export default function AppNavigator() {
       />
 
       <Tabs.Screen
-        name="Appointments"
-        component={AppointmentsNavigator}
-        options={{
-          tabBarLabel: "Appointments",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="documents" size={size} color={color} />
-          ),
-        }}
+      name="Scan"
+      component={ScanNaviagator}
+      options={{
+        headerRight: () =>(
+          <ThemeButton toggleTheme={toggleTheme} isDark={isDarkMode}/>
+        ),
+        tabBarIcon: (({color,size}) =>(
+          <Ionicons name="scan-circle-outline" size={size} color={color}/>
+        )),
+        headerTitle: "Scan Food",
+        tabBarIconStyle: {marginTop: -2},
+      }}
       />
 
       <Tabs.Screen
