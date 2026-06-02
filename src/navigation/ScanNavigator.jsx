@@ -30,7 +30,7 @@ export default function ScanNaviagator() {
                 options={
                     {
                         headerRight: () => {
-                            <ThemeButton isDark={isDarkMode} toggleTheme={toggleTheme} />
+                            return <ThemeButton isDark={isDarkMode} toggleTheme={toggleTheme} />
                         }
                     }
                 }
@@ -42,7 +42,7 @@ export default function ScanNaviagator() {
                 options={
                     {
                         headerRight: () => {
-                            <ThemeButton isDark={isDarkMode} toggleTheme={toggleTheme} />
+                            return <ThemeButton isDark={isDarkMode} toggleTheme={toggleTheme} />
                         }
                     }
                 }
@@ -54,7 +54,7 @@ export default function ScanNaviagator() {
                 component={HistoryScreen}
                 options={{
                     headerRight: () => {
-                        <ThemeButton isDark={isDarkMode} toggleTheme={toggleTheme} />
+                        return <ThemeButton isDark={isDarkMode} toggleTheme={toggleTheme} />
                     }
                 }} />
 
@@ -63,7 +63,7 @@ export default function ScanNaviagator() {
                 component={FeedbackScreen}
                 options={{
                     headerRight: () => {
-                        <ThemeButton isDark={isDarkMode} toggleTheme={toggleTheme} />
+                       return <ThemeButton isDark={isDarkMode} toggleTheme={toggleTheme} />
                     }
                 }} />
 
