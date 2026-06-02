@@ -102,7 +102,7 @@ export default function BookingScreen({ route, navigation }) {
       await appointmentsService.create(appointment);
 
       Alert.alert("Success", "Appointment booked successfully!");
-      navigation.navigate("Appointments");
+      navigation.pop(2)
     } catch (err) {
       setError("Booking failed. Try again.");
     } finally {
