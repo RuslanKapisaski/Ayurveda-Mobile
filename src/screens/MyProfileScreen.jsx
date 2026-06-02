@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  Image,
   ActivityIndicator,
   TextInput,
   TouchableOpacity,
@@ -21,6 +20,7 @@ import useFetchCount from "../hooks/useFetchCount";
 import useFetch from "../hooks/useFetch";
 import useFetchUserData from "../hooks/useFetchUserData";
 import useFetchAppointmentDetails from "../hooks/useFetchAppointmentDetails";
+import { Image } from "expo-image";
 
 export default function ProfileScreen() {
   const { user, logout } = useAuth();
@@ -121,6 +121,8 @@ export default function ProfileScreen() {
               "https://img.freepik.com/premium-vector/profile-icon-vector-image-can-be-used-ui_120816-260932.jpg?semt=ais_rp_progressive&w=740&q=80",
           }}
           style={styles.avatar}
+          cachePolicy={"memory-disk"}
+          transition={200}
         />
         <View>
           <Text style={[styles.welcome, { color: theme.colors.secondary }]}>

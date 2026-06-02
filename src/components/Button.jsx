@@ -36,20 +36,23 @@ export default function Button({
 
 const styles = StyleSheet.create({
   button: {
-    padding: 20,
-    borderRadius: 16,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 12,
     alignItems: "center",
     shadowColor: "#000000",
     shadowOffset: { width: 1, height: 10 },
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.1,
     shadowRadius: 4,
+    width: 120,
+    margin:6,
   },
 
   primaryButton: {
     backgroundColor: "#4A7C59",
   },
   secondaryButton: {
-    backgroundColor: "#d0f5db",
+    backgroundColor: "#9fd5af",
   },
   primaryText: {
     color: "#e5f9eb",

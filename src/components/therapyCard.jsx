@@ -1,4 +1,5 @@
-import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { Image } from "expo-image";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useTheme } from "../contexts/theme/useTheme";
 
@@ -12,7 +13,12 @@ export default function TherapyCard({ therapy, onPress }) {
       activeOpacity={0.9}
     >
       {therapy.imageUrl ? (
-        <Image source={{ uri: therapy.imageUrl }} style={styles.image} />
+        <Image
+        source={{ uri: therapy.imageUrl }} 
+        style={styles.image}
+        contentFit="cover"
+        cachePolicy={'memory-disk'}
+        transition={200} />
       ) : (
         <View
           style={[

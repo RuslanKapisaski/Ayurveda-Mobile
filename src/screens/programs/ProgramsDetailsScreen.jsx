@@ -5,8 +5,8 @@ import {
   Text,
   View,
   ScrollView,
-  Image,
 } from "react-native";
+import { Image } from "expo-image";
 import * as programsService from "../../services/programsService";
 import * as therapiesService from "../../services/therapiesService";
 import ProgramTherapiesGrid from "../../components/ProgramTherapiesGrid";
@@ -73,7 +73,11 @@ export default function ProgramDetailsScreen({ route, navigation }) {
       style={[styles.container, { backgroundColor: theme.colors.background }]}
     >
       {program.imageUrl ? (
-        <Image source={{ uri: program.imageUrl }} style={styles.image} />
+        <Image source={{ 
+          uri: program.imageUrl }}
+           style={styles.image}
+           cachePolicy={"memory-disk"}
+            />
       ) : (
         <View style={styles.imagePlaceholder}>
           <Text style={styles.imagePlaceholderText}>No Image</Text>
@@ -92,17 +96,17 @@ export default function ProgramDetailsScreen({ route, navigation }) {
         Information
       </Text>
 
-      <Text style={[styles.infoText, { color: theme.colors.text }]}>
-        Start: {program.startDate}
+      <Text style={[styles.infoText, { color: theme.colors.primary }]}>
+        Start: <Text style={{color:theme.colors.text}}> {program.startDate} </Text>
       </Text>
-      <Text style={[styles.infoText, { color: theme.colors.text }]}>
-        End: {program.endDate}
+        <Text style={[styles.infoText, { color: theme.colors.primary }]}>
+        End: <Text style={{color:theme.colors.text}}>{program.endDate} </Text>
       </Text>
-      <Text style={[styles.infoText, { color: theme.colors.text }]}>
-        Duration: {program.durationDays} days
+        <Text style={[styles.infoText, { color: theme.colors.primary }]}>
+        Duration: <Text style={{color:theme.colors.text}}> {program.durationDays} days </Text>
       </Text>
-      <Text style={[styles.infoText, { color: theme.colors.text }]}>
-        Origin: {program.origin}
+        <Text style={[styles.infoText, { color: theme.colors.primary }]}>
+        Origin:: <Text style={{color:theme.colors.text}}>  {program.origin} </Text>
       </Text>
 
       <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
@@ -210,9 +214,11 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   signUpButton: {
-    marginTop: 20,
+    marginTop: 10,
     marginBottom: 40,
     alignItems: "center",
+    alignSelf:"center",
+    width:200,
   },
   error: {
     textAlign: "center",

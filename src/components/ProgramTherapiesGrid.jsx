@@ -7,14 +7,17 @@ import {
   Image,
   TouchableOpacity,
 } from "react-native";
+import { useTheme } from "../contexts/theme/useTheme";
 
 export default function ProgramTherapiesGrid({ therapies, onTherapyPress }) {
   const numColumns = 2;
 
+  const {theme} = useTheme()
+
   const renderItem = ({ item }) => (
     <View style={styles.container}>
       <TouchableOpacity
-        style={styles.card}
+        style={[styles.card, {backgroundColor: theme.colors.primary}]}
         onPress={() => onTherapyPress(item.id)}
       >
         {item.imageUrl ? (
@@ -24,7 +27,7 @@ export default function ProgramTherapiesGrid({ therapies, onTherapyPress }) {
             <Text style={styles.imagePlaceholderText}>No Image</Text>
           </View>
         )}
-        <Text style={styles.title} numberOfLines={2}>
+        <Text style={[{color:theme.colors.card}], styles.title} numberOfLines={1}>
           {item.name}
         </Text>
       </TouchableOpacity>
@@ -82,6 +85,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     alignSelf: "center",
     fontWeight: "600",
-    color: "#118161",
+    color: "#ffffff",
   },
 });

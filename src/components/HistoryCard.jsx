@@ -3,11 +3,9 @@ import { View, Text, Image, StyleSheet } from "react-native";
 import { useTheme } from "../contexts/theme/useTheme";
 
 export default function HistoryCard({ item, formatDate }) {
-  console.log("data:", item);
-
-  const data = item.details || {};
-
   const { theme } = useTheme();
+  
+  const data = item.details || {};
 
   const getType = () => {
     if (data.type === "checkup") return "checkup";

@@ -42,9 +42,6 @@ export default function TherapiesScreen({ navigation }) {
     <View
       style={[styles.container, { backgroundColor: theme.colors.background }]}
     >
-      <Text style={[styles.subtitle, { color: theme.colors.text }]}>
-        Choose your healing journey
-      </Text>
 
       <FlatList
         data={therapies}
@@ -67,11 +64,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-  },
-  subtitle: {
-    fontSize: 18,
-    fontWeight: "500",
-    marginBottom: 16,
   },
   error: {
     textAlign: "center",

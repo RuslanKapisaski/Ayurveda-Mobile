@@ -1,4 +1,5 @@
-import { StyleSheet, View, Text, TouchableOpacity, Image } from "react-native";
+import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
+import { Image } from "expo-image"
 import { useTheme } from "../contexts/theme/useTheme";
 
 export default function ProgramCard({ program, onPress }) {
@@ -10,7 +11,12 @@ export default function ProgramCard({ program, onPress }) {
       onPress={onPress}
     >
       {program.imageUrl ? (
-        <Image source={{ uri: program.imageUrl }} style={styles.image} />
+        <Image 
+        source={{ uri: program.imageUrl }}
+        style={styles.image} 
+        cachePolicy={'memory-disk'} 
+        contentFit="cover" 
+        transition={200} />
       ) : (
         <View
           style={[
