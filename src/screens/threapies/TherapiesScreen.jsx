@@ -7,7 +7,7 @@ import {
   View,
 } from "react-native";
 import * as therapiesService from "../../services/therapiesService";
-import TherapyCard from "../../components/therapyCard.jsx";
+import TherapyCard from "../../components/TherapyCard"
 import { useTheme } from "../../contexts/theme/useTheme"; 
 
 export default function TherapiesScreen({ navigation }) {
