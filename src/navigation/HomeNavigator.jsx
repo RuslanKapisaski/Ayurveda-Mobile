@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HomeScreen from "../screens/HomeScreen";
 import CheckupScreen from "../screens/CheckupScreen";
 import ThemeButton from "../components/ThemeButton";
+import EditAppointmentsScreen from "../screens/appointments/EditAppointmentsScreen"
 import { useTheme } from "../contexts/theme/useTheme";
 
 export default function HomeNavigator() {
@@ -26,6 +27,15 @@ export default function HomeNavigator() {
         name="Checkup"
         component={CheckupScreen}
         options={{ headerShown: true }}
+      />
+      <Stack.Screen
+        name="EditAppointment"
+        component={EditAppointmentsScreen}
+        options={{
+          headerRight: () => (
+            <ThemeButton toggleTheme={toggleTheme} isDark={isDarkMode} />
+          ),
+        }}
       />
     </Stack.Navigator>
   );
