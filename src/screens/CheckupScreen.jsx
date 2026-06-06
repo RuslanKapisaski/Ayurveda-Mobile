@@ -21,12 +21,12 @@ import confirmAlert from "../utils/confirmAlert";
 import { formatDate } from "../utils/dateFormater";
 import { useTheme } from "../contexts/theme/useTheme";
 import * as doctorService from "../services/doctorService";
+import { useNotifications } from "../contexts/notifications/NotificationContext";
 
 export default function CheckupScreen({ navigation }) {
   const { theme } = useTheme();
   const { user } = useAuth();
   const type = "checkup";
-
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [bookedSlots, setBookedSlots] = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
@@ -34,6 +34,7 @@ export default function CheckupScreen({ navigation }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [doctors, setDoctors] = useState([]);
+  const { scheduleCheckupFollowUpReminder } = useNotifications()
 
   useEffect(() => {
     const fetchDoctors = async () => {
@@ -79,6 +80,7 @@ export default function CheckupScreen({ navigation }) {
 
     try {
       setIsLoading(true);
+      const notificationId = await scheduleCheckupFollowUpReminder()
 
       const data = {
         userId: user.id,
@@ -89,6 +91,7 @@ export default function CheckupScreen({ navigation }) {
           doctorId: selectedDoctor.id,
           name: selectedDoctor.name,
         },
+        reminderNotificationId: notificationId,
       };
 
       await appointmentsService.create(data);

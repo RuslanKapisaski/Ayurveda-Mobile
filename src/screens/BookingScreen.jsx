@@ -21,6 +21,7 @@ import * as programsService from "../services/programsService";
 import * as appointmentsService from "../services/appointmentsService";
 import confirmAlert from "../utils/confirmAlert";
 import { formatDate } from "../utils/dateFormater";
+import { useNotifications } from "../contexts/notifications/NotificationContext";
 
 export default function BookingScreen({ route, navigation }) {
   const { type, itemId } = route.params;
@@ -32,6 +33,7 @@ export default function BookingScreen({ route, navigation }) {
   const [note, setNote] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const { scheduleAppointmentReminder } = useNotifications()
 
   useEffect(() => {
     const loadItem = async () => {
@@ -83,12 +85,13 @@ export default function BookingScreen({ route, navigation }) {
     const confirmed = await confirmAlert(title, message);
 
     if (!confirmed) {
-      selectedDate(null);
+      setSelectedDate(null);
       return;
     }
 
     try {
       setIsLoading(true);
+      const notificationId = await scheduleAppointmentReminder(date, type)
 
       const appointment = {
         userId: user.id,
@@ -96,7 +99,7 @@ export default function BookingScreen({ route, navigation }) {
         type,
         note,
         date,
-        createdAt: Date.now(),
+        reminderNotificationId: notificationId,
       };
 
       await appointmentsService.create(appointment);

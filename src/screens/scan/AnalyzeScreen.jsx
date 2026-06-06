@@ -5,6 +5,7 @@ import useAuth from "../../contexts/auth/useAuth";
 import AnalyzedFoodCard from "../../components/AnalyzedFoodCard";
 import useFetchUserData from "../../hooks/useFetchUserData";
 import * as scanService from "../../services/foodScanningService";
+import { useNotifications } from "../../contexts/notifications/NotificationContext";
 
 export default function AnalyzeScreen({ route, navigation }) {
     const { scanResult } = route.params;
@@ -12,13 +13,11 @@ export default function AnalyzeScreen({ route, navigation }) {
     const { theme } = useTheme();
     const { allergies, firestoreUser, loadUserData, isLoading, error } = useFetchUserData(user?.uid);
     const [saving, setSaving] = useState(false)
+    const {sendLocalNotification} = useNotifications()
 
     useEffect(() => {
         if (user?.uid) loadUserData();
     }, [user?.uid]);
-
-    console.log(`Scan result: ${scanResult}`)
-    console.log('dosha_recommendation:', JSON.stringify(scanResult?.dosha_recommendation))
 
     const handleAddToMeals = async () => {
         setSaving(true)
@@ -34,6 +33,11 @@ export default function AnalyzeScreen({ route, navigation }) {
             }
 
             await scanService.create(analyzeData)
+
+            await sendLocalNotification(
+                "Scan saved!",
+                `${scanResult.food} has been added to your meal history.`
+            )
 
             navigation.navigate("Scan History");
 
