@@ -1,42 +1,42 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   ActivityIndicator,
+  Alert,
 } from "react-native";
-import * as appointmentService from "../services/appointmentsService";
+import * as appointmentsService from "../services/appointmentsService";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Button from "../components/Button";
 import useAuth from "../contexts/auth/useAuth";
-import { formatDate } from "../utils/dateFormater";
 import { useFocusEffect } from "@react-navigation/native";
 import { useTheme } from "../contexts/theme/useTheme";
 import useFetchCount from "../hooks/useFetchCount";
 import useFetchAppointments from "../hooks/useFetchAppointments";
+import AppointmentCard from "../components/AppointmentCard";
+import confirmAlert from "../utils/confirmAlert";
+import useDailyRecommendations from "../hooks/useRecommendations";
+import RecommenationCard from "../components/RecomendationCard";
 
 export default function HomeScreen({ navigation }) {
   const { user } = useAuth();
   const { theme } = useTheme();
-
   const { counts, loadCount } = useFetchCount(user.id);
-  const {
-    upcomingAppointments,
-    pastAppointments,
-    loadUpcoming,
-    loadPast,
-    isLoading,
-    error,
-  } = useFetchAppointments(user.id);
+  const [changed, setChanged] = useState(false);
+  const { upcomingAppointments, loadUpcoming, isLoading, error } = useFetchAppointments(user.id);
+  const { dailyRecommendations, isLoading: recommendationsLoading } = useDailyRecommendations(
+    user?.id,
+    user?.dosha?.dominant
+  );
 
   useFocusEffect(
     useCallback(() => {
       if (!user?.id) return;
       loadUpcoming();
-      loadPast();
       loadCount();
-    }, [user?.id]),
+    }, [user?.id, changed])
   );
 
   if (isLoading) {
@@ -44,124 +44,122 @@ export default function HomeScreen({ navigation }) {
   }
 
   if (error) {
-    return (
-      <Text style={[styles.error, { color: theme.colors.text }]}>{error}</Text>
-    );
+    return <Text style={[styles.error, { color: theme.colors.text }]}>{error}</Text>;
   }
+
+  const handleEdit = (data) => {
+    navigation.navigate("EditAppointment", { data });
+  };
+
+  const handleCancel = async (appointmentId) => {
+    const confirmed = await confirmAlert(
+      "Cancel Appointment",
+      "Are you sure you want to cancel this appointment?"
+    );
+    if (!confirmed) return;
+
+    try {
+      await appointmentsService.deleteAppointment(appointmentId);
+      setChanged((prev) => !prev)
+    } catch (err) {
+      Alert.alert("Error", err.message || "Failed to cancel appointment");
+    }
+  };
+
+  const recommendations = dailyRecommendations?.recommendations
+    ? Object.values(dailyRecommendations.recommendations)
+    : [];
 
   return (
     <ScrollView
       showsVerticalScrollIndicator={false}
       style={[styles.container, { backgroundColor: theme.colors.background }]}
+      contentContainerStyle={styles.content}
     >
-      {/* Section: Upcoming Appointments */}
-      <View style={[styles.card, { backgroundColor: theme.colors.cardColor }]}>
+      {/* Upcoming Appointments */}
+      <View style={[styles.cardContainer, { backgroundColor: theme.colors.cardColor }]}>
         <Text style={[styles.cardTitle, { color: theme.colors.text }]}>
           Upcoming Appointments
         </Text>
-        {upcomingAppointments && upcomingAppointments.length > 0 ? (
-          upcomingAppointments.map((appointment, index) => (
-            <View
-              key={index}
-              style={[styles.infoCard, styles.featureInfoCards]}
-            >
-              <Text style={{ color: theme.colors.text }}>
-                Type: {appointment.type}
-              </Text>
-              <Text style={{ color: theme.colors.text }}>
-                Time:
-                {appointment.date
-                  ? formatDate(appointment.date)
-                  : "Invalid date"}
-              </Text>
-            </View>
-          ))
-        ) : (
-          <Text
-            style={[styles.noAppointmentsText, { color: theme.colors.text }]}
-          >
+
+        {!upcomingAppointments || upcomingAppointments.length === 0 ? (
+          <Text style={[styles.noAppointmentsText, { color: theme.colors.text }]}>
             No upcoming appointments
           </Text>
+        ) : (
+          upcomingAppointments.map((item) => (
+            <AppointmentCard
+              key={item.id.toString()}
+              appointment={item}
+              onCancel={() => handleCancel(item?.id)}
+              onEdit={() => handleEdit(item)}
+            />
+          ))
         )}
       </View>
 
-      {/* Section: Past Appointments */}
-      <View style={[styles.card, { backgroundColor: theme.colors.cardColor }]}>
+      {/* Daily Recommendations */}
+      <View style={[styles.cardContainer, { backgroundColor: theme.colors.cardColor }]}>
         <Text style={[styles.cardTitle, { color: theme.colors.text }]}>
-          Past Appointments
+          Daily Recommendations
         </Text>
-        {pastAppointments && pastAppointments.length > 0 ? (
-          pastAppointments.map((appointment, index) => (
-            <View key={index} style={[styles.infoCard, styles.pastinfoCards]}>
-              <Text style={{ color: theme.colors.text }}>
-                Type: {appointment.type}
-              </Text>
-              <Text style={{ color: theme.colors.text }}>
-                Time:{" "}
-                {appointment.date
-                  ? formatDate(appointment.date)
-                  : "Invalid date"}
-              </Text>
-            </View>
+
+        {recommendations.length > 0 ? (
+          recommendations.map((rec) => (
+            <RecommenationCard
+              key={rec.id || rec.title}
+              category={rec.category}
+              dosha={rec.dosha}
+              description={rec.description}
+              title={rec.title}
+            />
           ))
         ) : (
-          <Text style={{ color: theme.colors.text }}>No past appointments</Text>
+          <Text style={[styles.noAppointmentsText, { color: theme.colors.text }]}>
+            No daily recommendations
+          </Text>
         )}
+
+        <Text style={[styles.cardSubTitle, { color: theme.colors.text }]}>
+          Based on your {user?.dosha?.dominant} dosha
+        </Text>
       </View>
 
-      {/* PROGRESS SECTION */}
-      <View style={[styles.progressContainer, ,]}>
-        <View
-          style={[
-            styles.progressBox,
-            { backgroundColor: theme.colors.cardColor },
-          ]}
-        >
-          <Text style={[styles.progressNumber, { color: theme.colors.text }]}>
-            {counts.therapies}
-          </Text>
-          <Text style={[styles.progressLabel, { color: theme.colors.text }]}>
-            Therapies
-          </Text>
-        </View>
-        <View
-          style={[
-            styles.progressBox,
-            { backgroundColor: theme.colors.cardColor },
-          ]}
-        >
-          <Text style={[styles.progressNumber, { color: theme.colors.text }]}>
-            {counts.programs}
-          </Text>
-          <Text style={[styles.progressLabel, { color: theme.colors.text }]}>
-            Programs
-          </Text>
-        </View>
-        <View
-          style={[
-            styles.progressBox,
-            { backgroundColor: theme.colors.cardColor },
-          ]}
-        >
-          <Text style={[styles.progressNumber, { color: theme.colors.text }]}>
-            {counts.checkups}
-          </Text>
-          <Text style={[styles.progressLabel, { color: theme.colors.text }]}>
-            Checkups
-          </Text>
+      {/* Progress */}
+      <View style={[styles.cardContainer, { backgroundColor: theme.colors.cardColor }]}>
+        <Text style={[styles.cardTitle, { color: theme.colors.text, marginHorizontal: 16 }]}>
+          Your Progress
+        </Text>
+        <View style={styles.progressContainer}>
+          <View style={[styles.progressBox, { backgroundColor: theme.colors.cardColor }]}>
+            <Text style={[styles.progressNumber, { color: theme.colors.text }]}>
+              {counts.therapies}
+            </Text>
+            <Text style={[styles.progressLabel, { color: theme.colors.text }]}>Therapies</Text>
+          </View>
+
+          <View style={[styles.progressBox, { backgroundColor: theme.colors.cardColor }]}>
+            <Text style={[styles.progressNumber, { color: theme.colors.text }]}>
+              {counts.programs}
+            </Text>
+            <Text style={[styles.progressLabel, { color: theme.colors.text }]}>Programs</Text>
+          </View>
+
+          <View style={[styles.progressBox, { backgroundColor: theme.colors.cardColor }]}>
+            <Text style={[styles.progressNumber, { color: theme.colors.text }]}>
+              {counts.checkups}
+            </Text>
+            <Text style={[styles.progressLabel, { color: theme.colors.text }]}>Checkups</Text>
+          </View>
         </View>
       </View>
-
-      {/* QUICK ACTIONS */}
       <Button
         text="Book Consultation"
         active={true}
-        style={[
-          styles.consultationButton,
-          { backgroundColor: theme.colors.primary },
-        ]}
+        style={[styles.consultationButton, { backgroundColor: theme.colors.primary }]}
         onPress={() => navigation.navigate("Checkup")}
       />
+
     </ScrollView>
   );
 }
@@ -170,88 +168,75 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  progressContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginHorizontal: 20,
-    marginBottom: 20,
+  content: {
+    paddingVertical: 16,
   },
-
-  progressBox: {
-    backgroundColor: "#FFFFFF",
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    borderRadius: 12,
-    flex: 1,
-    marginHorizontal: 5,
+  cardContainer: {
+    marginVertical: 10,
+    marginHorizontal: "auto",
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    borderRadius: 16,
+    width: "95%",
     elevation: 5,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
+  },
+  cardTitle: {
+    fontSize: 22,
+    fontWeight: "600",
+    marginBottom: 16,
+  },
+  cardSubTitle: {
+    marginTop: 10,
+    alignSelf: "flex-end",
+    fontStyle: "italic",
+    fontSize: 13,
+  },
+  progressContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginHorizontal: 16,
+    marginBottom: 20,
+  },
+  progressBox: {
+    flex: 1,
+    marginHorizontal: 5,
+    paddingVertical: 16,
+    paddingHorizontal: 12,
+    borderRadius: 16,
     justifyContent: "center",
     alignItems: "center",
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.4,
+    shadowRadius: 4,
   },
-
   progressNumber: {
     fontSize: 18,
     fontWeight: "600",
   },
-
   progressLabel: {
-    fontSize: 14,
-    color: "#777",
+    fontSize: 13,
     marginTop: 4,
   },
-
-  card: {
-    backgroundColor: "#c13f3f",
-    marginVertical: 20,
-    marginHorizontal: 20,
-    padding: 20,
-    borderRadius: 12,
-    elevation: 5,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-
-  cardTitle: {
-    fontSize: 22,
-    color: "#4A7C59",
-    fontWeight: "bold",
-    marginBottom: 8,
-  },
-
-  infoCard: {
-    marginBottom: 12,
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-    marginBottom: 10,
-  },
-
-  featureInfoCards: {
-    backgroundColor: "#78d0a1",
-  },
-
-  pastinfoCards: {
-    backgroundColor: "#eebebe",
-  },
-
   consultationButton: {
     marginVertical: 20,
     paddingVertical: 12,
-    backgroundColor: "#4A7C59",
-    borderRadius: 8,
+    borderRadius: 16,
     alignSelf: "center",
     width: "80%",
-    textAlign: "center",
   },
-
   noAppointmentsText: {
-    marginVertical: 20,
+    marginVertical: 10,
     fontSize: 14,
+  },
+  error: {
+    flex: 1,
+    textAlign: "center",
+    marginTop: 40,
   },
 });
