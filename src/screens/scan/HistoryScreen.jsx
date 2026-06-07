@@ -5,43 +5,45 @@ import ScannedFoodCard from "../../components/ScannedFoodCard"
 import useFetch from "../../hooks/useFetch"
 import { useFetchHistoryScans } from "../../hooks/useFetchHistoryScans"
 import useAuth from "../../contexts/auth/useAuth"
-import { ScrollView ,FlatList} from "react-native"
+import { ScrollView, FlatList } from "react-native"
 import useFetchUserData from "../../hooks/useFetchUserData"
 
-export default function HistoryScreen() {
+export default function HistoryScreen({navigation}) {
 
     const { theme } = useTheme()
     const { user } = useAuth()
     const { scans, loadScans, isLoading, error } = useFetchHistoryScans(user.id)
 
-//    const {loadUserData} = useFetchUserData(user.id)
+    //    const {loadUserData} = useFetchUserData(user.id)
 
-console.log("History render");
     useEffect(() => {
         loadScans()
         // loadUserData()
     }, [user.id])
 
-    console.log(scans)
+
     return (
         <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
             <Text style={[styles.title, { color: theme.colors.primary }]}> Your past scans: </Text>
             {isLoading && <ActivityIndicator />}
 
-                {scans?.length > 0 
-                ? 
+            {scans?.length > 0
+                ?
                 <FlatList
-                data={scans}
-                keyExtractor={(item) => item.id}
-                renderItem={({item}) => <ScannedFoodCard  data={item}
-                initialNumToRender={5}
-                maxToRenderPerBatch={5}
-                windowSize={5}
-                removeClippedSubviews={true}
+                    data={scans}
+                    keyExtractor={(item) => item.id}
+                    renderItem={({ item }) =>
+                        <ScannedFoodCard
+                            data={item}
+                            initialNumToRender={5}
+                            maxToRenderPerBatch={5}
+                            windowSize={5}
+                            removeClippedSubviews={true}
+                            onPress={() => navigation.navigate("HistoryDetails", { scanResult: item })}
+                        />
+                    }
                 />
-             }
-                />
-                : <Text style={[styles.noScans, {color: theme.colors.primary}]}> No scans yet.</Text>}
+                : <Text style={[styles.noScans, { color: theme.colors.primary }]}> No scans yet.</Text>}
 
             {error && < Text>{error}</Text>}
         </View>
@@ -62,7 +64,7 @@ const styles = StyleSheet.create({
         fontSize: 24,
         fontWeight: "600",
     },
-    noScans:{
+    noScans: {
 
     }
 

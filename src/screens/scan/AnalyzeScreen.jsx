@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { View, Text,StyleSheet } from "react-native";
+import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { useTheme } from "../../contexts/theme/useTheme";
 import useAuth from "../../contexts/auth/useAuth";
 import AnalyzedFoodCard from "../../components/AnalyzedFoodCard";
@@ -13,7 +13,7 @@ export default function AnalyzeScreen({ route, navigation }) {
     const { theme } = useTheme();
     const { allergies, firestoreUser, loadUserData, isLoading, error } = useFetchUserData(user?.uid);
     const [saving, setSaving] = useState(false)
-    const {sendLocalNotification} = useNotifications()
+    const { sendLocalNotification } = useNotifications()
 
     useEffect(() => {
         if (user?.uid) loadUserData();
@@ -24,15 +24,21 @@ export default function AnalyzeScreen({ route, navigation }) {
         try {
             const imageUrl = await scanService.uploadImage(scanResult.uri, user.id);
 
-            const analyzeData = {
+            const mealData = {
                 userId: user.id,
                 food: scanResult.food,
                 confidence: scanResult.confidence,
-                dosha: scanResult.dosha_recommendation,
-                imageUrl,
-            }
+                dosha: scanResult.dosha,
+                explanation: scanResult.explanation || null,
+                alternatives: scanResult.alternatives || [],
+                allergens: scanResult.allergens || [],
+                properties: scanResult.properties || [],
+            };
 
-            await scanService.create(analyzeData)
+            await scanService.create({
+                ...mealData,
+                imageUrl,
+            });
 
             await sendLocalNotification(
                 "Scan saved!",
@@ -51,7 +57,7 @@ export default function AnalyzeScreen({ route, navigation }) {
     }
 
     return (
-        <View
+        <ScrollView
             contentContainerStyle={[
                 styles.container,
                 { backgroundColor: theme.colors.background },
@@ -68,13 +74,14 @@ export default function AnalyzeScreen({ route, navigation }) {
                 onCancel={() => navigation.pop(2)}
                 saving={saving}
             />
-        </View>
+        </ScrollView>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
-     alignItems:"center",
-     justifyContent:"center"   
+        alignItems: "center",
+        justifyContent: "center",
+        marginVertical: 20,
     }
 });

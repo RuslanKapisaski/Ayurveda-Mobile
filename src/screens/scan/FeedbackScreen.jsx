@@ -23,9 +23,23 @@ export default function FeedbackScreen({ route, navigation }) {
         uri,
         predictedFood,
         confidence,
+        status
     } = route.params;
     const [correctFood, setCorrectFood] = useState("");
     const [loading, setLoading] = useState(false);
+
+    const confidenceMap = {
+    low_confidence:
+        "We are not confident enough about this food. Please help us identify it.",
+
+    food_not_found:
+        "The food is not yet part of our Ayurveda knowledge base.",
+
+    unsupported_food:
+        "This food is currently unsupported.",
+};
+
+    const message = confidenceMessages.map((m) => m === status)
 
     const handleSubmit = async () => {
 
@@ -119,6 +133,8 @@ export default function FeedbackScreen({ route, navigation }) {
                     <Text style={styles.confidence}>
                         Confidence: {confidence}%
                     </Text>
+
+                    <Text style={styles.predictedFood}>{message}</Text>
 
                 </View>
 

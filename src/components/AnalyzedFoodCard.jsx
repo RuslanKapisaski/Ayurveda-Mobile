@@ -1,8 +1,9 @@
-import { View, Text, StyleSheet, Touchable, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, Touchable, TouchableOpacity, ScrollView } from "react-native";
 import { Image } from "expo-image"
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../contexts/theme/useTheme";
 import Button from "./Button";
+import { ThemeContext } from "@react-navigation/native";
 
 const doshaColor = {
     beneficial: { bg: "#e1f5ee", text: "#0f6e56" },
@@ -25,17 +26,22 @@ export default function AnalyzedFoodCard({
     userError,
     onAddToMeals,
     onCancel,
-    saving
+    saving,
+    readOnly = false
 
 }) {
     const { theme } = useTheme();
 
+    const alternatives = scanResult?.alternatives || [];
+    const allergens = scanResult?.allergens || [];
+    const properties = scanResult?.properties || [];
+
     return (
-        <View style={[styles.card, { backgroundColor: theme.colors.card }]}>
+        <View style={[styles.card, { backgroundColor: theme.colors.cardColor }]}>
 
             <View style={[styles.header, { borderBottomColor: theme.colors.border }]}>
                 <Image
-                    source={{ uri: scanResult.uri }}
+                    source={{ uri: scanResult.uri || scanResult.imageUrl }}
                     style={styles.image}
                     contentFit={'cover'}
                     cachePolicy={'memory-disk'}
@@ -46,7 +52,7 @@ export default function AnalyzedFoodCard({
                     <Text style={[styles.foodName, { color: theme.colors.text }]}>
                         {scanResult.food}
                     </Text>
-                    <Text style={[styles.foodLabel, { color: theme.colors.secondaryText }]}>
+                    <Text style={[styles.foodLabel, { color: theme.colors.primary }]}>
                         Food identified
                     </Text>
                 </View>
@@ -61,7 +67,7 @@ export default function AnalyzedFoodCard({
 
             {userDosha && (
                 <View style={[styles.section, { borderBottomColor: theme.colors.border }]}>
-                    <Text style={[styles.sectionLabel, { color: theme.colors.secondaryText }]}>
+                    <Text style={[styles.sectionLabel, { color: theme.colors.primary }]}>
                         YOUR DOSHA
                     </Text>
                     <View style={styles.doshaRow}>
@@ -75,52 +81,74 @@ export default function AnalyzedFoodCard({
                                 color="#0f6e56"
                             />
                         </View>
-                    
+
                     </View>
                 </View>
             )}
 
-            <View style={[styles.section, { borderBottomColor: theme.colors.border }]}>
-                <Text style={[styles.sectionLabel, { color: theme.colors.secondaryText }]}>
-                    DOSHA RECOMMENDATIONS
-                </Text>
-                {Object.entries(scanResult?.dosha_recommendation || {}).map(([dosha, value]) => (
-                    <View key={dosha} style={styles.recommendationRow}>
-                        <Text style={[styles.recommendationDosha, { color: theme.colors.text }]}>
-                            {dosha.charAt(0).toUpperCase() + dosha.slice(1)}
-                        </Text>
-
-                        <View style={[styles.pill, { backgroundColor: doshaColor[value]?.bg || "#eee" }]}>
-                            <Text style={[styles.pillText, { color: doshaColor[value]?.text || "#888" }]}>
-                                {value}
-                            </Text>
-                        </View>
-                    </View>
-                ))}
-            </View>
-
-            {allergies.length > 0 && (
-                <View style={styles.section}>
-                    <Text style={[styles.sectionLabel, { color: theme.colors.secondaryText }]}>
-                        ALLERGIES
+            {scanResult?.explanation && (
+                <View style={[styles.section, { borderBottomColor: theme.colors.border }]}>
+                    <Text style={[styles.sectionLabel, { color: theme.colors.primary }]}>
+                        EXPLANATION
                     </Text>
+                    <Text style={[styles.explanationText, { color: theme.colors.text }]}>
+                        {scanResult.explanation}
+                    </Text>
+                </View>
+            )}
+
+            {alternatives.length > 0 && (
+                <View style={[styles.section, { borderBottomColor: theme.colors.border }]}>
+                    <Text style={[styles.sectionLabel, { color: theme.colors.primary }]}>
+                        ALTERNATIVES
+                    </Text>
+
+                    {alternatives.map((item) => (
+                        <Text key={item} style={[styles.contentText, { color: theme.colors.text }]}>
+                            • {item}
+                        </Text>
+                    ))}
+                </View>
+            )}
+
+            {allergens.length > 0 && (
+                <View style={[styles.section, { borderBottomColor: theme.colors.border }]}>
+                    <Text style={[styles.sectionLabel, { color: theme.colors.primary }]}>
+                        ALLERGENS
+                    </Text>
+
                     <View style={styles.allergiesRow}>
-                        {allergies.map((allergy, index) => (
-                            <View key={index} style={styles.allergyPill}>
+                        {allergens.map((item) => (
+                            <View key={item} style={styles.allergyPill}>
                                 <Ionicons name="warning-outline" size={13} color="#a32d2d" />
-                                <Text style={styles.allergyText}>{allergy}</Text>
+                                <Text style={[styles.allergyText, styles.contentText,]}>{item}</Text>
                             </View>
                         ))}
                     </View>
                 </View>
             )}
 
-       
+            {properties.length > 0 && (
+                <View style={[styles.section, { borderBottomColor: theme.colors.border }]}>
+                    <Text style={[styles.sectionLabel, { color: theme.colors.primary }]}>
+                        PROPERTIES
+                    </Text>
 
-            <View style={styles.previewActions}>
+                    <View style={styles.allergiesRow}>
+                        {properties.map((item) => (
+                            <View key={item} style={styles.propertyPill}>
+                                <Text style={[styles.contentText, { color: theme.colors.text }]}>{item}</Text>
+                            </View>
+                        ))}
+                    </View>
+                </View>
+            )}
+
+
+            {!readOnly && <View style={styles.previewActions}>
                 <TouchableOpacity
                     onPress={onCancel}
-                    style={styles.actionButton}
+                    style={[styles.actionButton, { backgroundColor: theme.colors.background }]}
                     disabled={saving}
                 >
                     <Ionicons
@@ -133,7 +161,7 @@ export default function AnalyzedFoodCard({
 
                 <TouchableOpacity
                     onPress={onAddToMeals}
-                    style={styles.actionButton}
+                    style={[styles.actionButton, { backgroundColor: theme.colors.background }]}
                     disabled={saving}
                 >
                     <Ionicons
@@ -143,24 +171,29 @@ export default function AnalyzedFoodCard({
                     />
                     <Text style={styles.actionText}>{saving ? "Saving..." : "Add To Meals"}</Text>
                 </TouchableOpacity>
-            </View>
+            </View>}
+
         </View>
     );
 }
 
 const styles = StyleSheet.create({
     card: {
-        width: "100%",
+        width: "90%",
         borderRadius: 20,
-        overflow: "hidden",
-        marginTop: 24,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.08,
+        overflow: "scroll",
+        margin: "auto",
+        shadowColor: "#000000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
         shadowRadius: 12,
         elevation: 4,
+        marginBottom: 10,
     },
-
+    contentText: {
+        textTransform: "capitalize",
+        fontWeight: "400",
+    },
     header: {
         flexDirection: "row",
         alignItems: "center",
@@ -182,7 +215,7 @@ const styles = StyleSheet.create({
         textTransform: "capitalize",
     },
     foodLabel: {
-        fontSize: 13,
+        fontSize: 18,
         marginTop: 2,
     },
     confidenceBadge: {
@@ -201,16 +234,16 @@ const styles = StyleSheet.create({
         fontSize: 11,
         color: "#0f6e56",
     },
-
     section: {
         padding: 16,
         borderBottomWidth: 0.5,
+        marginBottom: 4,
     },
     sectionLabel: {
-        fontSize: 11,
-        fontWeight: "600",
-        letterSpacing: 0.5,
-        marginBottom: 12,
+        fontSize: 14,
+        fontWeight: "800",
+        letterSpacing: 0.8,
+        marginBottom: 14,
     },
     buttonSection: {
         flex: "row",
@@ -236,18 +269,17 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: "500",
     },
-
-    recommendationRow: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-        marginBottom: 10,
+    explanationText: {
+        fontStyle: "italic",
+        fontWeight: "300",
+        fontSize: 15,
+        lineHeight: 22,
     },
     recommendationDosha: {
         fontSize: 15,
     },
     pill: {
-        borderRadius: 20,
+        borderRadius: 30,
         paddingHorizontal: 12,
         paddingVertical: 4,
     },
@@ -273,7 +305,6 @@ const styles = StyleSheet.create({
     allergyText: {
         fontSize: 13,
         color: "#a32d2d",
-        fontWeight: "500",
     },
     previewActions: {
         flexDirection: "row",
@@ -286,17 +317,20 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: "center",
         justifyContent: "center",
-        paddingVertical: 18,
+        paddingVertical: 12,
         marginBottom: 28,
-        marginHorizontal: 8,
-        borderRadius: 16,
-        backgroundColor: "#F5F5F5",
+        marginHorizontal: 16,
+        borderRadius: 20,
+        shadowColor: "#000000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
     },
 
     actionText: {
         marginTop: 4,
         fontSize: 14,
         fontWeight: "600",
-        color: "#333",
+        color: "#777474"
     },
 });
