@@ -8,6 +8,7 @@ import HistoryScreen from "../screens/scan/HistoryScreen";
 import ScanHomeScreen from "../screens/scan/ScanHomeScreen";
 import AnalyzeScreen from "../screens/scan/AnalyzeScreen";
 import FeedbackScreen from "../screens/scan/FeedbackScreen";
+import HistoryDetailsScreen from "../screens/scan/HistoryDetailsScreen";
 
 
 export default function ScanNaviagator() {
@@ -63,9 +64,19 @@ export default function ScanNaviagator() {
                 component={FeedbackScreen}
                 options={{
                     headerRight: () => {
-                       return <ThemeButton isDark={isDarkMode} toggleTheme={toggleTheme} />
+                        return <ThemeButton isDark={isDarkMode} toggleTheme={toggleTheme} />
                     }
                 }} />
+
+            <Stack.Screen
+                name="HistoryDetails"
+                component={HistoryDetailsScreen}
+                options={{
+                    headerRight: () => {
+                        return <ThemeButton isDark={isDarkMode} toggleTheme={toggleTheme} />
+                    }
+                }}
+            />
 
         </Stack.Navigator>
     )
