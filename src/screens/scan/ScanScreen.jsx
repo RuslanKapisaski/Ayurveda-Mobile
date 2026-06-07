@@ -4,6 +4,7 @@ import {
     View, Text, TouchableOpacity, StyleSheet,
     ActivityIndicator, Image, ScrollView,
 } from "react-native";
+import { auth } from "../../fireBaseConfig";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../../contexts/theme/useTheme";
 import useAuth from "../../contexts/auth/useAuth";
@@ -47,30 +48,44 @@ export default function ScanScreen({ navigation }) {
             const formData = new FormData();
             formData.append("file", { uri, name: "food.jpg", type: "image/jpeg" });
 
-            const controller = new AbortController()
+            if (!auth.currentUser) {
+                throw new Error("User is not authenticated");
+            }
+            const token = await auth.currentUser.getIdToken()
 
+            const controller = new AbortController()
             const timeout = setTimeout(() => {
                 controller.abort()
             }, 30000)
 
             const response = await fetch(API_URL, {
                 method: "POST",
+                headers: {
+                    Authorization: `Bearer ${token}`
+                },
                 body: formData,
                 signal: controller.signal
             });
 
             clearTimeout(timeout);
 
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Scan failed: ${response.status} ${errorText}\n Please try again..`);
+            }
+
             const data = await response.json();
-            if (data.confidence < 50) {
+
+            if (data.status !== "success") {
                 navigation.navigate("Feedback", {
                     uri,
                     predictedFood: data.food,
                     confidence: data.confidence,
+                    status: data.status,
                 });
                 return;
             }
-            navigation.navigate("Analyze", {scanResult:{ ...data, uri:uri}})
+            navigation.navigate("Analyze", { scanResult: { ...data, uri: uri } })
 
         } catch (error) {
             alert("Error: " + error.message);
