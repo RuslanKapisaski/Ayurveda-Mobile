@@ -11,9 +11,20 @@ export default function ScanHomeScreen({ navigation }) {
     const { theme } = useTheme();
     const [visible, setVisible] = useState(false);
     const slideAnim = useRef(new Animated.Value(300)).current;
+    const API_URL = "https://ayurveda-lens-api.onrender.com/";
+
+    const warmUpApi = async () => {
+        try {
+            await fetch(API_URL);
+        } catch (error) {
+            console.log("API warm up failed:", error.message);
+        }
+    };
 
     useFocusEffect(
         useCallback(() => {
+            warmUpApi();
+
             setVisible(true);
             slideAnim.setValue(300);
             Animated.spring(slideAnim, {
