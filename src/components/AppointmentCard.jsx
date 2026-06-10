@@ -39,33 +39,38 @@ export default function AppointmentCard({ appointment, onCancel, onEdit }) {
   };
 
   return (
-    <View style={[styles.card, { backgroundColor: theme.colors.cardColor }]}>
-      <Image
-        source={{ uri: getImageUri() }}
-        style={styles.image}
-        resizeMode="cover"
-      />
+    <View style={[styles.card, theme.shadows.large, { backgroundColor: theme.colors.cardColor }]}>
 
-      <Text style={[styles.subtitle, { color: theme.colors.text }]}>
-        Appointment:
-        <Text style={[styles.itemName, { color: theme.colors.text }]}>
-          {" "}
-          {item?.name || appointment.type}{" "}
+      <View>
+        <Image
+          source={{ uri: getImageUri() }}
+          style={styles.image}
+          resizeMode="cover"
+        />
+      </View>
+
+      <View>
+        <Text style={[styles.subtitle, { color: theme.colors.text }]}>
+          Appointment:
+          <Text style={[styles.itemName, { color: theme.colors.text }]}>
+            {" "}
+            {item?.name || appointment.type}{" "}
+          </Text>
         </Text>
-      </Text>
-      <Text style={[styles.subtitle, { color: theme.colors.text }]}>
-        Type:
-        <Text style={[styles.itemName, { color: theme.colors.text }]}>
-          {" "}
-          {appointment?.type}
+        <Text style={[styles.subtitle, { color: theme.colors.text }]}>
+          Type:
+          <Text style={[styles.itemName, { color: theme.colors.text }]}>
+            {" "}
+            {appointment?.type}
+          </Text>
         </Text>
-      </Text>
-      <Text style={[styles.subtitle, { color: theme.colors.text }]}>
-        Date:
-        <Text style={[styles.itemName, { color: theme.colors.text }]}>
-          {appointment?.date && formatDate(appointment.date)}
+        <Text style={[styles.subtitle, { color: theme.colors.text }]}>
+          Date:
+          <Text style={[styles.itemName, { color: theme.colors.text }]}>
+            {appointment?.date && formatDate(appointment.date)}
+          </Text>
         </Text>
-      </Text>
+      </View>
 
       <View style={styles.buttonPanel}>
         <Button
@@ -81,56 +86,63 @@ export default function AppointmentCard({ appointment, onCancel, onEdit }) {
           onPress={() => onEdit(appointment)}
         />
       </View>
+
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
+    flexDirection: "row",
+    alignItems:"flex-center",
+    justifyContent:"space-around",
+    width: 'auto',
+    height: 90,
     borderRadius: 12,
-    padding: 10,
-    marginBottom: 16,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 3,
+    marginBottom: 10,
   },
   subtitle: {
-    fontSize: 20,
+    fontSize: 10,
+    fontWeight: "800",
     margin: 4,
   },
   itemName: {
-    fontSize: 16,
+    fontSize: 12,
     fontWeight: "400",
     marginBottom: 4,
   },
   buttonPanel: {
-    flexDirection: "row",
-    gap: 10,
-    marginTop: 20,
+    flexDirection: "column",
     justifyContent: "flex-end",
+   
   },
   buttonText: {
     color: "#fff",
-    fontWeight: "500",
+    fontWeight: "300",
+    fontSize:10,
   },
   cancelButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 12,
+    height: 30,
+    width: 80,
+    paddingVertical: 8,
+    paddingHorizontal: 8,
     borderRadius: 8,
     backgroundColor: "#c25555",
   },
   editButton: {
-    paddingVertical: 10,
+    height: 30,
+    width: 80,
+    paddingVertical: 8,
     borderRadius: 8,
     alignItems: "center",
     backgroundColor: "#4A7C59",
   },
   image: {
-    width: "100%",
-    height: 160,
+    marginTop:10,
+    width: "80%",
+    height: 60,
+    width: 60,
     borderRadius: 8,
-    marginBottom: 8,
+    
   },
 });

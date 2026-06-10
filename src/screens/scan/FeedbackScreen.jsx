@@ -19,30 +19,19 @@ import { createScanFeedback } from "../../services/foodScanningService";
 export default function FeedbackScreen({ route, navigation }) {
     const { theme } = useTheme();
     const { user } = useAuth();
-    const {
-        uri,
-        predictedFood,
-        confidence,
-        status
-    } = route.params;
+    const { uri, predictedFood, confidence, status } = route.params;
     const [correctFood, setCorrectFood] = useState("");
     const [loading, setLoading] = useState(false);
 
     const confidenceMap = {
-    low_confidence:
-        "We are not confident enough about this food. Please help us identify it.",
+        low_confidence: "We are not confident enough about this food. Please help us identify it.",
+        food_not_found: "The food is not yet part of our Ayurveda knowledge base.",
+        unsupported_food: "This food is currently unsupported.",
+    };
 
-    food_not_found:
-        "The food is not yet part of our Ayurveda knowledge base.",
-
-    unsupported_food:
-        "This food is currently unsupported.",
-};
-
-    const message = confidenceMessages.map((m) => m === status)
+    const message = confidenceMap[status];
 
     const handleSubmit = async () => {
-
         if (!correctFood.trim()) {
             Alert.alert("Please enter the correct food");
             return;
@@ -62,19 +51,9 @@ export default function FeedbackScreen({ route, navigation }) {
 
             Alert.alert(
                 "Thank you!",
-                "Your feedback will help improve the AI model."
+                "Your feedback will help improve the AI model.",
+                [{ text: "OK", onPress: () => navigation.navigate("Scan History") }]
             );
-
-            navigation.navigate("Scan History", {
-                scanResult: {
-                    userId: user.id,
-                    food: correctFood.trim().toLowerCase(),
-                    confidence: 100,
-                    dosha: null,
-                    uri,
-                    isUserCorrected: true,
-                }
-            });
 
         } catch (error) {
             Alert.alert("Error", error.message);
@@ -84,58 +63,44 @@ export default function FeedbackScreen({ route, navigation }) {
     };
 
     return (
-
         <KeyboardAvoidingView
             style={{ flex: 1 }}
             behavior={Platform.OS === "ios" ? "padding" : "height"}
+            keyboardVerticalOffset={Platform.OS === "ios" ? 120 : 0}
         >
-
             <ScrollView
-                style={[
+                contentContainerStyle={[
                     styles.container,
                     { backgroundColor: theme.colors.background }
                 ]}
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={false}
             >
-
-                <Text
-                    style={[
-                        styles.title,
-                        { color: theme.colors.primary }
-                    ]}
-                >
+                <Text style={[styles.title, { color: theme.colors.primary }]}>
                     Wrong prediction?
                 </Text>
 
-                <Text
-                    style={[
-                        styles.subtitle,
-                        { color: theme.colors.text }
-                    ]}
-                >
+                <Text style={[styles.subtitle, { color: theme.colors.text }]}>
                     Help improve the AI by entering the correct food.
                 </Text>
 
-                <Image
-                    source={{ uri: uri }}
-                    style={styles.image}
-                />
+                <Image source={{ uri }} style={styles.image} />
 
-                <View style={styles.predictionBox}>
-
-                    <Text style={styles.predictionLabel}>
+                <View style={[styles.predictionBox, { backgroundColor: theme.colors.card }]}>
+                    <Text style={[styles.predictionLabel, { color: theme.colors.secondaryText }]}>
                         AI Prediction
                     </Text>
-
-                    <Text style={styles.predictionFood}>
+                    <Text style={[styles.predictionFood, { color: theme.colors.text }]}>
                         {predictedFood}
                     </Text>
-
-                    <Text style={styles.confidence}>
+                    <Text style={[styles.confidence, { color: theme.colors.secondaryText }]}>
                         Confidence: {confidence}%
                     </Text>
-
-                    <Text style={styles.predictedFood}>{message}</Text>
-
+                    {message && (
+                        <Text style={[styles.message, { color: theme.colors.secondaryText }]}>
+                            {message}
+                        </Text>
+                    )}
                 </View>
 
                 <TextInput
@@ -143,102 +108,90 @@ export default function FeedbackScreen({ route, navigation }) {
                     placeholderTextColor="#999"
                     value={correctFood}
                     onChangeText={setCorrectFood}
-                    style={styles.input}
+                    style={[styles.input, { backgroundColor: theme.colors.card, color: theme.colors.text }]}
+                    autoCapitalize="none"
+                    returnKeyType="done"
                 />
 
                 <TouchableOpacity
-                    style={[
-                        styles.button,
-                        { backgroundColor: theme.colors.primary }
-                    ]}
+                    style={[styles.button, { backgroundColor: theme.colors.primary }]}
                     onPress={handleSubmit}
                     disabled={loading}
                 >
-
                     <Text style={styles.buttonText}>
                         {loading ? "Saving..." : "Submit Feedback"}
                     </Text>
-
                 </TouchableOpacity>
 
             </ScrollView>
-
         </KeyboardAvoidingView>
     );
 }
 
 const styles = StyleSheet.create({
-
     container: {
-        flex: 1,
-        padding: 24,
+        flexGrow: 1,
+        padding: 18,
     },
-
     title: {
         fontSize: 28,
         fontWeight: "700",
         marginBottom: 10,
     },
-
     subtitle: {
         fontSize: 14,
         textAlign: "center",
         marginBottom: 24,
         lineHeight: 20,
     },
-
     image: {
         width: "100%",
         height: 280,
         borderRadius: 22,
         marginBottom: 20,
     },
-
     predictionBox: {
         width: "100%",
         padding: 18,
         borderRadius: 18,
-        backgroundColor: "#F4F4F4",
         marginBottom: 20,
         alignItems: "center",
+        gap: 6,
     },
-
     predictionLabel: {
         fontSize: 14,
-        color: "#777",
         marginBottom: 6,
     },
-
     predictionFood: {
         fontSize: 22,
         fontWeight: "700",
-        color: "#222",
+        textTransform: "capitalize",
     },
-
     confidence: {
-        marginTop: 8,
+        marginTop: 4,
         fontSize: 14,
-        color: "#666",
     },
-
+    message: {
+        marginTop: 8,
+        fontSize: 13,
+        textAlign: "center",
+        lineHeight: 20,
+    },
     input: {
         width: "100%",
-        backgroundColor: "#F4F4F4",
         borderRadius: 16,
         paddingHorizontal: 16,
-        paddingVertical: 14,
-        fontSize: 16,
+        paddingVertical: 20,
+        fontSize: 14,
         marginBottom: 18,
-        color: "#111",
     },
-
     button: {
         width: "100%",
         paddingVertical: 16,
         borderRadius: 18,
         alignItems: "center",
+        marginBottom: 32,
     },
-
     buttonText: {
         color: "#fff",
         fontSize: 16,
