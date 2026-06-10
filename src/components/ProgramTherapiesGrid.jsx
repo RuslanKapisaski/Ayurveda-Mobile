@@ -17,7 +17,7 @@ export default function ProgramTherapiesGrid({ therapies, onTherapyPress }) {
   const renderItem = ({ item }) => (
     <View style={styles.container}>
       <TouchableOpacity
-        style={[styles.card, {backgroundColor: theme.colors.primary}]}
+        style={[styles.card, theme.shadows.small, {backgroundColor: theme.colors.primary}]}
         onPress={() => onTherapyPress(item.id)}
       >
         {item.imageUrl ? (
@@ -54,16 +54,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     marginVertical: 16,
-    shadowColor: "#000",
     marginHorizontal: 2,
   },
   card: {
     backgroundColor: "#f5fff5",
-    shadowColor: "#000",
-    shadowOpacity: 0.2,
-    shadowRadius: 6,
-    shadowOffset: { width: 10, height: 3 },
-    elevation: 2,
   },
   image: {
     width: "100%",

@@ -14,11 +14,13 @@ import { db } from "../../fireBaseConfig";
 import { getDocs, collection } from "firebase/firestore";
 import * as onBoardingService from "../../services/onBoardingService";
 import Button from "../../components/Button";
+import { useTheme } from "../../contexts/theme/useTheme";
 
 export default function DoshaTestScreen({ navigation }) {
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState({});
   const [loading, setLoading] = useState(true);
+  const {theme} = useTheme()
 
   useEffect(() => {
     const fetchQuestions = async () => {
@@ -119,7 +121,7 @@ export default function DoshaTestScreen({ navigation }) {
     >
       <Text style={styles.title}>Dosha Test</Text>
       {questions.map((question, index) => (
-        <View key={index} style={styles.questionContainer}>
+        <View key={index} style={[styles.questionContainer, theme.shadows.medium]}>
           <Text style={styles.questionText}>{question.text}</Text>
 
           <View style={styles.pickerWrapper}>
@@ -180,12 +182,6 @@ const styles = StyleSheet.create({
     padding: 18,
     borderRadius: 16,
     marginBottom: 18,
-
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 4,
   },
 
   questionText: {

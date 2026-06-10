@@ -14,6 +14,7 @@ export default function Button({
     <TouchableOpacity
       style={[
         styles.button,
+        theme.shadows.medium,
         active && styles.primaryButton,
         passive && styles.secondaryButton,
         style,
@@ -40,10 +41,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 12,
     alignItems: "center",
-    shadowColor: "#000000",
-    shadowOffset: { width: 1, height: 10 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
     width: 120,
     margin:6,
   },

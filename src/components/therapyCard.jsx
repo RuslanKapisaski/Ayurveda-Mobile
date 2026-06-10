@@ -7,68 +7,77 @@ export default function TherapyCard({ therapy, onPress }) {
   const { theme } = useTheme();
 
   return (
-    <TouchableOpacity
-      style={[styles.card, { backgroundColor: theme.colors.cardColor }]}
-      onPress={onPress}
-      activeOpacity={0.9}
-    >
-      {therapy.imageUrl ? (
-        <Image
-        source={{ uri: therapy.imageUrl }} 
-        style={styles.image}
-        contentFit="cover"
-        cachePolicy={'memory-disk'}
-        transition={200} />
-      ) : (
-        <View
-          style={[
-            styles.placeholder,
-            { backgroundColor: theme.colors.placeholderBackground },
-          ]}
-        >
-          <Ionicons name="leaf-outline" size={28} color="#118161" />
-        </View>
-      )}
+    <View style={[styles.cardWrapper, theme.shadows.medium]}>
+      <TouchableOpacity
+        style={[styles.card, { backgroundColor: theme.colors.cardColor }]}
+        onPress={onPress}
+        activeOpacity={0.9}
+      >
+        {therapy.imageUrl ? (
+          <Image
+            source={{ uri: therapy.imageUrl }}
+            style={styles.image}
+            contentFit="cover"
+            cachePolicy="memory-disk"
+            transition={200}
+          />
+        ) : (
+          <View
+            style={[
+              styles.placeholder,
+              { backgroundColor: theme.colors.secondary },
+            ]}
+          >
+            <Ionicons
+              name="leaf-outline"
+              size={28}
+              color={theme.colors.primary}
+            />
+          </View>
+        )}
 
-      <View style={styles.content}>
-        <Text style={[styles.title, { color: theme.colors.text }]}>
-          {therapy.name}
-        </Text>
+        <View style={styles.content}>
+          <Text style={[styles.title, { color: theme.colors.text }]}>
+            {therapy.name}
+          </Text>
 
-        <Text
-          style={[styles.description, { color: theme.colors.text }]}
-          numberOfLines={2}
-        >
-          {therapy.shortDescription}
-        </Text>
+          <Text
+            style={[styles.description, { color: theme.colors.text }]}
+            numberOfLines={2}
+          >
+            {therapy.shortDescription}
+          </Text>
 
-        <View style={styles.footer}>
-          <View style={styles.info}>
-            <Ionicons name="time-outline" size={14} color="#666" />
-            <Text style={[styles.metaText, { color: theme.colors.text }]}>
-              {therapy.durationMinutes} min
+          <View style={styles.footer}>
+            <View style={styles.info}>
+              <Ionicons
+                name="time-outline"
+                size={14}
+                color={theme.colors.textMuted}
+              />
+              <Text style={[styles.metaText, { color: theme.colors.textMuted }]}>
+                {therapy.durationMinutes} min
+              </Text>
+            </View>
+
+            <Text style={[styles.price, { color: theme.colors.primary }]}>
+              {therapy.price} €
             </Text>
           </View>
-
-          <Text style={[styles.price, { color: theme.colors.text }]}>
-            {therapy.price} €
-          </Text>
         </View>
-      </View>
-    </TouchableOpacity>
+      </TouchableOpacity>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  card: {
+  cardWrapper: {
     borderRadius: 16,
     marginBottom: 16,
+  },
+  card: {
+    borderRadius: 16,
     overflow: "hidden",
-    elevation: 3,
-    shadowColor: "#000",
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 4 },
   },
   image: {
     width: "100%",
@@ -106,6 +115,6 @@ const styles = StyleSheet.create({
   },
   price: {
     fontSize: 15,
-    fontWeight: "400",
+    fontWeight: "600",
   },
 });

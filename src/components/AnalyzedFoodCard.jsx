@@ -37,7 +37,7 @@ export default function AnalyzedFoodCard({
     const properties = scanResult?.properties || [];
 
     return (
-        <View style={[styles.card, { backgroundColor: theme.colors.cardColor }]}>
+        <View style={[styles.card, theme.shadows.medium, { backgroundColor: theme.colors.cardColor }]}>
 
             <View style={[styles.header, { borderBottomColor: theme.colors.border }]}>
                 <Image
@@ -148,7 +148,7 @@ export default function AnalyzedFoodCard({
             {!readOnly && <View style={styles.previewActions}>
                 <TouchableOpacity
                     onPress={onCancel}
-                    style={[styles.actionButton, { backgroundColor: theme.colors.background }]}
+                    style={[styles.actionButton, theme.shadows.large, { backgroundColor: theme.colors.background }]}
                     disabled={saving}
                 >
                     <Ionicons
@@ -161,7 +161,7 @@ export default function AnalyzedFoodCard({
 
                 <TouchableOpacity
                     onPress={onAddToMeals}
-                    style={[styles.actionButton, { backgroundColor: theme.colors.background }]}
+                    style={[styles.actionButton, theme.shadows.large, { backgroundColor: theme.colors.background }]}
                     disabled={saving}
                 >
                     <Ionicons
@@ -183,11 +183,6 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         overflow: "scroll",
         margin: "auto",
-        shadowColor: "#000000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.3,
-        shadowRadius: 12,
-        elevation: 4,
         marginBottom: 10,
     },
     contentText: {
@@ -321,10 +316,6 @@ const styles = StyleSheet.create({
         marginBottom: 28,
         marginHorizontal: 16,
         borderRadius: 20,
-        shadowColor: "#000000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
     },
 
     actionText: {

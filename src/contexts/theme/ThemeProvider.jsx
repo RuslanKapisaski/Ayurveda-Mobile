@@ -1,6 +1,8 @@
 import { createContext, useMemo, useState } from "react";
 import { Platform } from "react-native";
 import { DefaultTheme, DarkTheme } from "@react-navigation/native";
+import { createShadow } from "../../utils/createShadow";
+
 
 export const ThemeContext = createContext(null);
 
@@ -14,16 +16,21 @@ export default function ThemeProvider({ children }) {
       colors: {
         ...DefaultTheme.colors,
         primary: "#4A7C59",
-        secondary: "#dcf9e1d6",
+        secondary: "#e2f0e5d6",
         cardColor: "#ffffff",
         background: "#ecf0ea",
         header: "#4A7C59",
         text: "#035910",
-        buttonText:"#fff"
+        buttonText: "#fff",
+      },
+      shadows: {
+        small: createShadow("#000", 0.1, 2),
+        medium: createShadow("#000", 0.15, 4),
+        large: createShadow("#000", 0.25, 8),
       },
       fonts: Platform.select({
         ios: "San Francisco",
-        android: "Robboto",
+        android: "Roboto",
         default: "System",
       }),
     }),
@@ -39,32 +46,36 @@ export default function ThemeProvider({ children }) {
         background: "#303030",
         cardColor: "#4e4e4e",
         primary: "#c25555",
-        secondary: "#00da91",
+        secondary: "#030303",
         header: "#000000",
         text: "#ffffff",
         buttonText: "#fff",
       },
+      shadows: {
+        small: createShadow("#000", 0.3, 2),  
+        medium: createShadow("#000", 0.4, 4),
+        large: createShadow("#000", 0.6, 8),
+      },
       fonts: Platform.select({
         ios: "San Francisco",
-        android: "Robboto",
+        android: "Roboto",
         default: "System",
       }),
     }),
     [],
   );
 
-  const toggleTheme = () => {
-    setIsDarkMode((prevMode) => !prevMode);
-  };
+  const toggleTheme = () => setIsDarkMode((prev) => !prev);
 
-  const contextValue = {
-    setIsDarkMode,
-    toggleTheme,
-    isDarkMode,
-    theme: isDarkMode ? darkTheme : lightTheme,
-  };
   return (
-    <ThemeContext.Provider value={contextValue}>
+    <ThemeContext.Provider
+      value={{
+        isDarkMode,
+        toggleTheme,
+        setIsDarkMode,
+        theme: isDarkMode ? darkTheme : lightTheme,
+      }}
+    >
       {children}
     </ThemeContext.Provider>
   );

@@ -126,7 +126,7 @@ export default function HistoryCard({ item, formatDate }) {
   };
 
   return (
-    <View style={[styles.card, { backgroundColor: theme.colors.cardColor }]}>
+    <View style={[styles.card, theme.shadows.large, { backgroundColor: theme.colors.cardColor }]}>
       {renderContent()}
     </View>
   );

@@ -1,5 +1,6 @@
 import { CameraView, useCameraPermissions } from "expo-camera";
-import * as ImagePicker from "expo-image-picker";import { useRef, useState } from "react";
+import * as ImagePicker from "expo-image-picker"; 
+import { useRef, useState } from "react";
 import {
     View, Text, TouchableOpacity, StyleSheet,
     ActivityIndicator, Image, ScrollView,
@@ -9,7 +10,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../../contexts/theme/useTheme";
 import useAuth from "../../contexts/auth/useAuth";
 import Button from "../../components/Button";
-import AnalyzedFoodCard from "../../components/AnalyzedFoodCard";
 
 const API_URL = "https://ayurveda-lens-api.onrender.com/api/scan";
 
@@ -19,7 +19,6 @@ export default function ScanScreen({ navigation }) {
     const [permission, requestPermission] = useCameraPermissions();
     const [image, setImage] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [result, setResult] = useState(null);
     const [cameraOpen, setCameraOpen] = useState(false);
     const cameraRef = useRef(null);
 
@@ -39,28 +38,27 @@ export default function ScanScreen({ navigation }) {
             alert("Camera error: " + error.message);
         }
     };
+    
+    const handleImagePicker = async () => {
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync(); // gallery, not camera
 
-const handleImagePicker = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync(); // gallery, not camera
+        if (status !== "granted") {
+            alert("Gallery permission is required to pick an image.");
+            return;
+        }
 
-    if (status !== "granted") {
-        alert("Gallery permission is required to pick an image.");
-        return;
-    }
+        const pickerResult = await ImagePicker.launchImageLibraryAsync({
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 0.7,
+        });
 
-    const pickerResult = await ImagePicker.launchImageLibraryAsync({
-        allowsEditing: true,
-        aspect: [4, 3],
-        quality: 0.7,
-    });
-
-    if (!pickerResult.canceled) {
-        setImage(pickerResult.assets[0].uri);
-    }
-};
+        if (!pickerResult.canceled) {
+            setImage(pickerResult.assets[0].uri);
+        }
+    };
     const analyzeFood = async (uri) => {
         setLoading(true);
-        setResult(null);
 
         try {
             const formData = new FormData();
@@ -74,7 +72,7 @@ const handleImagePicker = async () => {
             const controller = new AbortController()
             const timeout = setTimeout(() => {
                 controller.abort()
-            }, 30000)
+            }, 60000)
 
             const response = await fetch(API_URL, {
                 method: "POST",
@@ -106,7 +104,12 @@ const handleImagePicker = async () => {
             navigation.navigate("Analyze", { scanResult: { ...data, uri: uri } })
 
         } catch (error) {
-            alert("Error: " + error.message);
+            if (error.name === "AbortError") {
+                alert("The AI service is starting. Please try again in a few seconds.");
+            } else {
+                alert("Error: " + error.message)
+            }
+                return;
         } finally {
             setLoading(false);
         }
@@ -188,6 +191,7 @@ const handleImagePicker = async () => {
                         <TouchableOpacity
                             style={[
                                 styles.scanButton,
+                                theme.shadows.large,
                                 { backgroundColor: theme.colors.primary },
                             ]}
                             onPress={() => setCameraOpen(true)}
@@ -198,6 +202,7 @@ const handleImagePicker = async () => {
                         <TouchableOpacity
                             style={[
                                 styles.scanButton,
+                                 theme.shadows.large,
                                 { backgroundColor: theme.colors.primary },
                             ]}
                             onPress={handleImagePicker}
@@ -208,7 +213,7 @@ const handleImagePicker = async () => {
                     </View>
                 </View>
             ) : (
-                <View style={[styles.imageSection, { backgroundColor: theme.colors.card }]}>
+                <View style={[styles.imageSection, theme.shadows.large, { backgroundColor: theme.colors.card }]}>
                     <Text style={[styles.title, { color: theme.colors.primary }]}>
                         Your Image
                     </Text>
@@ -223,7 +228,6 @@ const handleImagePicker = async () => {
                         <TouchableOpacity
                             onPress={() => {
                                 setImage(null);
-                                setResult(null);
                             }}
                             style={styles.actionButton}
                             disabled={loading}
@@ -260,8 +264,6 @@ const handleImagePicker = async () => {
                     </Text>
                 </View>
             )}
-
-            {result && <AnalyzedFoodCard result={result} />}
         </ScrollView>
     );
 }
@@ -315,10 +317,6 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         width: "40%",
         minHeight: 100,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 6 },
-        shadowOpacity: 0.18,
-        shadowRadius: 10,
         elevation: 6,
     },
 
@@ -335,10 +333,6 @@ const styles = StyleSheet.create({
         alignItems: "center",
         padding: 18,
         borderRadius: 28,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 6 },
-        shadowOpacity: 0.12,
-        shadowRadius: 12,
         elevation: 5,
     },
 

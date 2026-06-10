@@ -134,7 +134,7 @@ export default function ProfileScreen() {
       </View>
 
       {/* User Information Section */}
-      <View style={[styles.card, { backgroundColor: theme.colors.cardColor }]}>
+      <View style={[styles.card, theme.shadows.medium, { backgroundColor: theme.colors.cardColor }]}>
         <Text style={[styles.cardTitle, { color: theme.colors.text }]}>
           User Information
         </Text>
@@ -161,7 +161,7 @@ export default function ProfileScreen() {
       </View>
 
       {/* Allergies Section */}
-      <View style={[styles.card, { backgroundColor: theme.colors.cardColor }]}>
+      <View style={[styles.card, theme.shadows.medium,  { backgroundColor: theme.colors.cardColor }]}>
         <Text style={[styles.cardTitle, { color: theme.colors.text }]}>
           Allergies
         </Text>
@@ -199,7 +199,7 @@ export default function ProfileScreen() {
 
         <TouchableOpacity
           onPress={handleEditAllergies}
-          style={[styles.editButton, { backgroundColor: theme.colors.primary }]}
+          style={[styles.editButton, theme.shadows.medium, { backgroundColor: theme.colors.primary }]}
         >
           <Text style={styles.editButtonText}>
             {editingAllergies ? "Save" : "Edit"}
@@ -208,7 +208,7 @@ export default function ProfileScreen() {
       </View>
 
       {/* Goals Section */}
-      <View style={[styles.card, { backgroundColor: theme.colors.cardColor }]}>
+      <View style={[styles.card, theme.shadows.medium, { backgroundColor: theme.colors.cardColor }]}>
         <Text style={[styles.cardTitle, { color: theme.colors.text }]}>
           Goals
         </Text>
@@ -230,7 +230,7 @@ export default function ProfileScreen() {
       </View>
 
       {/* History Section */}
-      <View style={[styles.card, { backgroundColor: theme.colors.cardColor }]}>
+      <View style={[styles.card, theme.shadows.medium, { backgroundColor: theme.colors.cardColor }]}>
         <Text style={[styles.cardTitle, { color: theme.colors.text }]}>
           History of appointments
         </Text>
@@ -252,6 +252,7 @@ export default function ProfileScreen() {
             onPress={handleLogout}
             style={[
               styles.logoutButton,
+              theme.shadows.large, 
               { backgroundColor: theme.colors.primary },
             ]}
           >
@@ -295,11 +296,6 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     padding: 20,
     borderRadius: 12,
-    elevation: 5,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
   },
   cardTitle: {
     fontSize: 18,

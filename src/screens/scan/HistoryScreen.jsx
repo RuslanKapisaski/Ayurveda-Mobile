@@ -14,11 +14,8 @@ export default function HistoryScreen({navigation}) {
     const { user } = useAuth()
     const { scans, loadScans, isLoading, error } = useFetchHistoryScans(user.id)
 
-    //    const {loadUserData} = useFetchUserData(user.id)
-
     useEffect(() => {
         loadScans()
-        // loadUserData()
     }, [user.id])
 
 

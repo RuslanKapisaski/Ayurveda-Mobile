@@ -7,7 +7,7 @@ export default function ProgramCard({ program, onPress }) {
 
   return (
     <TouchableOpacity
-      style={[styles.card, { backgroundColor: theme.colors.cardColor }]}
+      style={[styles.card, theme.shadows.large, { backgroundColor: theme.colors.cardColor }]}
       onPress={onPress}
     >
       {program.imageUrl ? (
@@ -46,11 +46,6 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 16,
     marginBottom: 20,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 4,
   },
   image: {
     width: "100%",

@@ -77,7 +77,7 @@ export default function HomeScreen({ navigation }) {
       contentContainerStyle={styles.content}
     >
       {/* Upcoming Appointments */}
-      <View style={[styles.cardContainer, { backgroundColor: theme.colors.cardColor }]}>
+      <View style={[styles.cardContainer, theme.shadows.medium, { backgroundColor: theme.colors.cardColor }]}>
         <Text style={[styles.cardTitle, { color: theme.colors.text }]}>
           Upcoming Appointments
         </Text>
@@ -99,7 +99,7 @@ export default function HomeScreen({ navigation }) {
       </View>
 
       {/* Daily Recommendations */}
-      <View style={[styles.cardContainer, { backgroundColor: theme.colors.cardColor }]}>
+      <View style={[styles.cardContainer,theme.shadows.medium, { backgroundColor: theme.colors.cardColor }]}>
         <Text style={[styles.cardTitle, { color: theme.colors.text }]}>
           Daily Recommendations
         </Text>
@@ -126,32 +126,35 @@ export default function HomeScreen({ navigation }) {
       </View>
 
       {/* Progress */}
-      <View style={[styles.cardContainer, { backgroundColor: theme.colors.cardColor }]}>
+      <View style={[styles.cardContainer, theme.shadows.medium, { backgroundColor: theme.colors.cardColor }]}>
         <Text style={[styles.cardTitle, { color: theme.colors.text, marginHorizontal: 16 }]}>
           Your Progress
         </Text>
         <View style={styles.progressContainer}>
-          <View style={[styles.progressBox, { backgroundColor: theme.colors.cardColor }]}>
+          <View style={[styles.progressBox, theme.shadows.large, { backgroundColor: theme.colors.cardColor }]}>
             <Text style={[styles.progressNumber, { color: theme.colors.text }]}>
               {counts.therapies}
             </Text>
             <Text style={[styles.progressLabel, { color: theme.colors.text }]}>Therapies</Text>
           </View>
 
-          <View style={[styles.progressBox, { backgroundColor: theme.colors.cardColor }]}>
+          <View style={[styles.progressBox, theme.shadows.large,{ backgroundColor: theme.colors.cardColor }]}>
             <Text style={[styles.progressNumber, { color: theme.colors.text }]}>
               {counts.programs}
             </Text>
             <Text style={[styles.progressLabel, { color: theme.colors.text }]}>Programs</Text>
           </View>
 
-          <View style={[styles.progressBox, { backgroundColor: theme.colors.cardColor }]}>
+          <View style={[styles.progressBox, theme.shadows.large,{ backgroundColor: theme.colors.cardColor }]}>
             <Text style={[styles.progressNumber, { color: theme.colors.text }]}>
               {counts.checkups}
             </Text>
             <Text style={[styles.progressLabel, { color: theme.colors.text }]}>Checkups</Text>
           </View>
         </View>
+                 <Text style={[styles.cardSubTitle, { color: theme.colors.text }]}>
+          Your count of activities 
+        </Text>
       </View>
       <Button
         text="Book Consultation"
@@ -179,10 +182,6 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     width: "95%",
     elevation: 5,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
   },
   cardTitle: {
     fontSize: 22,
@@ -210,10 +209,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     elevation: 5,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.4,
-    shadowRadius: 4,
   },
   progressNumber: {
     fontSize: 18,

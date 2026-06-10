@@ -6,7 +6,7 @@ export default function RecommenationCard({ title, category, description }) {
     const { theme } = useTheme()
 
     return (
-        <View style={[styles.card, { backgroundColor: theme.colors.cardColor }]}>
+        <View style={[styles.card, theme.shadows.medium, { backgroundColor: theme.colors.cardColor }]}>
             <View style={[styles.categoryBubble, { backgroundColor: theme.colors.primary }]}>
                 <Text style={[styles.categoryTitle]}>{category}</Text>
             </View>
@@ -28,11 +28,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 8,
         borderTopLeftRadius: 60,
         borderBottomRightRadius: 60,
-        shadowColor: "#000000",
-        shadowOffset: { width: 2, height:8},
-        shadowOpacity: 0.4,
-        shadowRadius: 8,
-        elevation: 4, 
     },
     cardTitle:{
         marginTop:20,

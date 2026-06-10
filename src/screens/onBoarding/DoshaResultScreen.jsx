@@ -4,10 +4,12 @@ import Button from "../../components/Button";
 
 import * as onBoardingService from "../../services/onBoardingService";
 import useAuth from "../../contexts/auth/useAuth";
+import { useTheme } from "../../contexts/theme/useTheme";
 
 const { width } = Dimensions.get("window");
 
 export default function DoshaResultScreen({ route, navigation }) {
+  const {theme} = useTheme()
   const { dominantDosha, percentages } = route.params;
   const { user, setUser } = useAuth();
 
@@ -83,7 +85,7 @@ export default function DoshaResultScreen({ route, navigation }) {
 
   return (
     <View style={styles.container}>
-      <View style={styles.card}>
+      <View style={[styles.card, theme.shadows.medium]}>
         <Text style={styles.title}>Your Dosha Result</Text>
 
         <Text style={styles.subtitle}>Discover your energetic balance</Text>
@@ -131,10 +133,6 @@ const styles = StyleSheet.create({
     borderRadius: 28,
     padding: 28,
     marginTop: 50,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.08,
-    shadowRadius: 25,
     elevation: 6,
   },
 

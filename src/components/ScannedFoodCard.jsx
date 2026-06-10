@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet } from "react-native"
+import { View, Text, StyleSheet, Pressable } from "react-native"
 import { Image } from "expo-image"
 import { useTheme } from "../contexts/theme/useTheme"
 import { Ionicons } from "@expo/vector-icons"
@@ -10,11 +10,14 @@ const doshaColor = {
     avoid: { bg: "#fcebeb", text: "#a32d2d" },
 }
 
-export default function ScannedFoodCard({ data, userDosha }) {
+
+export default function ScannedFoodCard({ data, userDosha, onPress }) {
     const { theme } = useTheme()
 
 
-    const userDoshaRecommendation = userDosha
+    const isFeedback = data.type === "feedback"
+
+    const userDoshaRecommendation = userDosha && !isFeedback
         ? data.dosha?.[userDosha.toLowerCase()]
         : null
 
@@ -23,14 +26,13 @@ export default function ScannedFoodCard({ data, userDosha }) {
         : "—"
 
     return (
-        <View style={[styles.card, { backgroundColor: theme.colors.card }]}>
-
+        <Pressable onPress={onPress} style={[styles.card, theme.shadows.medium, { backgroundColor: theme.colors.cardColor }]}>
             <View style={styles.row}>
                 <Image
-                    source={{ uri: data.imageUrl }}
+                    source={{ uri: data.imageUrl || data.uri }}
                     style={styles.image}
-                    contentFit={'cover'}
-                    cachePolicy={'memory-disk'}
+                    contentFit="cover"
+                    cachePolicy="memory-disk"
                     transition={300}
                 />
 
@@ -38,30 +40,33 @@ export default function ScannedFoodCard({ data, userDosha }) {
                     <Text style={[styles.foodName, { color: theme.colors.text }]}>
                         {data.food}
                     </Text>
+
+                    {isFeedback && (
+                        <View style={styles.feedbackBadge}>
+                            <Text style={styles.feedbackBadgeText}>User corrected</Text>
+                        </View>
+                    )}
+
                     <Text style={[styles.date, { color: theme.colors.text }]}>
                         Date: {date}
                     </Text>
                 </View>
 
-                <Text style={[styles.confidence, { color: theme.colors.buttonText, backgroundColor: theme.colors.primary }]}>
-                    {Math.round(data.confidence)}% match
-                </Text>
+                {!isFeedback && (
+                    <Text style={[styles.confidence, theme.shadows.large, { color: theme.colors.buttonText, backgroundColor: theme.colors.primary }]}>
+                        {Math.round(data.confidence)}% match
+                    </Text>
+                )}
 
                 {userDoshaRecommendation && (
-                    <View style={[
-                        styles.doshaBadge,
-                        { backgroundColor: doshaColor[userDoshaRecommendation]?.bg || "#eee" }
-                    ]}>
-                        <Text style={[
-                            styles.doshaBadgeText,
-                            { color: doshaColor[userDoshaRecommendation]?.text || "#888" }
-                        ]}>
+                    <View style={[styles.doshaBadge, { backgroundColor: doshaColor[userDoshaRecommendation]?.bg || "#eee" }]}>
+                        <Text style={[styles.doshaBadgeText, { color: doshaColor[userDoshaRecommendation]?.text || "#888" }]}>
                             {userDoshaRecommendation}
                         </Text>
                     </View>
                 )}
             </View>
-        </View>
+        </Pressable>
     )
 }
 
@@ -71,15 +76,6 @@ const styles = StyleSheet.create({
         padding: 12,
         marginVertical: 4,
         marginHorizontal: 8,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.06,
-        shadowRadius: 8,
-        elevation: 2,
-        shadowColor: "#787070",
-        elevation: 4,
-        shadowOffset: { width: 10, height: 10 },
-        shadowOpacity: 0.3,
     },
     row: {
         flexDirection: "row",
@@ -114,10 +110,6 @@ const styles = StyleSheet.create({
         height: 60,
         borderRadius: 40,
         alignSelf: "flex-start",
-        shadowColor: "#787070",
-        elevation: 4,
-        shadowOffset: { width: 10, height: 10 },
-        shadowOpacity: 0.3,
     },
     doshaBadge: {
         borderRadius: 20,
@@ -126,6 +118,19 @@ const styles = StyleSheet.create({
     },
     doshaBadgeText: {
         fontSize: 12,
+        fontWeight: "500",
+    },
+        feedbackBadge: {
+        backgroundColor: "#faeeda",
+        borderRadius: 8,
+        paddingHorizontal: 8,
+        paddingVertical: 2,
+        alignSelf: "flex-start",
+        marginVertical: 4,
+    },
+    feedbackBadgeText: {
+        fontSize: 11,
+        color: "#854f0b",
         fontWeight: "500",
     },
 })
