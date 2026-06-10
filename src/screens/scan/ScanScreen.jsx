@@ -1,5 +1,5 @@
 import { CameraView, useCameraPermissions } from "expo-camera";
-import { useRef, useState } from "react";
+import * as ImagePicker from "expo-image-picker";import { useRef, useState } from "react";
 import {
     View, Text, TouchableOpacity, StyleSheet,
     ActivityIndicator, Image, ScrollView,
@@ -40,6 +40,24 @@ export default function ScanScreen({ navigation }) {
         }
     };
 
+const handleImagePicker = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync(); // gallery, not camera
+
+    if (status !== "granted") {
+        alert("Gallery permission is required to pick an image.");
+        return;
+    }
+
+    const pickerResult = await ImagePicker.launchImageLibraryAsync({
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 0.7,
+    });
+
+    if (!pickerResult.canceled) {
+        setImage(pickerResult.assets[0].uri);
+    }
+};
     const analyzeFood = async (uri) => {
         setLoading(true);
         setResult(null);
@@ -163,19 +181,31 @@ export default function ScanScreen({ navigation }) {
                     </Text>
 
                     <Text style={[styles.subtitle, { color: theme.colors.text }]}>
-                        Take a picture of food and receive ayurvedic recommendations.
+                        Show a picture of food and receive ayurvedic recommendations based on your dosha.
                     </Text>
 
-                    <TouchableOpacity
-                        style={[
-                            styles.scanButton,
-                            { backgroundColor: theme.colors.primary },
-                        ]}
-                        onPress={() => setCameraOpen(true)}
-                    >
-                        <Ionicons name="scan-circle" size={64} color="#fff" />
-                        <Text style={styles.scanButtonText}>Scan food</Text>
-                    </TouchableOpacity>
+                    <View style={styles.buttonSection}>
+                        <TouchableOpacity
+                            style={[
+                                styles.scanButton,
+                                { backgroundColor: theme.colors.primary },
+                            ]}
+                            onPress={() => setCameraOpen(true)}
+                        >
+                            <Ionicons name="scan-circle" size={64} color="#fff" />
+                            <Text style={styles.scanButtonText}>Scan food</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={[
+                                styles.scanButton,
+                                { backgroundColor: theme.colors.primary },
+                            ]}
+                            onPress={handleImagePicker}
+                        >
+                            <Ionicons name="images-outline" size={64} color="#fff" />
+                            <Text style={styles.scanButtonText}>Take from gallery</Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
             ) : (
                 <View style={[styles.imageSection, { backgroundColor: theme.colors.card }]}>
@@ -266,20 +296,25 @@ const styles = StyleSheet.create({
         lineHeight: 22,
         maxWidth: 310,
     },
-
     foodScannerSection: {
         width: "100%",
         alignItems: "center",
+        justifyContent: "center",
     },
+    buttonSection: {
+        width: "100%",
+        flexDirection: "row",
+        justifyContent: "space-around"
 
+    },
     scanButton: {
         borderRadius: 24,
-        paddingVertical: 34,
-        paddingHorizontal: 28,
+        paddingVertical: 14,
+        paddingHorizontal: 18,
         alignItems: "center",
         justifyContent: "center",
-        width: "85%",
-        minHeight: 170,
+        width: "40%",
+        minHeight: 100,
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 6 },
         shadowOpacity: 0.18,
@@ -289,9 +324,10 @@ const styles = StyleSheet.create({
 
     scanButtonText: {
         color: "#fff",
-        fontSize: 18,
+        fontSize: 14,
         fontWeight: "600",
         marginTop: 8,
+        textAlign: "center"
     },
 
     imageSection: {
