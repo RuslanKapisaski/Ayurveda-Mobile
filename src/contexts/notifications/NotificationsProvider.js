@@ -11,9 +11,11 @@ import {
     cancelScheduledNotificationAsync,
     SchedulableTriggerInputTypes,
 } from "expo-notifications"
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Device from "expo-device"
 import { Platform } from "react-native";
 import { NotificationContext } from "./NotificationContext"
+import { navigationRef } from "../../navigation/navigationRef";
 
 setNotificationHandler({
     handleNotification: async () => ({
@@ -45,9 +47,27 @@ export function NotificationsProvider({ children }) {
 
         responseListener.current = addNotificationResponseReceivedListener(
             (response) => {
-                console.log("Notification tapped: ", response)
+                const data = response.notification.request.content.data;
+
+                console.log("Notification tapped: ", data);
+
+                if (!navigationRef.isReady()) return;
+
+                if (data.type === "daily_recommendation_reminder") {
+                    navigationRef.navigate("HomeScreen");
+                }
+
+                if (data.type === "appointment_reminder") {
+                    navigationRef.navigate("HomeScreen");
+                }
+
+                if (data.type === "checkup_follow_up") {
+                    navigationRef.navigate("HomeScreen", {
+                        screen: "Checkup",
+                    });
+                }
             }
-        )
+        );
 
 
         return () => {
@@ -131,7 +151,7 @@ export function NotificationsProvider({ children }) {
                 date: reminderDate,
             };
         }
-        
+
         return await sendLocalNotification(
             "Upcoming appointment",
             `You have Ayurveda ${type} tommorow.`,
@@ -140,6 +160,35 @@ export function NotificationsProvider({ children }) {
                 type: "appointment_reminder",
             }
         );
+    };
+
+    const scheduleRecommendationsReminder = async () => {
+        const existingId = await AsyncStorage.getItem("dailyRecommendationNotificationId");
+
+        if (existingId) {
+            return existingId;
+        }
+
+        const notificationId = await sendLocalNotification(
+            "Daily Ayurveda recommendation",
+            "Your personalized recommendation for today is ready.",
+            {
+                type: SchedulableTriggerInputTypes.CALENDAR,
+                hour: 9,
+                minute: 0,
+                repeats: true,
+            },
+            {
+                type: "daily_recommendation_reminder",
+            }
+        );
+
+        await AsyncStorage.setItem(
+            "dailyRecommendationNotificationId",
+            notificationId
+        );
+
+        return notificationId;
     };
 
     const cancelNotification = async (notificationId) => {
@@ -157,7 +206,7 @@ export function NotificationsProvider({ children }) {
                 scheduleAppointmentReminder,
                 cancelNotification,
                 scheduleCheckupFollowUpReminder,
-
+                scheduleRecommendationsReminder,
             }}
         >
             {children}

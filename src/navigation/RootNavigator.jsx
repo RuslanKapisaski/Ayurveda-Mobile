@@ -1,6 +1,6 @@
 import { ActivityIndicator, StatusBar } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
-
+import { navigationRef } from "./navigationRef";
 import AppNavigator from "./AppNavigator";
 import OnBoardingNavigator from "./OnBoardingNavigator";
 import AuthNavigator from "./AuthNavigator";
@@ -12,7 +12,7 @@ export default function RootNavigator() {
   const { theme, isDarkMode } = useTheme();
 
   return (
-    <NavigationContainer theme={theme}>
+    <NavigationContainer theme={theme} ref={navigationRef}>
       <StatusBar style={isDarkMode ? "light" : "dark"} />
       {!isAuthenticated ? (
         <AuthNavigator />
