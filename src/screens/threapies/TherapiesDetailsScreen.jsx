@@ -176,7 +176,8 @@ const styles = StyleSheet.create({
   },
   signUpButton: {
     marginBottom: 40,
-    alignItems: "center",
+    minWidth:'60%',
+    alignSelf:"center",
   },
   signUpButtonText: {
     color: "#fff",

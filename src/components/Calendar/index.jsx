@@ -75,14 +75,9 @@ export default function Calendar({
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity
-        onPress={() => setShow(true)}
-        style={[styles.dateBtn, { backgroundColor: theme.colors.primary }]}
-      >
-        <Text style={{ color: theme.colors.buttonText }}>Select date</Text>
-      </TouchableOpacity>
+    
 
-      {show && (
+      {show ? (
         <DateTimePicker
           value={date}
           mode="date"
@@ -90,7 +85,12 @@ export default function Calendar({
           onChange={onChange}
           minimumDate={new Date()}
         />
-      )}
+      ):  <TouchableOpacity
+        onPress={() => setShow(true)}
+        style={[styles.dateBtn, { backgroundColor: theme.colors.primary }]}
+      >
+        <Text style={{ color: theme.colors.buttonText }}>Select date</Text>
+      </TouchableOpacity>}
 
       {hasSelectedDate && (
         <>

@@ -38,9 +38,9 @@ export default function ScanScreen({ navigation }) {
             alert("Camera error: " + error.message);
         }
     };
-    
+
     const handleImagePicker = async () => {
-        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync(); // gallery, not camera
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync(); 
 
         if (status !== "granted") {
             alert("Gallery permission is required to pick an image.");

@@ -16,6 +16,7 @@ export default function HistoryDetailsScreen({ route }) {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
+    padding: 14,
+    top:"10%",
   },
 });

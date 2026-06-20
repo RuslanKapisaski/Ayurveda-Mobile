@@ -99,7 +99,7 @@ export default function HomeScreen({ navigation }) {
       </View>
 
       {/* Daily Recommendations */}
-      <View style={[styles.cardContainer,theme.shadows.medium, { backgroundColor: theme.colors.cardColor }]}>
+      <View style={[styles.cardContainer, theme.shadows.medium, { backgroundColor: theme.colors.cardColor }]}>
         <Text style={[styles.cardTitle, { color: theme.colors.text }]}>
           Daily Recommendations
         </Text>
@@ -138,22 +138,22 @@ export default function HomeScreen({ navigation }) {
             <Text style={[styles.progressLabel, { color: theme.colors.text }]}>Therapies</Text>
           </View>
 
-          <View style={[styles.progressBox, theme.shadows.large,{ backgroundColor: theme.colors.cardColor }]}>
+          <View style={[styles.progressBox, theme.shadows.large, { backgroundColor: theme.colors.cardColor }]}>
             <Text style={[styles.progressNumber, { color: theme.colors.text }]}>
               {counts.programs}
             </Text>
             <Text style={[styles.progressLabel, { color: theme.colors.text }]}>Programs</Text>
           </View>
 
-          <View style={[styles.progressBox, theme.shadows.large,{ backgroundColor: theme.colors.cardColor }]}>
+          <View style={[styles.progressBox, theme.shadows.large, { backgroundColor: theme.colors.cardColor }]}>
             <Text style={[styles.progressNumber, { color: theme.colors.text }]}>
               {counts.checkups}
             </Text>
             <Text style={[styles.progressLabel, { color: theme.colors.text }]}>Checkups</Text>
           </View>
         </View>
-                 <Text style={[styles.cardSubTitle, { color: theme.colors.text }]}>
-          Your count of activities 
+        <Text style={[styles.cardSubTitle, { color: theme.colors.text }]}>
+          Your count of activities
         </Text>
       </View>
       <Button

@@ -21,15 +21,7 @@ export default function AppointmentsNavigator() {
           ),
         }}
       />
-      <Stack.Screen
-        name="Edit"
-        component={EditAppointmentsScreen}
-        options={{
-          headerRight: () => (
-            <ThemeButton toggleTheme={toggleTheme} isDark={isDarkMode} />
-          ),
-        }}
-      />
+      
     </Stack.Navigator>
   );
 }
